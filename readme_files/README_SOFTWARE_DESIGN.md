@@ -126,6 +126,14 @@
         A value for date object (e.g. day 16) is a prerequisite for buying and selling products
         and all subsequent use cases below.
 
+        pyt fn:
+        def set_the_date_in_time_range(system_date):
+
+        (super.py abbreviated as s.py so less repetitive typing)
+        shell command plus argparse arguments: 
+        py s.py set_date 4   
+
+
     
     - timetravel in time range.
 
@@ -136,19 +144,60 @@
         Implement Argparse argument 'timetravel' inside a subparsers with a positional argument. 
         (use timedelta from module datetime to implement)
 
+
+        pyt fn: 
+        def timetravel(nr_of_days_to_set_system_date_to_future_or_past):
+
+        shell command plus argparse arguments:
+        (super.py abbreviated as s.py so less repetitive typing)
+        py s.py time_travel -2 
+        legenda:
+        positive nr: to the future
+        negative nr: to the past  
+
+
         Order of events:
         The ability to timetravel must be in place in order to implement any use case that requires
         the presence of a range (e.g. report profit in day range 17 to 43 inclusive). 
 
+
+    
+
     - buy product (and add to bought.csv) 
-        Nun geht es los. With the preparational activities out of the way, buying products can be implemented
-        in its own subparser.
+
+        pyt fn:
+        def buy_product(productType, amountOfUnits, pricePerUnit, boughtDate, expiryDate):
+        
+        shell command plus argparse arguments:
+        py s.py buy apple 9 4.50 16 20 
 
     - sell product (and add to sold.csv)
-        Idem for selling products.
+ 
+        pyt fn:
+        def sell_product(productType, amountOfUnits, pricePerUnit, sellDate):
+        
+        shell command plus argparse arguments:
+        py s.py sell apple 9 13.50 18 
 
     - calculate inventory on day x (in range 1 to 60 inclusive)
+
+        pyt fn:
+        def calculate_inventory(system_date, productType):
+        productType will be positional argument.
+        
+        shell command plus argparse arguments:
+        py s.py show_inventory 18 
+        py s.py show_inventory 18 --productType apple
+
     - calculate expired products on day x (in range 1 to 60 inclusive)
+
+        pyt fn:
+        def calculate_expired_products(system_date, productType):
+        productType will be positional argument.
+        
+        shell command plus argparse arguments:
+        py s.py show_expired 18 
+        py s.py show_expired 18 --productType apple
 
     - calculate sales of number of products (Dutch: afzet). 
         --> serves as input to calculate revenue 
@@ -156,9 +205,27 @@
         at different prices. In that case calculating an average sales price
         would be pointless)
 
+        (skip this)
+
     - report revenue in time range
 
+        pyt fn:
+        def calculate_revenue(system_date, productType):
+        productType will be positional argument.
+        
+        shell command plus argparse arguments:
+        py s.py calc_revenue 18 
+        py s.py calc_revenue 18 --productType apple
+
     - report profit in time range
+
+        pyt fn:
+        def calculate_profit(system_date, productType):
+        productType will be positional argument.
+        
+        shell command plus argparse arguments:
+        py s.py calc_profit 18 
+        py s.py calc_profit 18 --productType apple    
 
     - delete product (e.g. an expired one)
         This is not a requirement. So only implement if there is time left. 
@@ -167,17 +234,36 @@
         it possible to update and correct data. A system does not feel
         complete without this feature. 
 
-4.  create the argparse user interface:
+        pyt fn:
+        def delete_row_in_csv_file_bought(id):
+        
+        shell command plus argparse arguments:
+        py s.py del_bought 43 
+        legenda: delete row from BOUGHT.csv with id 43
+    
+        pyt fn:
+        def delete_row_in_csv_file_sold(id):
+        
+        shell command plus argparse arguments:
+        py s.py del_sold 43  
+        legenda: delete row from SOLD.csv with id 18. 
+
+5.  create the argparse user interface:
     in argparse assign a subparser to each use case from step 3.  
     make choices about positional vs optional arguments, etc.
     Goal: make sure the superpy-app is easy and  intuitive to use.
     The argparse-code itself will be created later on. 
 
-5.  Create testdata
+    status: done. See section  4. above.
+
+6.  Create testdata
      generate automated testdata in bought.csv and sold.csv 
       (erd in previous step must be ready before creating testdata)
     
     The testdata is necessary to work in a TDD-fashion. 
+
+    The testdata is very specific, so I prefer to create it myself, rather than 
+    to create it on e.g. mockaroo.com
 
     table bought.csv:
         Use built-in fn enumerate to dynamically create values for the columns ID.
