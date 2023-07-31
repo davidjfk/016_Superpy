@@ -40,7 +40,7 @@
 
     # Thinking of how to connect csv-tables bought.csv and sold.csv
 
-        -- design idea 1: bought.csv and sold.csv not connected via primary and foreign keys 
+    -- design idea 1: bought.csv and sold.csv not connected via primary and foreign keys 
         (tldr; bad idea for practical coding reasons).
 
         The supermarket strictly uses logistic principle FIFO (first in first out).
@@ -100,9 +100,9 @@
         QED: a lot of work for disconnecting bought.csv from sold.csv in the erd.
 
 
-        -- design idea 2: use primary and foreign key to connect bought.csv and sold.csv (my choice)
-        (continuation)
-        So instead I connect each transaction  in sold.csv via a foreign key in sold.csv to a primary key
+    -- design idea 2: use primary and foreign key to connect bought.csv and sold.csv (my choice)
+        
+        I connect each transaction  in sold.csv via a foreign key in sold.csv to a primary key
         in bought.csv 
 
         That makes it practical for the supermarket to sell products in the same amount they were bought in. 
@@ -132,6 +132,31 @@
         OK
         analysis: 1 orange is bought at a certain price. 
         Both transactions are connected via primary and foreign key. 
+
+        Benefit: the supermarket can buy any type of product. E.g.
+        py s.py buy apple 0.20
+        py s.py buy quinoa 1.20 
+        etc.
+
+        Benefit: for each new buy or sell transaction I can set the price manually. E.g.
+        py s.py buy apple 0.20  (system generates id, e.g. b_194, for appended row in bought.csv)
+
+
+        py.s.py sell s_194 0.50   --> so I refer to the transaction where I bought the apple: e.g. take b_194, then
+                replace the 'b' by 's'. 
+
+        The profit is delta between b_194 and s_194. So here  profit is  0.30 euro.
+
+        Another ex:
+        py s.py buy quinoa 1.20  --> system generates id 'b_188'
+        py s.py sell s_188 0.70
+        
+        (loss: 0.50 euro --> perhaps quinoa is on sale  to attract  customers)
+
+        If you try to sell product that does not exist, e.g. there is no buy-transaction with id b_1004, then 
+        the following argparse command will raise an exception:
+        
+        py.s.py sell s_1004 0.50 
 
 
 # DESIGN
@@ -168,14 +193,27 @@
     Each ID must be unique.
     Each ID must work like a counter.
     Each ID must specify its identity (i.e. tell id in  bought.csv apart from id in sold.csv).
+    Each ID must be brief, because selling a product will look like this:
+
+    py s.py s_8 5.30
+    This means:
+    py = python
+    s = vsCode superpy project = abbreviation of superpy. 
+        Superpy is command line tool and an argparse argument while using this tool.
+        So for the sake of brevity / pleasant user experience I have named the superpy-project itself 's'. 
+    
+    s_8 means: as a supermarket employee I sell the product b_8. b_8 is transaction on row
+        8 in bought.csv.
+    5.30 == the price in euros.
+
     ex: 
-    first buy_transaction gets id bought_1
-    second buy_transaction gets id bought_2
+    first buy_transaction gets id b_1 ( == bought_1 )
+    second buy_transaction gets id b_2
     etc.
 
     idem for sold.csv:
-        sold_1
-        sold_2
+        s_1 ( == sold_1)
+        s_2
         etc.
     
     implement with closure (status: in progress)
@@ -250,7 +288,7 @@
     - buy product (and add to bought.csv) 
 
         pyt fn:
-        def buy_product(productType, pricePerUnit, boughtDate, expiryDate):
+        def buy_product(productType, pricePerUnit, buy_date, expiryDate):
         
         shell command plus argparse arguments:
         py s.py buy apple 4.50 16 20 
@@ -338,7 +376,7 @@
     Goal: make sure the superpy-app is easy and  intuitive to use.
     The argparse-code itself will be created later on. 
 
-    status: done. See section  4. above.
+    status: done. See section  7. above.
 
 9.  Create testdata
      generate automated testdata in bought.csv and sold.csv 
@@ -355,14 +393,15 @@
         Use product-fn from itertools library to create testdata for fields productType and 
         pricePerUnit in table bought.csv
 
-        boughtDate for each buying transaction gets a value in day range 1 to 55 inclusive. 
-        expiryDate is 5 days after boughtDate.
+        buy_date for each buying transaction gets a value in day range 1 to 55 inclusive. 
+        expiryDate is 5 days after buy_date.
 
     table sold.csv:
         sold.csv is a copy of bought.csv
+        For each row in  sold.csv a foreign key refers to primary key in bought.csv
         Each 5th bought product will expire.
         The other products will be sold for 3 times the price it was bought for.        
-        soldDate is 1 day after boughtDate.
+        sold_date is 2 days after buy_date.
 
 
 10.  Implement each use case in its own iteration
