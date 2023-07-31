@@ -37,7 +37,22 @@
 
 
 
-# constants: configurable to get other results in e.g. profit or revenue report, matplotlib graphs, etc.)
+# Configuration settings to get other results in e.g. profit or revenue report, matplotlib graphs, etc.)
+'''
+    set nr of products in supermarket:
+    This variable is an operand in fn product from module itertools.
+    So more products leads to more rows in bought.csv and less products to less rows in bought.csv.
+'''
+nr_of_products_in_supermarket = 3
+
+'''
+    set nr of rows to delete from sold.csv:
+    sold.csv is as a copy of bought.csv. After making the deepcopy, a few changes are made: e.g. make sell_price different (higher) than buy_price, but also delete some rows. Rows that are present in bought.csv, but not in sold.csv, will expire while time traveling.
+    (e.g. if delete_every_nth_row = 2, then every 2nd row will be deleted)
+    (e.g. if delete_every_nth_row = 3, then every 3rd row will be deleted)
+'''
+delete_every_nth_row = 2
+
 # set nr of days between buying and selling a product:
 number_of_days_between_buying_and_selling_a_product = 2
 
@@ -47,15 +62,16 @@ nr_of_days_between_buying_a_product_and_its_expiry_date = 5
 # set price margin for selling a product: 
 # (e.g. if buying price is 3 euro and selling price is 12 euro, then margin is 4)
 # (e.g. if buying price is 2 euro and selling price is 3 euro, then margin is 1.5)
-price_margin = 3
+price_margin_as_mulitplication_factor = 3
 
-# timespan of application is 2 months. 
-# (e.g. if today is 1 january 2021, then timespan is 1 january 2021 to 1 march 2021)
-# to change the timespan, goto utils.py and adjust fn generate_random_date_in_future_in_time_interval_of_2_months()
-# (there is no need to, just for future reference)
+# timespan of application is 2 months:
+'''
+    (e.g. if today is 1 january 2021, then timespan is 1 january 2021 to 1 march 2021)
+    to change the timespan, goto utils.py and adjust fn generate_random_date_in_future_in_time_interval_of_2_months()
+    (there is no need to, just for future reference)
+'''
 
-
-import csv, os, sys
+import csv, os, random, sys
 from itertools import product
 from copy import deepcopy
 
@@ -85,8 +101,14 @@ print('part 1 of 2: create testdata for bought.csv: ')
 # part 1 of 2: create testdata for bought.csv
 
 #math highschool analogy: (5+2)*(3+4) == 5*3 + 5*4 + 2*3 + 2*4
-products = ['apple', 'banana', 'kiwi', 'beans', 'quinoa', 'oats', 'bulgur', 'rice', 'pasta', 'bread']
-amountOfUnits = [1, 2, 3, 4]
+supermarket_products = ['fish', 'rice', 'potatoes', 'quinoa', 'bread', 'carrots', 'chicken', 'beef', 'bulgur', 'tomatoes', 'lettuce', 'beans', 'cheese', 'apple', 'beetroot', 'kiwi', 'onions', 'eggs', 'banana', 'oats', 'milk', 'pasta']
+
+# defensive coding: check if some products are in list more than once:
+supermarket_products = list(set(supermarket_products))
+
+products = random.sample(supermarket_products, nr_of_products_in_supermarket) # see config at start of file to change nr of products in supermarket.
+# products = ['apple', 'banana', 'kiwi', 'beans', 'quinoa', 'oats', 'bulgur', 'rice', 'pasta', 'bread']
+# amountOfUnits = [1, 2, 3, 4] # backlog: perhaps add this later.
 pricePerUnit = [0.50, 1.10, 1.40, 2.50, 3.10, 4.00, 5.20]
 
 boughtProducts = (list(product(products, pricePerUnit)))
@@ -147,27 +169,32 @@ for row in products_with_sold_date:
     row[0] = row[0].replace('b', 's') 
     row.insert(1, row[0].replace('s', 'b'))
     # calculate price_sold: (price_sold = price_bought * 3)
-    row[3] = round(row[3] * price_margin,2) # see config at start of file to set 2nd argument.
+    row[3] = round(row[3] * price_margin_as_mulitplication_factor,2) # see config at start of file to set 2nd argument.
     # set the sold_date to 2 days after bought_date:
     row[4] = add_days_to_date(row[4], number_of_days_between_buying_and_selling_a_product) # see config at start of file to set 2nd argument.
     
 
 
-print('products_with_sold_date: ')
-print(products_with_sold_date)
+
 '''
     no need to sort the list on column date_sold, becaus that was already done in part 1 (on date_bought) and
     date_sold = date_bought + 2. (so they correlate in a linear fashion)
 '''
 
-# delete each 5th list in list: (so each 5th row will expire while time traveling)
-products_with_sold_date = [row for row in products_with_sold_date if int(row[0].split("_")[1]) % 5 != 0]   
+# delete each nth list in list: (so each nth row will expire in sold.csv while time traveling to the future)
+products_with_sold_date = [row for row in products_with_sold_date if int(row[0].split("_")[1]) % delete_every_nth_row != 0]   
+# config variable delete_every_nth_row at beginning of this file.  
 '''
+see config at start of file to set variable delete_every_nth_row.
+
  explanation of 
  e.g. input is 'b_17'. b_17 means: row 17 in bought.csv == transaction nr 17 in bought.csv. b_17 is primary key in bought.csv.
  int(row[0].split("_")[1]) extracts 17 from b_17.
 '''
 # print(products_with_sold_date) # ok
+
+print('products_with_sold_date: ')
+print(products_with_sold_date)
 
 path = os.getcwd()
 #  print(path) # ok

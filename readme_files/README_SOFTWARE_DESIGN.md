@@ -407,7 +407,7 @@
 10.  Implement each use case in its own iteration
     Perform the following steps iteratively for each use case from step 4. above. E.g.:
     a. take the first use case: buy_product (each use case already has a fn-signature at this point)
-    b. create testfn test_buy_product (with testdat from previous step). (goal is to do TDD)
+    b. create testfn test_buy_product (with testdata from previous step). (goal is to do TDD)
         Once completed, all testcases in the testfn are supposed to fail, because the 
         fn-body is still empty at this point. 
 
