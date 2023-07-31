@@ -35,7 +35,27 @@
 
 '''
 
-import csv, os, random, sys
+
+
+# constants: configurable to get other results in e.g. profit or revenue report, matplotlib graphs, etc.)
+# set nr of days between buying and selling a product:
+number_of_days_between_buying_and_selling_a_product = 2
+
+# set nr of days between buying a product and its expiry date:
+nr_of_days_between_buying_a_product_and_its_expiry_date = 5
+
+# set price margin for selling a product: 
+# (e.g. if buying price is 3 euro and selling price is 12 euro, then margin is 4)
+# (e.g. if buying price is 2 euro and selling price is 3 euro, then margin is 1.5)
+price_margin = 3
+
+# timespan of application is 2 months. 
+# (e.g. if today is 1 january 2021, then timespan is 1 january 2021 to 1 march 2021)
+# to change the timespan, goto utils.py and adjust fn generate_random_date_in_future_in_time_interval_of_2_months()
+# (there is no need to, just for future reference)
+
+
+import csv, os, sys
 from itertools import product
 from copy import deepcopy
 
@@ -54,7 +74,9 @@ sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
 '''
 
 # print(sys.path) # ok
+from utils_superpy.utils import generate_random_date_in_future_in_time_interval_of_2_months
 from utils_superpy.utils import make_id_for_each_row_in_csv_file
+from utils_superpy.utils import add_days_to_date
 # print(make_id_for_each_row_in_csv_file('b', 1)()) 
 csv_file_bought_id = make_id_for_each_row_in_csv_file('b', 1) 
 
@@ -71,9 +93,9 @@ boughtProducts = (list(product(products, pricePerUnit)))
 
 products_with_bought_date = []
 for product in boughtProducts:
-    bought_date = random.randint(1, 55) 
+    bought_date = generate_random_date_in_future_in_time_interval_of_2_months()
     # I want all data to stay in the range of 1 to 60.
-    expiry_date = bought_date + 5 # 5 days after bought_date (to keep it simple for now)
+    expiry_date = add_days_to_date(bought_date, nr_of_days_between_buying_a_product_and_its_expiry_date) # see config at start of file to set 2nd argument.
     products_with_bought_date.append(product + (bought_date, expiry_date)) 
     # note to self: tuple concatenation, if needed use comma after expiry_date.
 
@@ -108,7 +130,7 @@ path = os.getcwd()
 path_to_bought_csv = path + '\\create_new_testdata_for_csv_files\\bought.csv'
 with open(path_to_bought_csv, 'w', newline='') as csvfile:    
     writer = csv.writer(csvfile)
-    writer.writerow(['id', 'product', 'price', 'bought_date', 'expiry_date'])
+    writer.writerow(['id', 'product', 'price', 'buy_date', 'expiry_date'])
     writer.writerows(products_with_bought_date) # note to self: writerows() expects a list of lists.
 
 print('----------------------------------')
@@ -125,9 +147,10 @@ for row in products_with_sold_date:
     row[0] = row[0].replace('b', 's') 
     row.insert(1, row[0].replace('s', 'b'))
     # calculate price_sold: (price_sold = price_bought * 3)
-    row[3] = row[3] * 3
+    row[3] = round(row[3] * price_margin,2) # see config at start of file to set 2nd argument.
     # set the sold_date to 2 days after bought_date:
-    row[4] = row[4] + 2
+    row[4] = add_days_to_date(row[4], number_of_days_between_buying_and_selling_a_product) # see config at start of file to set 2nd argument.
+    
 
 
 print('products_with_sold_date: ')

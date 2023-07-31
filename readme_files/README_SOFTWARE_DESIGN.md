@@ -268,7 +268,7 @@
 
 
         pyt fn: 
-        def timetravel(nr_of_days_to_set_system_date_to_future_or_past):
+        def time_travel(nr_of_days_to_set_system_date_to_future_or_past):
 
         shell command plus argparse arguments:
         (super.py abbreviated as s.py so less repetitive typing)
