@@ -43,7 +43,7 @@
     This variable is an operand in fn product from module itertools.
     So more products leads to more rows in bought.csv and less products to less rows in bought.csv.
 '''
-nr_of_products_in_supermarket = 3
+nr_of_products_in_supermarket = 5
 
 '''
     set nr of rows to delete from sold.csv:
@@ -106,7 +106,8 @@ supermarket_products = ['fish', 'rice', 'potatoes', 'quinoa', 'bread', 'carrots'
 # defensive coding: check if some products are in list more than once:
 supermarket_products = list(set(supermarket_products))
 
-products = random.sample(supermarket_products, nr_of_products_in_supermarket) # see config at start of file to change nr of products in supermarket.
+products = random.sample(supermarket_products, nr_of_products_in_supermarket) 
+# see config at start of file to change nr of products in supermarket.
 # products = ['apple', 'banana', 'kiwi', 'beans', 'quinoa', 'oats', 'bulgur', 'rice', 'pasta', 'bread']
 # amountOfUnits = [1, 2, 3, 4] # backlog: perhaps add this later.
 pricePerUnit = [0.50, 1.10, 1.40, 2.50, 3.10, 4.00, 5.20]
@@ -179,6 +180,7 @@ for row in products_with_sold_date:
 '''
     no need to sort the list on column date_sold, becaus that was already done in part 1 (on date_bought) and
     date_sold = date_bought + 2. (so they correlate in a linear fashion)
+    "+ 2" is my arbitrary choice. I could have chosen any other number.
 '''
 
 # delete each nth list in list: (so each nth row will expire in sold.csv while time traveling to the future)
@@ -187,8 +189,8 @@ products_with_sold_date = [row for row in products_with_sold_date if int(row[0].
 '''
 see config at start of file to set variable delete_every_nth_row.
 
- explanation of 
- e.g. input is 'b_17'. b_17 means: row 17 in bought.csv == transaction nr 17 in bought.csv. b_17 is primary key in bought.csv.
+ ex: e.g. input is 'b_17'. b_17 means: row 17 in bought.csv == transaction nr 17 in bought.csv. 
+ b_17 is primary key in bought.csv.
  int(row[0].split("_")[1]) extracts 17 from b_17.
 '''
 # print(products_with_sold_date) # ok

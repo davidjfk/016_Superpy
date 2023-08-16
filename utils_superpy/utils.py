@@ -1,5 +1,6 @@
 
 # list of imports:
+import os
 import datetime
 import random
 from datetime import date, datetime, timedelta
@@ -9,9 +10,12 @@ from datetime import date, datetime, timedelta
 # add_days_to_date(date_string, days_to_add)
 # generate_random_date_in_future_in_time_interval_of_2_months()
 # make_id_for_each_row_in_csv_file(csv_file_name_first_letter, first_nr_in_range):
+# set_system_date_to(system_date, path_to_system_date, system_date_file='system_date.txt'): (created in TDD fashion)
 
-# set_system_time_to_date(date_to_travel_to):
-# time_travel_to_date(date_to_travel_to)
+
+
+
+# time_travel_to_date(date_to_travel_to) (2do)
 
 def add_days_to_date(date_string, days_to_add):
     date = datetime.strptime(date_string, '%Y-%m-%d')
@@ -48,6 +52,40 @@ def make_id_for_each_row_in_csv_file(csv_file_name_first_letter, first_nr_in_ran
         count += 1
         return f"{csv_file_name_first_letter}_{count}"
     return counter
+
+
+def set_system_date_to(system_date, path_to_system_date, system_date_file='system_date.txt'):
+    pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import os
+print(os.getcwd())
+
+import site 
+print(site.getsitepackages())
 
 
 
