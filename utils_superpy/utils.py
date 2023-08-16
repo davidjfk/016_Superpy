@@ -55,7 +55,24 @@ def make_id_for_each_row_in_csv_file(csv_file_name_first_letter, first_nr_in_ran
 
 
 def set_system_date_to(system_date, path_to_system_date, system_date_file='system_date.txt'):
-    pass
+    # system_date is datetime object, ex: '2020-01-01'
+    print(path_to_system_date)
+    
+    # defensive programming: (over-engineering here?)
+    if not os.path.exists(path_to_system_date):
+        os.makedirs(path_to_system_date)
+    
+    # defensive programming:
+    try:
+        with open(os.path.join(path_to_system_date, system_date_file), 'w', newline='') as file:
+            file.write(system_date)
+    except IOError:
+        print("Error: File is already / still open. Plz investigate.")
+        file.close()
+        print("status: File has been closed (as a work-around). But error must still be investigated.")
+        with open(os.path.join(path_to_system_date, system_date_file), 'w', newline='') as file:
+            file.write(system_date)
+    return system_date
 
 
 
