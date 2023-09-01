@@ -393,12 +393,12 @@
     
 
 8.  create the argparse user interface:
-    in argparse assign a subparser to each use case from step 3.  
+    in argparse assign a subparser to each use case from step 7.  
     make choices about positional vs optional arguments, etc.
     Goal: make sure the superpy-app is easy and  intuitive to use.
     The argparse-code itself will be created later on. 
 
-    status: done. See section  7. above.
+    status: done. Argparse-UI has been added to step 7 above.
 
 9.  Create testdata in script create_testdata_for_csv_files_bought_and_sold.py 
     (erd in previous step must be ready before creating testdata)
@@ -456,17 +456,23 @@
         argparse interface e.g. with a bash script is out of scope (for now).
 
 
-    h. take the next use case from step 4: use case time travel in time range
+    h. take the next use case from step 4: uc time travel in time range
         (repeat the steps above)
 
-    i. during the coding (iteration) of a uc (e.g. calculate_profit) all testcases for this uc, 
+    i. about os.getcwd():
+        When using the superpy application via argparse, then  data is always stored inside folder data_directory inside project superpy.
+        So os.getcwd() is static (i.e. always the same) when I run main.py from the command line.
+        By comparison: when I run pytest, os.getcwd() is dynamic, i.e. different for each directory that 
+        contains 1 [or more] testcases to test a fn from utils.py: ex of such a directory: fn_set_system_date_testcase_01
+
+    j. during the (iterative) coding of a uc (e.g. calculate_profit) all testcases for this uc, 
         together will all testcases for all the already implemented ucs  (i.e. the regression test)
         can be tested inside project superpy via the cli with the default command 'pytest'. 
         
 
-        I will use the first uc, set_system_date_to, to implement this TDD-compliant software development 
-        way of working. So this first uc will serve as a proof of concept that I can implement all 
-        use cases like with this way of working. 
+        I will use the first uc, set_system_date_to, as a proof of concept to implement, adjust and polish my intended TDD methodology. 
+        Then I use the resulting TDD methodology to implement the remaining ucs. 
+        If needed I make adjustments to the TDD methodology on-the-fly.
 
 
         bird's-eye view: For TDD of each uc I need 6 "things" / deliverables: 
@@ -474,13 +480,22 @@
             developed with TDD. Each fn will be invoked via argparse-cli. The argparse-cli development
             itself is out of scope for TDD.
         II. test-fn in pytest
-        III. fn-input == some data (e.g. a string system_date, a product to buy, a product to sell, etc.) and a   file path (to system_date.txt, bought.csv or sold.csv).
-            A file bought.csv or sold.csv (not both at the same time) is also fn-input, but only if the goal 
-            is to update bought.csv or sold.csv (with either a bought or sold product).
+        III. fn-input (not all are used in each fn): 
+            - some data (e.g. a string system_date, a product to buy, a product to sell, etc.) --> mandatory fn-parameter.
+            - file path (to system_date.txt, bought.csv or sold.csv). --> 1 of 3 is mandatory fn-parameter.
+
+            - a file system_date.txt is also a fn-input, but only if the goal is to update file system_date.txt.
+              a file bought.csv or sold.csv (not both at the same time) is also fn-input, but only if the goal 
+                is to update bought.csv or sold.csv (with either a bought or sold product).
+              --> 1 of 3 file types is mandatory fn-parameter.
+            
             Script 'create_testdata_for_csv_files_bought_and_sold' creates testdata for each fn individually.
 
-            I make filepath a fn-input, because I want the fn-output of (e.g. fn set_system_date_to) when running pytest testcase 
+            filepath is fn-input, because I want the fn-output of (e.g. fn set_system_date_to) when running pytest testcase 
             to be stored in a testdirectory test_utils, but the same fn-output in "live production" in directory data_directory. ("structure follows strategy")
+
+            file is fn-input to make the fn pure. Otherwise fn has side-effect(s).
+
         IV. actual_testresult == csv-file or txt-file --> created by running the fn from step 1.
         V. expected_testresult = csv-file or txt-file --> created manually upfront.
         VI. fn to compare two files: see filecmp.cmp from standard library for this. file.cmp takes 
