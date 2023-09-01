@@ -15,37 +15,37 @@ from utils_superpy.utils import set_system_date_to
 
 def main():
 
+    #step: initialize parser
+    parser = argparse.ArgumentParser(description="Welcome to inventory management tool Superpy.", epilog="The line between disorder and order lies in logistics.")
 
-    '''
-        GOAL: call fn set_system_date_to to update file system__date.txt
-        (next step will be to do this from  argparse)
+    # step: create container for all subparsers. --> 'command' is a container for [and name of] all the subparsers.
+    subparsers = parser.add_subparsers(dest="command") 
 
-        os.getcwd() is static (i.e. always the same) when I run main.py from the command line.
-        By comparison: when I run pytest, os.getcwd() is dynamic, i.e. different for each directory that 
-        contains 1 [or more] testcases to test a fn from utils.pyGoedemorg: ex of such a directory: fn_set_system_date_testcase_01
-    '''
-    print('path_to_project_superpy:')
+
+    # Create subparser "set_date" with help text and add it to the container "command":
+    subparser_set_date = subparsers.add_parser("set_date", help="use this to set_system_date_to a specific date in the file system__date.txt")
+
+    #step: add the positional and optional arguments to the subparser with name 'subparser_calculate': 
+    subparser_set_date.add_argument("new_system_date", type=str, help="specify the new system date in format YYYY-MM-DD") 
+
+    #step: parse the arguments
+    args = parser.parse_args()
+
+    # reusable variables: 
     path_to_project_superpy  = str(os.getcwd()) 
     print(path_to_project_superpy)
-    # output: C:\dev\pytWinc\superpy
-
-    # print(os.path.abspath(__file__))
-    '''
-        output: C:\dev\pytWinc\superpy\main.py
-        desired result: I want path to end on "superpy". 
-        qed: so use os.getcwd() instead of os.path.abspath(__file__) when calling fn from argparse.
-    '''
-
     print('--------------------------------------------------')
     print('path_to_data_directory_inside_project_superpy:')
     path_to_data_directory_inside_project_superpy = os.path.abspath(os.path.join(path_to_project_superpy, "data_directory"))
     print(path_to_data_directory_inside_project_superpy)
 
     print('--------------------------------------------------')
-    # step: call fn set_system_date_to to update file system__date.txt with following date:
-    system_date = '2020-02-17'
-    system_date = set_system_date_to(system_date, path_to_data_directory_inside_project_superpy)
-    print(system_date)
+    print('args.command:')
+    if args.command == "set_date":
+        print("set_date")
+        # step: call fn set_system_date_to to update file system__date.txt with following date:
+        system_date = set_system_date_to(args.new_system_date, path_to_data_directory_inside_project_superpy)
+        print(system_date)
 
 
 

@@ -272,7 +272,8 @@
 
         (super.py abbreviated as s.py so less repetitive typing)
         shell command plus argparse arguments: 
-        py s.py set_date 4   
+        py .\main.py set_date 2020-02-25   (status: works)
+       
 
 
     
@@ -442,7 +443,7 @@
     d.  if a fn modifies system_date.txt (e.g. set_system_date_to), then script
         create_testdata_for_csv_files_bought_and_sold.py does not need to create an input-file
         nor an output file with expected_testresult.
-        elif a fn modifies bought.csv or sold.csv, then the script does does.
+        elif a fn modifies bought.csv or sold.csv, then the script does.
 
     e.  At this point all testcases will fail, because the fn-body of the "fn under test"
         is still empty at this point. 
@@ -451,9 +452,10 @@
 
     f. in utils.py implement fn-body (i.e. "code that does stuff") of 
         fn-signature set_system_date_to. The code is ready as soon as all testcases pass.
+        Then call this fn from main.py and check if it sets the system_date correctly.
        
     g. in main.py create argparse code that calls fn set_system_date_to . Testing the 
-        argparse interface e.g. with a bash script is out of scope (for now).
+        argparse interface itself e.g. with a bash script is out of scope.
 
 
     h. take the next use case from step 4: uc time travel in time range
