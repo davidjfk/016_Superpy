@@ -10,7 +10,7 @@ from datetime import date
 
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
-from utils_superpy.utils import set_system_date_to
+from utils_superpy.utils import set_system_date_to, time_travel_system_date_with_nr_of_days
 
 
 def main():
@@ -31,10 +31,10 @@ def main():
     #step: parse the arguments
     args = parser.parse_args()
 
+    print('--------------------------------------------------')
     # reusable variables: 
     path_to_project_superpy  = str(os.getcwd()) 
     print(path_to_project_superpy)
-    print('--------------------------------------------------')
     print('path_to_data_directory_inside_project_superpy:')
     path_to_data_directory_inside_project_superpy = os.path.abspath(os.path.join(path_to_project_superpy, "data_directory"))
     print(path_to_data_directory_inside_project_superpy)
@@ -48,11 +48,15 @@ def main():
         print(system_date)
 
 
+    print('--------------------------------------------------')
+    # goal: run fn time_travel_system_date_with_nr_of_days() with nr_of_days_to_travel = 1. This is a dry run prior to 
+    #       running this fn via argparse. 
+    new_system_date = time_travel_system_date_with_nr_of_days(-5, path_to_data_directory_inside_project_superpy)
+    print(new_system_date)
+
 
 if __name__ == "__main__":
     main()
-
-
 
 
 

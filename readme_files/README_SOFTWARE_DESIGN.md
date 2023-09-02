@@ -278,7 +278,6 @@
 
     
     - uc 02: timetravel in time range.
-
         example code: $ python super.py --advance-time 2
 
         To 'advance' means to move forward in purposeful way. But this superpy-app can also timetravel to 
@@ -286,24 +285,21 @@
         Implement Argparse argument 'timetravel' inside a subparsers with a positional argument. 
         (use timedelta from module datetime to implement)
 
-
         pyt fn: 
         def time_travel(nr_of_days_to_set_system_date_to_future_or_past):
 
         shell command plus argparse arguments:
         (super.py abbreviated as s.py so less repetitive typing)
-        py s.py time_travel -2 
+        py .\main.py time_travel -2 
         legenda:
-        positive nr: to the future
-        negative nr: to the past  
-
-
+        positive nr: to the future. e.g. 7 is 7 days to the future
+        negative nr: to the past. e.g. -4 is 4 days to the past  
+        
         Order of events:
         The ability to timetravel must be in place in order to implement any use case that requires
         the presence of a range (e.g. report profit in day range 17 to 43 inclusive). 
 
 
-    
 
     - uc 03: buy product (and add to bought.csv) 
 
