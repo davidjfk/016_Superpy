@@ -6,14 +6,11 @@
            create_new_tesdata_for_csv_files.
            Parts of this created data are random, so the testdata will be different each time the code is run.
            But the pytest testcases need a frozen copy of the testdata to be able to run reliably.
-        3. So I have created testdata and manually copied this data into directory csv_files_used_by_superpy. This 
-           frozen copy is to be used to create pytest testcases for TDD-software-development.
+        3. So whenever I need testdata, I run the script and then manually cut-paste it to its destination (e.g. testdata for
+           a pytest testcase). This now "frozen" testdata is to be used to create pytest testcases for TDD-software-development.
 
-        4. So if needed (e.g. if there is a reason to update the testdata), then this script can be run again 
-           to create new testdata for bought.csv and sold.csv, without 
-           affecting the current testdata.
-
-
+        4. So this script can be run again to create new testdata for bought.csv and sold.csv, without 
+           affecting the already created testdata.
            '''
  
 '''
@@ -33,9 +30,9 @@
     # part 1 of 2: create testdata for bought.csv
     # part 2 of 2: create testdata for sold.csv
 
+    For Winc Academy dentist assignment (see github repo) I created a config file similar to this one.
+
 '''
-
-
 
 # Configuration settings to get other results in e.g. profit or revenue report, matplotlib graphs, etc.)
 '''
@@ -47,7 +44,9 @@ nr_of_products_in_supermarket = 5
 
 '''
     set nr of rows to delete from sold.csv:
-    sold.csv is as a copy of bought.csv. After making the deepcopy, a few changes are made: e.g. make sell_price different (higher) than buy_price, but also delete some rows. Rows that are present in bought.csv, but not in sold.csv, will expire while time traveling.
+    sold.csv is as a copy of bought.csv. After making the deepcopy, a few changes are made: 
+    e.g. make sell_price different (higher) than buy_price, but also delete some rows. 
+    Rows that are present in bought.csv, but not in sold.csv, will expire while time traveling.
     (e.g. if delete_every_nth_row = 2, then every 2nd row will be deleted)
     (e.g. if delete_every_nth_row = 3, then every 3rd row will be deleted)
 '''
@@ -180,7 +179,7 @@ for row in products_with_sold_date:
 '''
     no need to sort the list on column date_sold, becaus that was already done in part 1 (on date_bought) and
     date_sold = date_bought + 2. (so they correlate in a linear fashion)
-    "+ 2" is my arbitrary choice. I could have chosen any other number.
+    "+ 2" is my arbitrary choice. I could have chosen any other number in the config settings at beginning of this file.
 '''
 
 # delete each nth list in list: (so each nth row will expire in sold.csv while time traveling to the future)

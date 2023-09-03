@@ -48,10 +48,13 @@ def main():
         print(system_date)
 
 
+
     print('--------------------------------------------------')
     # goal: run fn time_travel_system_date_with_nr_of_days() with nr_of_days_to_travel = 1. This is a dry run prior to 
     #       running this fn via argparse. 
-    new_system_date = time_travel_system_date_with_nr_of_days(-5, path_to_data_directory_inside_project_superpy)
+
+    path_to_file_with_system_date = os.path.join(path_to_data_directory_inside_project_superpy, 'system_date.txt')
+    new_system_date = time_travel_system_date_with_nr_of_days(2, path_to_file_with_system_date, path_to_file_with_system_date)
     print(new_system_date)
 
 
