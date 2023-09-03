@@ -1,9 +1,26 @@
 
+# INTRO
+    This doc contains an analysis-part and a design-part.
+
+    The analysis-part helps me to understand things.
+    The overal / "grand" design, consisting of the steps 1-13, helps me to get 
+    things done, while providing an overview.
+    Step 7 contains the main use cases (ucs).
+    Step 10 is a manual of how to implement the ucs of step 7 in a TDD manner.
+
+    Steps 11, 12 and 13 are functionality (e.g. show data in matplotlib) that will not be 
+    implemented with TDD.
+
+    The first uc of step 7, set_system_date_to, is used as a touchstone to modify 
+    and validate the TDD way of implementing the remaining ucs of step 7. 
+    
 # ANALYSIS
 
 1. # definitions:
     profit == total revenue minus total expenses
-    revenue == average sales price * number of units sold.
+    revenue == sum of each individual product * sales price of that product. --> each product is bought and sold 1 at a 
+    time, so revenue == sum of all sales prices of all sold proudcts. 
+        remark: so this definition deviates from the general definition of revenue: "average sales price * number of units sold".
 
     date == date object == calendar day.
     Format of calender day: the date object with string representation in format: '%Y-%m-%d'. 
@@ -12,15 +29,15 @@
                     maximum time range is 60 days and minimum time range is 1 day.
 
     record == transaction ==  line of text (i.e. the "transaction" ) in bought.csv or sold.csv that depicts 
-                    the act of buying or selling products by the supermarket.  
+                    the act of buying or selling a product (1 in each transaction) by the supermarket.  
 
+    system_date == ('the day that is today'). This date will be saved
+    in file 'system_date.txt'
 
     # 2 types of data:
-    "original" data: bought products, sold products, system-date.
-        system_date == ('the day that is today'). This date will be saved
-        in file 'system_date.txt'
+    stateful data ('the model layer'): bought products, sold products, system-date.
 
-    "derived" data: inventory 
+    "derived" data ('the view layer'): inventory 
             Inventory == sold products minus bought products in a time range.
             This time range starts at the first day that products were bought or sold.
             This time range ends at system_date.txt
@@ -50,7 +67,7 @@
         Field 'productType' is nor a primary key nor a foreign key.
 
         In table SYSTEM_DATE.txt the field system_current_date matches
-        the date field 'expiryDate' in table BOUGHT.csv and 'expiryDate' in table SOLD.csv.
+        the date field 'boughtDate' in table BOUGHT.csv and 'soldDate' in table SOLD.csv.
         These date fields are nor primary key nor foreign key.
 
         design choice: the(se aforementioned) fields 'productType', 'system_current_date' and 
@@ -61,12 +78,12 @@
         Codd's rules https://www.tutorialspoint.com/dbms/dbms_codds_rules.htm ).
 
         In a real-life supermarket most products (e.g. an apple, packet of milk, loaf of bread) only have a barcode, 
-        but you cannot trace (a product on the shelves or) a sold product (in sold.csv) back to a transaction on bought.csv 
+        but you cannot trace (a product on the shelves nor) a sold product (in sold.csv) back to a transaction on bought.csv 
         (i.e. the transaction when this e.g. apple was bought by the supermarket).
     
         Suppose in the supermarket in the vegetable department in a fruit-display-container there are apples  mixed together 
         from 3 transactions in bought.csv and a client (by coincidence) selects apples from all 3 transactions in bought.csv. 
-        When (s)he buys these apples the resulting transaction in sold.csv would need 
+        When the client buys these apples the resulting transaction in sold.csv would need 
         to contain 3 foreign keys to the bought.csv file.
         Getting back to the logistic principle FIFO: e.g. the oldest milk is presented at the front of the shelf and the
         milk with longer longevity is placed at the back of the shelf (just like  in a real supermarket). Same with e.g. the
@@ -97,7 +114,7 @@
             12,banana,6,1.25,13,17 --> 3 out of 6 bananas have expired. The other 3 had already been sold.
         
         Now repeat this for all other products.
-        QED: a lot of work for disconnecting bought.csv from sold.csv in the erd.
+        QED: a lot of work as a consequence / toil of disconnecting bought.csv from sold.csv in the erd.
 
 
     -- design idea 2: use primary and foreign key to connect bought.csv and sold.csv (my choice)
@@ -235,13 +252,15 @@
     - write data (part of fn update_csv_file)
     - append data ()  --> 2do.
 
-7.  Create for following use cases the fn-signature (i.e. fn-name, fn-arguments, type of fn-arguments, return-variable, type of returned-var):    
+7.  List with fn signatures and argparse-command signatures:
+    Create for following use cases the fn-signature (i.e. fn-name, fn-arguments, type of fn-arguments, return-variable, type of returned-var):    
 
     - general remark: subparsers will be used to implement the following use cases. 
       Use cases that do not require a range, must be ready before starting with use cases
       that require a range.
 
-    - set the date in time range. 
+
+    - uc 01: set the system_date in time range
         This creates a baseline to timetravel ('back to the future, yeah, here I come')
 
         Order of events: 
@@ -249,16 +268,16 @@
         and all subsequent use cases below.
 
         pyt fn:
-        def set_the_date_in_time_range(system_date):
+        def set_system_date_to(system_date):
 
         (super.py abbreviated as s.py so less repetitive typing)
         shell command plus argparse arguments: 
-        py s.py set_date 4   
+        py .\main.py set_date 2020-02-25   (status: works)
+       
 
 
     
-    - timetravel in time range.
-
+    - uc 02: timetravel in time range.
         example code: $ python super.py --advance-time 2
 
         To 'advance' means to move forward in purposeful way. But this superpy-app can also timetravel to 
@@ -266,26 +285,23 @@
         Implement Argparse argument 'timetravel' inside a subparsers with a positional argument. 
         (use timedelta from module datetime to implement)
 
-
         pyt fn: 
-        def timetravel(nr_of_days_to_set_system_date_to_future_or_past):
+        def time_travel(nr_of_days_to_set_system_date_to_future_or_past):
 
         shell command plus argparse arguments:
         (super.py abbreviated as s.py so less repetitive typing)
-        py s.py time_travel -2 
+        py .\main.py time_travel -2 
         legenda:
-        positive nr: to the future
-        negative nr: to the past  
-
-
+        positive nr: to the future. e.g. 7 is 7 days to the future
+        negative nr: to the past. e.g. -4 is 4 days to the past  
+        
         Order of events:
         The ability to timetravel must be in place in order to implement any use case that requires
         the presence of a range (e.g. report profit in day range 17 to 43 inclusive). 
 
 
-    
 
-    - buy product (and add to bought.csv) 
+    - uc 03: buy product (and add to bought.csv) 
 
         pyt fn:
         def buy_product(productType, pricePerUnit, buy_date, expiryDate):
@@ -293,7 +309,7 @@
         shell command plus argparse arguments:
         py s.py buy apple 4.50 16 20 
 
-    - sell product (and add to sold.csv)
+    - uc 04: sell product (and add to sold.csv)
  
         pyt fn:
         def sell_product(productType, pricePerUnit, sellDate):
@@ -301,7 +317,7 @@
         shell command plus argparse arguments:
         py s.py sell apple 13.50 18 
 
-    - calculate inventory on day x (in range 1 to 60 inclusive)
+    - uc 05: calculate inventory on day x (in range 1 to 60 inclusive)
 
         pyt fn:
         def calculate_inventory(system_date, productType):
@@ -311,7 +327,7 @@
         py s.py show_inventory 18 
         py s.py show_inventory 18 --productType apple
 
-    - calculate expired products on day x (in range 1 to 60 inclusive)
+    - uc 06: calculate expired products on day x (in range 1 to 60 inclusive)
 
         pyt fn:
         def calculate_expired_products(system_date, productType):
@@ -321,7 +337,7 @@
         py s.py show_expired 18 
         py s.py show_expired 18 --productType apple
 
-    - calculate sales of number of products (Dutch: afzet). 
+    - uc 07: calculate sales of number of products (Dutch: afzet). 
         --> serves as input to calculate revenue 
         (maybe skip this one, because same products (e.g. apples) can (and will) be bought 
         at different prices. In that case calculating an average sales price
@@ -329,7 +345,7 @@
 
         (probably skip this)
 
-    - report revenue in time range
+    - uc 08: report revenue in time range
 
         pyt fn:
         def calculate_revenue(system_date, productType):
@@ -339,7 +355,7 @@
         py s.py calc_revenue 18 
         py s.py calc_revenue 18 --productType apple (implement if time left)
 
-    - report profit in time range
+    - uc 09: report profit in time range
 
         pyt fn:
         def calculate_profit(system_date, productType):
@@ -349,7 +365,7 @@
         py s.py calc_profit 18 
         py s.py calc_profit 18 --productType apple (implement if time left)   
 
-    - delete product (e.g. an expired one)
+    - uc 10: delete product (e.g. an expired one)
         (This is not a requirement. So only implement if there is time left. )
 
         The combination of timetravel, delete and buy and/or sell would make
@@ -370,22 +386,26 @@
         py s.py del_sold 43  
         legenda: delete row from SOLD.csv with id 18. 
 
+
+    
+
 8.  create the argparse user interface:
-    in argparse assign a subparser to each use case from step 3.  
+    in argparse assign a subparser to each use case from step 7.  
     make choices about positional vs optional arguments, etc.
     Goal: make sure the superpy-app is easy and  intuitive to use.
     The argparse-code itself will be created later on. 
 
-    status: done. See section  7. above.
+    status: done. Argparse-UI has been added to step 7 above.
 
-9.  Create testdata
-     generate automated testdata in bought.csv and sold.csv 
-      (erd in previous step must be ready before creating testdata)
+9.  Create testdata in script create_testdata_for_csv_files_bought_and_sold.py 
+    (erd in previous step must be ready before creating testdata)
     
     The testdata is necessary to work in a TDD-fashion. 
+    This script can make custom testdata to test each fn from section 
+    'List with fn signatures and argparse-command signatures:' above individually. 
 
-    The testdata is very specific, so I prefer to create it myself, rather than 
-    to create it on e.g. mockaroo.com
+    The testdata is very specific. Imho: quicker to create testdata myself, rather than 
+    to create it on e.g. mockaroo.com and tweak it subsequently.
 
     table bought.csv:
         Use built-in fn enumerate to dynamically create values for the columns ID.
@@ -400,42 +420,113 @@
         sold.csv is a copy of bought.csv
         For each row in  sold.csv a foreign key refers to primary key in bought.csv
         Each 5th bought product will expire.
-        The other products will be sold for 3 times the price it was bought for.        
+        The other products will be sold for 3 times the price they were (each individually) bought for.        
         sold_date is 2 days after buy_date.
 
+    status: done
 
-10.  Implement each use case in its own iteration
-    Perform the following steps iteratively for each use case from step 4. above. E.g.:
-    a. take the first use case: buy_product (each use case already has a fn-signature at this point)
-    b. create testfn test_buy_product (with testdat from previous step). (goal is to do TDD)
-        Once completed, all testcases in the testfn are supposed to fail, because the 
-        fn-body is still empty at this point. 
-
-    c. implement fn-body (i.e. "code that does stuff") of fn-signature buy_product
-    d. create argparse code that runs fn buy_product
-    e. write code until all testcases pass. 
-
-    e. take the next use case from step 4: use case sell_product
-        (repeat the steps above)
-        etc.
-
-
-
-
-11. display the output (e.g. report profit) to pyt module tabulate 
-    (more info: https://analyticsindiamag.com/beginners-guide-to-tabulate-python-tool-for-creating-nicely-formatted-tables/#:~:text=Tabulate%20is%20an%20open%2Dsource,for%20all%20types%20of%20formatting)
-
+10. coding methodology for each uc: implement each use case in its own TDD-iteration
+    Perform the following steps iteratively for each use case from chapter 'List with fn signatures and argparse-command signatures' above. 
+    Workflow: 
+    a. take the first use case: set_system_date_to . Each use case at this point already has:
+       - fn-signature. 
+       - signature to call fn with argparse
+    b. in utils.py create fn set_system_date_to with return pass as fn-body.
+    c. in test_utils.py create a directory fn__test_set_system_date_to. This directory will
+        contain testdata, actual results, expected result, etc. By experimenting I 
+        have figured out what exactly I need in this directory for each testcase.
     
-12. display the output (e.g. report profit) to pyt module matplotlib
+    d.  if a fn modifies system_date.txt (e.g. set_system_date_to), then script
+        create_testdata_for_csv_files_bought_and_sold.py does not need to create an input-file
+        nor an output file with expected_testresult.
+        elif a fn modifies bought.csv or sold.csv, then the script does.
 
-13. give error when trying to sell a product that is not in stock:  
+    e.  At this point all testcases will fail, because the fn-body of the "fn under test"
+        is still empty at this point. 
+
+
+
+    f. in utils.py implement fn-body (i.e. "code that does stuff") of 
+        fn-signature set_system_date_to. The code is ready as soon as all testcases pass.
+        Then call this fn from main.py and check if it sets the system_date correctly.
+       
+    g. in main.py create argparse code that calls fn set_system_date_to . Testing the 
+        argparse interface itself e.g. with a bash script is out of scope.
+
+
+    h. take the next use case from step 4: uc time travel in time range
+        (repeat the steps above)
+
+    i. about os.getcwd():
+        When using the superpy application via argparse, then  data is always stored inside folder data_directory inside project superpy.
+        So os.getcwd() is static (i.e. always the same) when I run main.py from the command line.
+        By comparison: when I run pytest, os.getcwd() is dynamic, i.e. different for each directory that 
+        contains 1 [or more] testcases to test a fn from utils.py: ex of such a directory: fn_set_system_date_testcase_01
+
+    j. during the (iterative) coding of a uc (e.g. calculate_profit) all testcases for this uc, 
+        together will all testcases for all the already implemented ucs  (i.e. the regression test)
+        can be tested inside project superpy via the cli with the default command 'pytest'. 
+        
+
+        I will use the first uc, set_system_date_to, as a proof of concept to implement, adjust and polish my intended TDD methodology. 
+        Then I use the resulting TDD methodology to implement the remaining ucs. 
+        If needed I make adjustments to the TDD methodology on-the-fly.
+
+
+        bird's-eye view: For TDD of each uc I need 6 "things" / deliverables: 
+        I. fn that performs some data manipulation in system_date.txt, bought.csv or sold.csv. Each fn will be
+            developed with TDD. Each fn will be invoked via argparse-cli. The argparse-cli development
+            itself is out of scope for TDD.
+        II. test-fn in pytest
+        III. fn-input (not all are used in each fn): 
+            - some data (e.g. a string system_date, a product to buy, a product to sell, etc.) --> mandatory fn-parameter.
+            - file path (to system_date.txt, bought.csv or sold.csv). --> 1 of 3 is mandatory fn-parameter.
+
+            - a file system_date.txt is also a fn-input, but only if the goal is to update file system_date.txt.
+              a file bought.csv or sold.csv (not both at the same time) is also fn-input, but only if the goal 
+                is to update bought.csv or sold.csv (with either a bought or sold product).
+              --> 1 of 3 file types is mandatory fn-parameter.
+            
+            Script 'create_testdata_for_csv_files_bought_and_sold' creates testdata for each fn individually.
+
+            filepath is fn-input, because I want the fn-output of (e.g. fn set_system_date_to) when running pytest testcase 
+            to be stored in a testdirectory test_utils, but the same fn-output in "live production" in directory data_directory. ("structure follows strategy")
+
+            file is fn-input to make the fn pure. Otherwise fn has side-effect(s).
+
+        IV. actual_testresult == csv-file or txt-file --> created by running the fn from step 1.
+        V. expected_testresult = csv-file or txt-file --> created manually upfront.
+        VI. fn to compare two files: see filecmp.cmp from standard library for this. file.cmp takes 
+            actual_testresult and expected_testresult as its parameters.
+
+            ex:
+            import filecmp
+            def test_set_system_date_to():
+                filecmp.clear_cache()
+                set_system_date_to('2020-01-01')
+                assert filecmp.cmp(actual_test_result_inside_file, expected_path_to_system_date)
+                
+                'expected_path_to_system_date' points to a txt-file that contains '2020-01-01' (if
+                this test is supposed to pass). 
+
+
+11. give error when trying to sell a product that is not in stock:  
 
     $ python super.py sell --product-name orange --price 2
     ERROR: Product not in stock.
 
     how2 implement:
     Inside fn sell_product check if products are available (so you don't end up selling a product that is not there).
-    Implementation: On a system_date (e.g. day 53) inside fn sell_product where you want to sell an orange, call fn calculte_inventory and check if an orange is in stock on day 53 that can be sold.
+    Implementation: On a system_date (e.g. day 53) inside fn sell_product where you want to sell an orange, call fn calculte_inventory and check if an orange is in stock on day 53 that can be sold.   
+
+
+12. display the output (e.g. report profit) to pyt module tabulate 
+    (more info: https://analyticsindiamag.com/beginners-guide-to-tabulate-python-tool-for-creating-nicely-formatted-tables/#:~:text=Tabulate%20is%20an%20open%2Dsource,for%20all%20types%20of%20formatting)
+
+    
+13. display the output (e.g. report profit) to pyt module matplotlib
+
+
 
 
 
