@@ -100,7 +100,7 @@ print('part 1 of 2: create testdata for bought.csv: ')
 # part 1 of 2: create testdata for bought.csv
 
 #math highschool analogy: (5+2)*(3+4) == 5*3 + 5*4 + 2*3 + 2*4
-supermarket_products = ['fish', 'rice', 'potatoes', 'quinoa', 'bread', 'carrots', 'chicken', 'beef', 'bulgur', 'tomatoes', 'lettuce', 'beans', 'cheese', 'apple', 'beetroot', 'kiwi', 'onions', 'eggs', 'banana', 'oats', 'milk', 'pasta']
+supermarket_products = ['fish', 'rice', 'potato', 'quinoa', 'bread', 'carrot', 'chicken', 'beef', 'bulgur', 'tomato', 'lettuce', 'beans', 'cheese', 'apple', 'beetroot', 'kiwi', 'onion', 'eggs', 'banana', 'oats', 'milk', 'pasta']
 
 # defensive coding: check if some products are in list more than once:
 supermarket_products = list(set(supermarket_products))
