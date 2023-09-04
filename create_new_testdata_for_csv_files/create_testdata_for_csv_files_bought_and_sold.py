@@ -40,7 +40,7 @@
     This variable is an operand in fn product from module itertools.
     So more products leads to more rows in bought.csv and less products to less rows in bought.csv.
 '''
-nr_of_products_in_supermarket = 5
+nr_of_products_in_supermarket = 2
 
 '''
     set nr of rows to delete from sold.csv:
@@ -119,8 +119,18 @@ for product in boughtProducts:
     # I want all data to stay in the range of 1 to 60.
     expiry_date = add_days_to_date(bought_date, nr_of_days_between_buying_a_product_and_its_expiry_date) # see config at start of file to set 2nd argument.
     products_with_bought_date.append(product + (bought_date, expiry_date)) 
-    # note to self: tuple concatenation, if needed use comma after expiry_date.
+    '''
+    About the order of variables bought_date and expiry_date in fn buy_product, bought.csv and sold.csv:
+    in python-fn buy_product expiry_date is a mandatory positional fn-parameter, but I want bought_date to be 
+    a default fn-parameter. Benefit of this: if superpy-user does not specify a bought_date, then bought_date will be set 
+    to the current value of system_date.
+    In other words: if the user does not specify a bought_date, then superpy-app will assume that the user 
+    wants to buy the product on the system_date.
+    However, in argparse -- contrary to a regular pyt fn -- a default parameter can precede a mandatory positional parameter. 
+    So there is no need to precede bought_date by expiry_date in fn-signature of fn buy_product.
 
+    note to self: tuple concatenation, if needed use comma after expiry_date.
+    '''
 # print(len(products_with_bought_date))
 
 # now sort list with tuples on bought_date: (x[3] is the bought_date)

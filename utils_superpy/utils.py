@@ -8,20 +8,22 @@ from datetime import date, datetime, timedelta
 
 # list of functions:
 # add_days_to_date(date_string, days_to_add)
+# buy_product(product, price, buy_date, expiry_date):
 # generate_random_date_in_future_in_time_interval_of_2_months()
 # make_id_for_each_row_in_csv_file(csv_file_name_first_letter, first_nr_in_range):
 # set_system_date_to(system_date, path_to_system_date, system_date_file='system_date.txt'): (created in TDD fashion)
+# time_travel_system_date_with_nr_of_days(nr_of_days_to_travel, path_to_input_file, path_to_output_file):
 
-
-
-
-# time_travel_to_date(date_to_travel_to) (2do)
 
 def add_days_to_date(date_string, days_to_add):
     date = datetime.strptime(date_string, '%Y-%m-%d')
     new_date = date + timedelta(days= days_to_add)
     print(new_date)
     return new_date.strftime('%Y-%m-%d')
+
+def buy_product(product, price, buy_date, expiry_date, path_to_input_file, path_to_output_file):
+    pass
+
 
 def generate_random_date_in_future_in_time_interval_of_2_months():
     today = date(3333, 3, 1)
@@ -32,6 +34,7 @@ def generate_random_date_in_future_in_time_interval_of_2_months():
     random_number_of_days = random.randrange(days_between_dates)
     random_date = start_date + timedelta(days=random_number_of_days)
     return random_date.strftime('%Y-%m-%d')
+
 
 
 def make_id_for_each_row_in_csv_file(csv_file_name_first_letter, first_nr_in_range):
@@ -48,7 +51,7 @@ def make_id_for_each_row_in_csv_file(csv_file_name_first_letter, first_nr_in_ran
         note to self: nonlocal is keyword that allows 
         you to assign to variables in outer 
         (but non-global) scope.  
-        jsComp: no kw nonlocal in javascript.      
+        jsComp: in javascript no kw nonlocal (nor a need to use such a kw in this situation).      
         '''
         count += 1
         return f"{csv_file_name_first_letter}_{count}"
@@ -103,6 +106,7 @@ def time_travel_system_date_with_nr_of_days(
             file.write(current_system_date)
     # returning new_system_date for testing purposes only (returned value is not used in the code)    
     return new_system_date
+
 
 
 

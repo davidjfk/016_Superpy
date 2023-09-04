@@ -309,6 +309,62 @@
         shell command plus argparse arguments:
         py s.py buy apple 4.50 16 20 
 
+        design:
+        2 options:
+        option 1:
+        add var buy_date explicitly (see code ex above)
+
+        option 2:
+        goto the date (e.g. 24-02-09) on which you want to buy a product with fns
+        set_system_date_to and/or time_travel. Then use that day  as system_date
+        on which you buy that product.
+
+        choice: option 1 seems to be more user-friendly.
+
+
+        Rule: each id in buy.csv (e.g. b_08) and sell.csv (e.g. s_08) MUST be unique.
+
+        There are 2 different SOURCES that create ids in the application:
+        SOURCE OF IDS 1OF2: script create_testdata_for_csv_files_bought_and_sold creates ids.
+        3 use cases:
+        1. start the production application with real-looking data.
+        2. create input files for testcases.
+        3. create expected testresult for testcases.
+
+        SOURCE OF IDS 2OF2: the application user and/or pytest user buys and sells products and by doing so also 
+        makes the app create ids.
+        2 use cases:
+        1. as a supermarket-logistics-employee-user of superpy create new data in the production application .
+        2. as pytest create the file with the actual testresult. 
+
+
+        To avoid source 1 and 2 accidentally create a buy or sell record with the 
+        same id, I stick to the following convention:
+        testdata id range: b_01 until b_299 included.
+        testdata id range: s_01 until s_299 included.
+        To create testdata this range is big enough.
+
+        id range for supermarket-user and/or pytest-user of application: b_300 and higher.
+        id range for supermarket-user and/or pytest-user of application: s_300 and higher.
+
+        fn make_id_for_each_row_in_csv_file must be able to accommodate these 2 ranges
+        in such a way that "id clashes" between testdata-generated-by-script on the one hand and on the other hand data created by supermarket-user and/or pytest-"engine"-user will be avoided. 
+        (2do implement this in branch_05_uc_buy_product)
+
+        About the user-friendliness of the id:
+        When user sells a product via commandline, then id of bought product (e.g. b_128) must be entered.
+        When a user deletes a product via commandline, then id of bought product (e.g. b_79) must be entered.
+
+        So to keep things user-friendly, an id should not be too lengthy:
+
+            import uuid
+            unique_id = uuid.uuid4()
+            print(unique_id)   
+            output: e.g.: d7fbc5c8-8772-4629-9aad-6af354964341
+
+            It would be very user-unfriendly to type in such an id when deleting e.g. a product with such an id.
+
+
     - uc 04: sell product (and add to sold.csv)
  
         pyt fn:
@@ -368,9 +424,11 @@
     - uc 10: delete product (e.g. an expired one)
         (This is not a requirement. So only implement if there is time left. )
 
-        The combination of timetravel, delete and buy and/or sell would make
-        it possible to update and correct data. A system does not feel
-        complete without this feature. 
+        First read uc 03 above. Uc 03 states:
+        Rule: each id in buy.csv (e.g. b_08) and sell.csv (e.g. s_08) MUST be unique.
+
+        In addition to this: After deleting a record (e.g. b_131 apple 0.50, 24-03-04, 24-03-04).
+        an id (here: b_131) should not be reused.
 
         pyt fn:
         def delete_row_in_csv_file_bought(id):
@@ -386,8 +444,13 @@
         py s.py del_sold 43  
         legenda: delete row from SOLD.csv with id 18. 
 
+        
+        design / implementation issues / choices: 
+        1. For each bought product that I want to delete (e.g. milk has expired / is out of date ), I must first check if
+        the product has not already been sold.
+        If it has been sold, then this product cannot be removed (not without 'cooking the books').
 
-    
+        2. a product can be deleted if it has expired, but also if it has not yet expired.
 
 8.  create the argparse user interface:
     in argparse assign a subparser to each use case from step 7.  
@@ -436,10 +499,10 @@
         contain testdata, actual results, expected result, etc. By experimenting I 
         have figured out what exactly I need in this directory for each testcase.
     
-    d.  if a fn modifies system_date.txt (e.g. set_system_date_to), then script
-        create_testdata_for_csv_files_bought_and_sold.py does not need to create an input-file
-        nor an output file with expected_testresult.
-        elif a fn modifies bought.csv or sold.csv, then the script does.
+    d.  if a fn modifies only a system_date.txt (e.g. set_system_date_to), then script
+        create_testdata_for_csv_files_bought_and_sold.py need not provide any data.
+        elif a fn modifies bought.csv or sold.csv, then the script does need to 
+        provide data.
 
     e.  At this point all testcases will fail, because the fn-body of the "fn under test"
         is still empty at this point. 
