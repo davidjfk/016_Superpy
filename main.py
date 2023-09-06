@@ -10,8 +10,8 @@ from datetime import date
 
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
+from utils_superpy.utils import buy_product, create_id_with_unused_highest_sequence_nr_to_buy_product, get_path_to_file
 from utils_superpy.utils import set_system_date_to, time_travel_system_date_with_nr_of_days
-
 
 def main():
 
@@ -72,6 +72,27 @@ def main():
 
 
     print('--------------------------------------------------')
+    # goal: dry run: run fn buy_product() before executing this fn from command line with argparse:  
+
+    #arguments to call fn buy_product() in directory utils.py:
+    path_to_id_with_highest_sequence_number = os.path.join(path_to_data_directory_inside_project_superpy, 'id_to_use_in_fn_buy_product.txt')
+    
+    print(path_to_id_with_highest_sequence_number)
+    id_of_row_in_csv_file_bought = create_id_with_unused_highest_sequence_nr_to_buy_product(path_to_id_with_highest_sequence_number) 
+
+    path_to_csv_bought_input_file = os.path.join(path_to_data_directory_inside_project_superpy, 'bought.csv')
+    path_to_csv_bought_output_file = path_to_csv_bought_input_file
+
+    print('foo:')
+    print(id_of_row_in_csv_file_bought)
+    print(path_to_csv_bought_input_file)
+    print(path_to_csv_bought_output_file)
+    print('bar')
+
+    buy_product("carrot", 1.09, "3333-03-12", "3333-03-20", id_of_row_in_csv_file_bought, path_to_csv_bought_input_file, path_to_csv_bought_output_file) 
+
+
+
 
 if __name__ == "__main__":
     main()
