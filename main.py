@@ -11,6 +11,7 @@ from datetime import date
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
 from utils_superpy.utils import buy_product, create_id_with_unused_highest_sequence_nr_to_buy_product
+from utils_superpy.utils import get_path_to_file, get_system_date
 from utils_superpy.utils import set_system_date_to, time_travel_system_date_with_nr_of_days
 
 def main():
@@ -38,12 +39,10 @@ def main():
     #step: add the positional and optional arguments to the subparser with name 'subparser_set_date': 
     subparser_buy_product.add_argument("product_name", type=str, help="e.g. apple, carrot, oats, etc.") 
     subparser_buy_product.add_argument("price", type=float, help="e.g. 1.20 means 1 euro and 20 cents. 0.2 or 0.20 means 20 cents.") 
-    subparser_buy_product.add_argument("-buy_date", "-b", default="2424-01-31", type=str, help="date object with string representation following the format: '%Y-%m-%d'. ex: 2026-10-21 ") 
-    '''
-    2do next: argument buy_date of fn buy_product is an optional argument.
-    Its default value is  currently hard-coded with value "2424-01-31".
-    This default value should be read dynamically from file system_date.txt in the data_directory.
-    '''
+
+    # -buy_date gets its default value from file system_date.txt in the data_directory.
+    path_to_system_date = get_path_to_file("data_directory" , 'system_date.txt')
+    subparser_buy_product.add_argument("-buy_date", "-b", default=get_system_date(path_to_system_date), type=str, help="date object with string representation following the format: '%Y-%m-%d'. ex: 2026-10-21 ") 
     subparser_buy_product.add_argument("-expiry_date", "-e", default="does not expire", type=str, help="supermarket also sells product that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
 
@@ -65,7 +64,8 @@ def main():
     if args.command == "set_date":
         print("set_date")
         # step: call fn set_system_date_to to update file system__date.txt with following date:
-        system_date = set_system_date_to(args.new_system_date, path_to_data_directory_inside_project_superpy)
+        path_to_file_with_system_date = os.path.join(path_to_data_directory_inside_project_superpy, 'system_date.txt')
+        system_date = set_system_date_to(args.new_system_date, path_to_file_with_system_date)
         print(system_date)
 
 
