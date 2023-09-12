@@ -4,11 +4,18 @@ import os, sys, csv
 import datetime
 import random
 from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
+
+# only used in fn create_data_for_csv_files_bought_and_sold():
+from itertools import product
+from copy import deepcopy
+
 
 
 # list of functions:
 # add_days_to_date(date_string, days_to_add)
 # buy_product(product,price,buy_date,expiry_date,id_of_row_in_csv_file_bought,path_to_csv_bought_input_file,path_to_csv_bought_output_file):
+# create_data_for_csv_files_bought_and_sold("long list of parameters")
 # create_id_with_unused_highest_sequence_nr_to_buy_product(path_to_id_with_highest_sequence_number):
 # generate_random_date_in_future_in_time_interval_of_2_months()
 # get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_path):
@@ -20,7 +27,11 @@ from datetime import date, datetime, timedelta
 def add_days_to_date(date_string, days_to_add):
     date = datetime.strptime(date_string, '%Y-%m-%d')
     new_date = date + timedelta(days= days_to_add)
-    print(new_date)
+    '''
+    pitfall:
+    new_date = date.replace(day=date.day+days_to_add) 
+    problem: if date.day+days_to_add > nr of days in month, then you get an error (e.g. 31+1=32, but no month has 32 days).
+    '''
     return new_date.strftime('%Y-%m-%d')
 
 
@@ -98,6 +109,133 @@ def buy_product(product,
     #     writer = csv.writer(file)
     #     writer.writerow(row)
 
+def create_data_for_csv_files_bought_and_sold(
+    nr_of_products_in_supermarket, 
+    delete_every_nth_row,
+    nr_of_days_between_buying_a_product_and_its_expiry_date,
+    number_of_days_between_buying_and_selling_a_product,
+    price_margin_as_mulitplication_factor,
+    lower_year_of_time_interval_in_which_to_create_random_testdata,
+    lower_month_of_time_interval_in_which_to_create_random_testdata,
+    lower_week_of_time_interval_in_which_to_create_random_testdata,
+    nr_of_months_to_add_to_calculate_upper_boundary,
+    nr_of_weeks_to_add_to_calculate_upper_boundary,
+    nr_of_days_to_add_to_calculate_upper_boundary,
+    path_to_file_bought_csv,
+    path_to_file_sold_csv,
+    add_days_to_date,
+    make_id_for_each_row_in_csv_file,
+    generate_random_date_in_future_in_time_interval
+):
+    '''
+        Goal: create testdata for bought.csv and sold.csv. 
+        # part 1 of 2: create testdata for bought.csv
+        # part 2 of 2: create testdata for sold.csv
+    '''
+    # PART 1 OF 2: create testdata for bought.csv: 
+    # make id for each bought product: (e.g. b_1, b_2, b_3, etc):
+    csv_file_bought_id = ''
+    csv_file_bought_id = make_id_for_each_row_in_csv_file('b', 1) 
+
+    # create list with products that are sold in supermarket:
+    # rule: each product can only appear once in supermarket_products:    
+    supermarket_products = list(set(['fish', 'rice', 'potato', 'quinoa', 'bread', 'carrot', 'chicken', 'beef', 'bulgur',  
+                            'tomato', 'lettuce', 'beans', 'cheese', 'apple', 'beetroot', 'kiwi', 'onion', 'eggs', 
+                            'banana', 'oats', 'milk', 'pasta']))
+   
+    # create random list with products that are sold in supermarket:
+    # product = '' # prevent UnboundLocalError: local variable 'product' referenced before assignment
+    products = random.sample(supermarket_products, nr_of_products_in_supermarket) 
+    price_per_unit = [0.50, 1.10, 1.40, 2.50, 3.10, 4.00, 5.20]
+
+    # generate all possible combinations of products and price_per_unit:
+    bought_products = (list(product(products, price_per_unit)))
+    '''
+        math highschool analogy: (5+2)*(3+4) == 5*3 + 5*4 + 2*3 + 2*4:
+        (5+2)*(3+4) == 5*3 + 5*4 + 2*3 + 2*4 == (5,2)*(3,4) == (5,3) + (5,4) + (2,3) + (2,4)
+        While reading this, suppose 5 and 3 are products and 2 and 4 are price_per_unit.
+        Then 2 products and 2 price_per_unit result in 4 combinations == 4 bought products == 4 rows in bought.csv.
+        Then 4 products and 3 price_per_unit result in 12 combinations == 12 bought products == 12 rows in bought.csv.
+    '''
+
+    # generate buy_date and expiry_date for each product:
+    products_with_bought_date = []
+    for bought_product in bought_products:
+        bought_date = generate_random_date_in_future_in_time_interval(
+            lower_year_of_time_interval_in_which_to_create_random_testdata,
+            lower_month_of_time_interval_in_which_to_create_random_testdata,
+            lower_week_of_time_interval_in_which_to_create_random_testdata,
+            nr_of_months_to_add_to_calculate_upper_boundary,
+            nr_of_weeks_to_add_to_calculate_upper_boundary,
+            nr_of_days_to_add_to_calculate_upper_boundary)
+
+        expiry_date = add_days_to_date(bought_date, nr_of_days_between_buying_a_product_and_its_expiry_date) 
+        products_with_bought_date.append(bought_product + (bought_date, expiry_date)) 
+
+    # sort list with tuples on bought_date: (x[3] is the bought_date)
+    products_with_bought_date.sort(key=lambda x: x[3])
+
+    # convert list with tuples into list with lists:
+    products_with_bought_date = [list(elem) for elem in products_with_bought_date]
+    # print(products_with_bought_date) # status: ok (output: list with lists)
+
+    # add id to each list in list:
+    for row_in_csv_file_bought in products_with_bought_date:
+        row_in_csv_file_bought.insert(0, csv_file_bought_id())
+
+    with open(path_to_file_bought_csv, 'w', newline='') as csvfile:    
+        writer = csv.writer(csvfile)
+        writer.writerow(['id', 'product', 'price', 'buy_date', 'expiry_date'])
+        writer.writerows(products_with_bought_date) 
+        # writerows() expects a list of lists.
+
+
+
+    # PART 2 OF 2: create testdata for sold.csv: 
+    products_with_sold_date = deepcopy(products_with_bought_date)
+    # deepcopy() is needed to prevent that changes to products_with_sold_date also affect products_with_bought_date.
+
+    for row in products_with_sold_date:
+        # products_with_sold_date is list with lists:
+
+        buy_price = row[2] # price_of_sold_product is float
+        sell_price = round(buy_price * price_margin_as_mulitplication_factor,2)
+        row[2] = sell_price # sell_price takes the place of buy_price in sold.csv
+
+        # calculate sell_date:
+        buy_date = row[3] # because sold.csv starts of as a deepcopy of bought.csv
+        sold_date = add_days_to_date(buy_date, number_of_days_between_buying_and_selling_a_product) 
+        row[3] = sold_date # sell_date takes the place of buy_date in sold.csv
+
+        # about expiry_date:
+        # expiry_date = row[4] 
+        # leave this value as is, because it is (and should be) the same as in bought.csv
+        # perhaps skip expiry_date from sold.csv, because expiry_date is in bought.csv as well.
+
+        # replace buy_id by sell_id: e.g. b_1 --> s_1, b_2 --> s_2, etc:
+        id_of_record_in_bought_csv = row[0] # e.g. b_28
+        row.insert(1, id_of_record_in_bought_csv) # e.g. b_28, so an exact copy of this immutable string.
+
+        id_of_record_in_sold_csv = row[1]
+        id_of_record_in_sold_csv = id_of_record_in_sold_csv.replace('b', 's') # e.g. b_28 --> s_28
+        row[1] = id_of_record_in_sold_csv # e.g. s_28
+
+    # delete each nth list in list: (so each nth row will expire in sold.csv while time traveling to the future)
+    products_with_sold_date = [row for row in products_with_sold_date if int(row[0].split("_")[1]) % delete_every_nth_row != 0]   
+    '''
+    ex: e.g. input is 'b_17'. b_17 means: row 17 in bought.csv == transaction nr 17 in bought.csv. 
+    b_17 is primary key in bought.csv.
+    int(row[0].split("_")[1]) extracts 17 from b_17.
+    The code bit "% delete_every_nth_row != 0" means: if 17 % 2 != 0, then keep row 17 in bought.csv.
+    17 % 2 != 0, so row 17 is kept in bought.csv.
+    '''
+    # step 3: save data to sold.csv:
+    with open(path_to_file_sold_csv, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['id_sold', 'id_bought', 'product', 'price', 'sold_date', 'expiry_date'])
+        writer.writerows(products_with_sold_date) # note to self: writerows() expects a list of lists.
+
+
 def create_id_with_unused_highest_sequence_nr_to_buy_product(path_to_id_with_highest_sequence_number):
     # uc: provide input for fn buy_product in directory utils.py
     # no other use cases. 
@@ -134,15 +272,39 @@ def create_id_with_unused_highest_sequence_nr_to_buy_product(path_to_id_with_hig
         print("Error in fn create_id_with_unused_highest_sequence_nr()")
     return new_id_to_use_in_fn_buy_product
 
-def generate_random_date_in_future_in_time_interval_of_2_months():
-    today = date(3333, 3, 1)
-    start_date = today.replace(day=1)
-    end_date = start_date.replace(month=start_date.month+2)
+
+def add_days_to_date2(date_string, days_to_add):
+    date = datetime.strptime(date_string, '%Y-%m-%d')
+    new_date = date + timedelta(days= days_to_add)
+    '''
+    pitfall:
+    new_date = date.replace(day=date.day+days_to_add) 
+    problem: if date.day+days_to_add > nr of days in month, then you get an error (e.g. 31+1=32, but no month has 32 days).
+    '''
+    return new_date.strftime('%Y-%m-%d')
+
+
+def generate_random_date_in_future_in_time_interval(interval_lower_boundary_year, 
+                                                    interval_lower_boundary_month, 
+                                                    interval_lower_boundary_day, 
+                                                    nr_of_months_added_to_calculate_upper_boundary,
+                                                    nr_of_weeks_added_to_calculate_upper_boundary,
+                                                    nr_of_days_added_to_calculate_upper_boundary
+                                                    ):
+    '''
+    alternative setup for fn-arguments: system_date in format '%Y-%m-%d' for lower boundary and another one for upper boundary.
+    '''
+    start_date = date(interval_lower_boundary_year, interval_lower_boundary_month, interval_lower_boundary_day)
+    end_date = start_date + relativedelta(months=nr_of_months_added_to_calculate_upper_boundary)
+    end_date = end_date + relativedelta(weeks=nr_of_weeks_added_to_calculate_upper_boundary)
+    end_date = end_date + relativedelta(days=nr_of_days_added_to_calculate_upper_boundary)
     time_between_dates = end_date - start_date
     days_between_dates = time_between_dates.days
     random_number_of_days = random.randrange(days_between_dates)
     random_date = start_date + timedelta(days=random_number_of_days)
     return random_date.strftime('%Y-%m-%d')
+
+
 
 def get_path_to_directory_of_file(directory_of_file):
     # rule: directory_of_file must be unique inside project superpy.
@@ -158,6 +320,7 @@ def get_path_to_directory_of_file(directory_of_file):
         (e.g. fn_set_system_date_testcase_01.), nomatter what the cwd is :).  
     '''
     whereabouts_of_directory_of_file  = str(os.getcwd()) 
+    path_to_directory_of_this_file = '' # prevent UnboundLocalError
     for root, dirs, files in os.walk(whereabouts_of_directory_of_file):
         for name in dirs:
             if name == directory_of_file: 
@@ -169,7 +332,7 @@ def get_path_to_directory_of_file(directory_of_file):
 
 def get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_path):
     whereabouts_of_directory_of_file  = str(os.getcwd()) 
-    path_to_directory_of_this_file = ''
+    path_to_directory_of_this_file = '' # prevent UnboundLocalError
     for root, dirs, files in os.walk(whereabouts_of_directory_of_file):
         for name in dirs:
             if name == directory_of_file: 
@@ -271,6 +434,10 @@ def time_travel_system_date_with_nr_of_days(
             file.write(current_system_date)
     # returning new_system_date for testing purposes only (returned value is not used in the code)    
     return new_system_date
+
+
+
+
 
 
 

@@ -16,6 +16,9 @@ from utils_superpy.utils import set_system_date_to, time_travel_system_date_with
 
 def main():
 
+    DATA_DIRECTORY = "data_used_in_superpy"
+    FILE_WITH_SYSTEM_DATE = "system_date.txt"
+
     #step: initialize parser
     parser = argparse.ArgumentParser(description="Welcome to inventory management tool Superpy.", epilog="The line between disorder and order lies in logistics.")
 
@@ -40,8 +43,8 @@ def main():
     subparser_buy_product.add_argument("product_name", type=str, help="e.g. apple, carrot, oats, etc.") 
     subparser_buy_product.add_argument("price", type=float, help="e.g. 1.20 means 1 euro and 20 cents. 0.2 or 0.20 means 20 cents.") 
 
-    # -buy_date gets its default value from file system_date.txt in the data_directory.
-    path_to_system_date = get_path_to_file("data_directory" , 'system_date.txt')
+    # -buy_date gets its default value from file system_date.txt in the DATA_DIRECTORY.
+    path_to_system_date = get_path_to_file(DATA_DIRECTORY , FILE_WITH_SYSTEM_DATE)
     subparser_buy_product.add_argument("-buy_date", "-b", default=get_system_date(path_to_system_date), type=str, help="date object with string representation following the format: '%Y-%m-%d'. ex: 2026-10-21 ") 
     subparser_buy_product.add_argument("-expiry_date", "-e", default="does not expire", type=str, help="supermarket also sells product that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
@@ -54,7 +57,7 @@ def main():
     path_to_project_superpy  = str(os.getcwd()) 
     # print(path_to_project_superpy)
     # print('path_to_data_directory_inside_project_superpy:')
-    path_to_data_directory_inside_project_superpy = os.path.abspath(os.path.join(path_to_project_superpy, "data_directory"))
+    path_to_data_directory_inside_project_superpy = os.path.abspath(os.path.join(path_to_project_superpy, DATA_DIRECTORY))
     # print(path_to_data_directory_inside_project_superpy)
     # <end of reusable variables>
 
@@ -64,7 +67,7 @@ def main():
     if args.command == "set_date":
         print("set_date")
         # step: call fn set_system_date_to to update file system__date.txt with following date:
-        path_to_file_with_system_date = os.path.join(path_to_data_directory_inside_project_superpy, 'system_date.txt')
+        path_to_file_with_system_date = os.path.join(path_to_data_directory_inside_project_superpy, FILE_WITH_SYSTEM_DATE)
         system_date = set_system_date_to(args.new_system_date, path_to_file_with_system_date)
         print(system_date)
 
@@ -73,7 +76,7 @@ def main():
     print('--------------------------------------------------')
     # goal: dry run: run fn time_travel_system_date_with_nr_of_days() with nr_of_days_to_travel = 1. This is a dry run prior to 
     #       running this fn via argparse. 
-    path_to_file_with_system_date = os.path.join(path_to_data_directory_inside_project_superpy, 'system_date.txt')
+    path_to_file_with_system_date = os.path.join(path_to_data_directory_inside_project_superpy, FILE_WITH_SYSTEM_DATE)
     # new_system_date = time_travel_system_date_with_nr_of_days(2, path_to_file_with_system_date, path_to_file_with_system_date)
     # print(new_system_date)
 
