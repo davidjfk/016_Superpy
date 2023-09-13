@@ -537,20 +537,20 @@
             then b_17 cannot be sold a second time ("you cannot have your cake and eat it too")
 
         pyt fn:
-        def sell_product(product_type, price_per_unit, sell_date):
-        product_type is positional parameter.
+        def sell_product(bought_product_id, price_per_unit, sell_date):
+        bought_product_id (e.g. b_18) is positional parameter.
         price_per_unit is positional parameter.
         sell_date is optional argument with 'system_date' as default value.
         
         shell command plus argparse arguments:
-        py super.py sell apple 4.50 23-09-10  --> taking 23-09-10 as sell_date
-        py super.py sell apple 4.50  --> taking system_date as default sell_date.
+        py super.py sell b_18 4.50 23-09-10  --> taking 23-09-10 as sell_date
+        py super.py sell b_18 4.50  --> taking system_date as default sell_date.
 
         Rule 4: error if you If you try to sell product that has not been bought (so is not in the inventory)
             ex: there is no buy-transaction with id b_1004, then 
             the following argparse command will raise an exception:
             
-            py.super.py sell s_1004 0.50 
+            py.super.py sell b_1004 0.50 
             output:
             ERROR: Product not in stock.
 

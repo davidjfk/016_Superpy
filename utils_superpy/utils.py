@@ -388,7 +388,12 @@ def get_system_date(path_to_system_date):
         print("fn get_system_date: trying to get system_date. Plz investigate error.")
     return system_date
 
-
+def sell_product(bought_product_id, 
+                 price_per_unit, 
+                 sell_date, 
+                 path_to_input_file_test_01, 
+                 path_to_file_with_actual_result_test_01):
+    pass 
 
 def set_system_date_to(system_date, path_to_system_date):
     # system_date is datetime object, ex: '2020-01-01'
