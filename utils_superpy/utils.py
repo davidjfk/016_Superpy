@@ -16,10 +16,10 @@ from copy import deepcopy
 # add_days_to_date(date_string, days_to_add)
 # buy_product(product,price,buy_date,expiry_date,id_of_row_in_csv_file_bought,path_to_csv_bought_input_file,path_to_csv_bought_output_file):
 # create_data_for_csv_files_bought_and_sold("long list of parameters")
-# create_id_with_unused_highest_sequence_nr_to_buy_product(path_to_id_with_highest_sequence_number):
+# create_id_for_each_row_in_boughtcsv_while_script_generates_boughtcsv(path_to_id_with_highest_sequence_number):
+# create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user(path_to_id_with_highest_sequence_number):
 # generate_random_date_in_future_in_time_interval_of_2_months()
 # get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_path):
-# make_id_for_each_row_in_csv_file(csv_file_name_first_letter, first_nr_in_range):
 # set_system_date_to(system_date, path_to_system_date, system_date_file='system_date.txt'): (created in TDD fashion)
 # time_travel_system_date_with_nr_of_days(nr_of_days_to_travel, path_to_input_file, path_to_output_file):
 
@@ -28,13 +28,16 @@ def add_days_to_date(date_string, days_to_add):
     date = datetime.strptime(date_string, '%Y-%m-%d')
     new_date = date + timedelta(days= days_to_add)
     '''
+    This is a helper fn used as fn-argument in following fns:
+    - create_data_for_csv_files_bought_and_sold()
+    - time_travel_system_date_with_nr_of_days()
+    
     pitfall:
     new_date = date.replace(day=date.day+days_to_add) 
     problem: if date.day+days_to_add > nr of days in month, then you get an error (e.g. 31+1=32, but no month has 32 days).
+    solution: use timedelta() instead of replace().
     '''
     return new_date.strftime('%Y-%m-%d')
-
-
 
 
 def buy_product(product,
@@ -110,45 +113,49 @@ def buy_product(product,
     #     writer.writerow(row)
 
 def create_data_for_csv_files_bought_and_sold(
-    nr_of_products_in_supermarket, 
-    delete_every_nth_row,
-    nr_of_days_between_buying_a_product_and_its_expiry_date,
-    number_of_days_between_buying_and_selling_a_product,
-    price_margin_as_mulitplication_factor,
-    lower_year_of_time_interval_in_which_to_create_random_testdata,
-    lower_month_of_time_interval_in_which_to_create_random_testdata,
-    lower_week_of_time_interval_in_which_to_create_random_testdata,
-    nr_of_months_to_add_to_calculate_upper_boundary,
-    nr_of_weeks_to_add_to_calculate_upper_boundary,
-    nr_of_days_to_add_to_calculate_upper_boundary,
+    product_range, 
+    delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling,
+    shelf_life,
+    turnover_time,
+    markup,
+    lower_boundary_year_of_time_interval_in_which_to_create_random_testdata,
+    lower_boundary_month_of_time_interval_in_which_to_create_random_testdata,
+    lower_boundary_week_of_time_interval_in_which_to_create_random_testdata,
+    upper_boundary_nr_of_months_to_add_to_calculate,
+    upper_boundary_nr_of_weeks_to_add_to_calculate,
+    upper_boundary_nr_of_days_to_add_to_calculate,
     path_to_file_bought_csv,
     path_to_file_sold_csv,
     add_days_to_date,
-    make_id_for_each_row_in_csv_file,
-    generate_random_date_in_future_in_time_interval
+    create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv,
+    generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
 ):
     '''
         Goal: create testdata for bought.csv and sold.csv. 
         # part 1 of 2: create testdata for bought.csv
         # part 2 of 2: create testdata for sold.csv
+
+        fn-parameters are not in a lookup-table / dictionary (e.g. config_variables = {} ), 
+        because it could make parsing with argparse cli more difficult (not sure).
+    
     '''
     # PART 1 OF 2: create testdata for bought.csv: 
-    # make id for each bought product: (e.g. b_1, b_2, b_3, etc):
+    # step 1: create id for each bought product: (e.g. b_1, b_2, b_3, etc):
     csv_file_bought_id = ''
-    csv_file_bought_id = make_id_for_each_row_in_csv_file('b', 1) 
+    csv_file_bought_id = create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv('b', 1) 
 
-    # create list with products that are sold in supermarket:
+    # step 2: create list with products that are sold in supermarket:
     # rule: each product can only appear once in supermarket_products:    
     supermarket_products = list(set(['fish', 'rice', 'potato', 'quinoa', 'bread', 'carrot', 'chicken', 'beef', 'bulgur',  
                             'tomato', 'lettuce', 'beans', 'cheese', 'apple', 'beetroot', 'kiwi', 'onion', 'eggs', 
                             'banana', 'oats', 'milk', 'pasta']))
    
-    # create random list with products that are sold in supermarket:
+    # step 3: create random list with products that are sold in supermarket:
     # product = '' # prevent UnboundLocalError: local variable 'product' referenced before assignment
-    products = random.sample(supermarket_products, nr_of_products_in_supermarket) 
+    products = random.sample(supermarket_products, product_range) 
     price_per_unit = [0.50, 1.10, 1.40, 2.50, 3.10, 4.00, 5.20]
 
-    # generate all possible combinations of products and price_per_unit:
+    # step 4: generate all possible combinations of products and price_per_unit:
     bought_products = (list(product(products, price_per_unit)))
     '''
         math highschool analogy: (5+2)*(3+4) == 5*3 + 5*4 + 2*3 + 2*4:
@@ -158,31 +165,32 @@ def create_data_for_csv_files_bought_and_sold(
         Then 4 products and 3 price_per_unit result in 12 combinations == 12 bought products == 12 rows in bought.csv.
     '''
 
-    # generate buy_date and expiry_date for each product:
+    # step 5: generate buy_date and expiry_date for each product:
     products_with_bought_date = []
     for bought_product in bought_products:
-        bought_date = generate_random_date_in_future_in_time_interval(
-            lower_year_of_time_interval_in_which_to_create_random_testdata,
-            lower_month_of_time_interval_in_which_to_create_random_testdata,
-            lower_week_of_time_interval_in_which_to_create_random_testdata,
-            nr_of_months_to_add_to_calculate_upper_boundary,
-            nr_of_weeks_to_add_to_calculate_upper_boundary,
-            nr_of_days_to_add_to_calculate_upper_boundary)
+        bought_date = generate_random_buy_date_for_buy_transaction_in_future_in_time_interval(
+            lower_boundary_year_of_time_interval_in_which_to_create_random_testdata,
+            lower_boundary_month_of_time_interval_in_which_to_create_random_testdata,
+            lower_boundary_week_of_time_interval_in_which_to_create_random_testdata,
+            upper_boundary_nr_of_months_to_add_to_calculate,
+            upper_boundary_nr_of_weeks_to_add_to_calculate,
+            upper_boundary_nr_of_days_to_add_to_calculate)
 
-        expiry_date = add_days_to_date(bought_date, nr_of_days_between_buying_a_product_and_its_expiry_date) 
+        expiry_date = add_days_to_date(bought_date, shelf_life) 
         products_with_bought_date.append(bought_product + (bought_date, expiry_date)) 
 
-    # sort list with tuples on bought_date: (x[3] is the bought_date)
+    # step 6: sort list with tuples on bought_date: (x[3] is the bought_date)
     products_with_bought_date.sort(key=lambda x: x[3])
 
-    # convert list with tuples into list with lists:
+    # step 7: convert list with tuples into list with lists:
     products_with_bought_date = [list(elem) for elem in products_with_bought_date]
     # print(products_with_bought_date) # status: ok (output: list with lists)
 
-    # add id to each list in list:
+    # step 8: add id (b_1, b_2, b_3, etc.) to each list in list:
     for row_in_csv_file_bought in products_with_bought_date:
         row_in_csv_file_bought.insert(0, csv_file_bought_id())
 
+    # step 9: save data to bought.csv:
     with open(path_to_file_bought_csv, 'w', newline='') as csvfile:    
         writer = csv.writer(csvfile)
         writer.writerow(['id', 'product', 'price', 'buy_date', 'expiry_date'])
@@ -190,21 +198,23 @@ def create_data_for_csv_files_bought_and_sold(
         # writerows() expects a list of lists.
 
 
-
     # PART 2 OF 2: create testdata for sold.csv: 
+
+    # step 1: make a deepcopy of bought.csv:
     products_with_sold_date = deepcopy(products_with_bought_date)
     # deepcopy() is needed to prevent that changes to products_with_sold_date also affect products_with_bought_date.
 
+    # step 2: make changes to deepcopy of bought.csv:
     for row in products_with_sold_date:
         # products_with_sold_date is list with lists:
 
         buy_price = row[2] # price_of_sold_product is float
-        sell_price = round(buy_price * price_margin_as_mulitplication_factor,2)
+        sell_price = round(buy_price * markup,2)
         row[2] = sell_price # sell_price takes the place of buy_price in sold.csv
 
         # calculate sell_date:
         buy_date = row[3] # because sold.csv starts of as a deepcopy of bought.csv
-        sold_date = add_days_to_date(buy_date, number_of_days_between_buying_and_selling_a_product) 
+        sold_date = add_days_to_date(buy_date, turnover_time) 
         row[3] = sold_date # sell_date takes the place of buy_date in sold.csv
 
         # about expiry_date:
@@ -220,23 +230,52 @@ def create_data_for_csv_files_bought_and_sold(
         id_of_record_in_sold_csv = id_of_record_in_sold_csv.replace('b', 's') # e.g. b_28 --> s_28
         row[1] = id_of_record_in_sold_csv # e.g. s_28
 
-    # delete each nth list in list: (so each nth row will expire in sold.csv while time traveling to the future)
-    products_with_sold_date = [row for row in products_with_sold_date if int(row[0].split("_")[1]) % delete_every_nth_row != 0]   
+    # step 3: delete each nth list in list: (so each nth row will expire in sold.csv while time traveling to the future)
+    products_with_sold_date = [row for row in products_with_sold_date if int(row[0].split("_")[1]) % 
+        delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling != 0]   
     '''
+    About 'deleting each nth list in list': this sets nr of rows to delete from sold.csv:
+    sold.csv is as a copy of bought.csv. After making the deepcopy, a few changes are made: 
+    e.g. make sell_price different (higher) than buy_price, but also delete some rows. 
+    Rows that are present in bought.csv, but not in sold.csv, will expire while time traveling.
+    (e.g. if delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling = 2, then every 2nd row will be deleted)
+    (e.g. if delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling = 3, then every 3rd row will be deleted)
+
     ex: e.g. input is 'b_17'. b_17 means: row 17 in bought.csv == transaction nr 17 in bought.csv. 
     b_17 is primary key in bought.csv.
     int(row[0].split("_")[1]) extracts 17 from b_17.
-    The code bit "% delete_every_nth_row != 0" means: if 17 % 2 != 0, then keep row 17 in bought.csv.
+    The code bit "% delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling != 0" means: if 17 % 2 != 0, then keep row 17 in bought.csv.
     17 % 2 != 0, so row 17 is kept in bought.csv.
     '''
-    # step 3: save data to sold.csv:
+
+    # step 4: save data to sold.csv:
     with open(path_to_file_sold_csv, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['id_sold', 'id_bought', 'product', 'price', 'sold_date', 'expiry_date'])
         writer.writerows(products_with_sold_date) # note to self: writerows() expects a list of lists.
 
+def create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv(csv_file_name_first_letter, first_nr_in_range):
+    ''' 
+    scope: only used by script create_testdata_for_csv_files_bought_and_sold.py.
+    e.g. "b" is abbreviation of 'bought.csv'. This 'b' will be part of 
+    argparse argument, so needs to be concise for pleasant user 
+    experience.    
+    '''
+    count = first_nr_in_range
+    count -= 1 # to start with 1, not 0
+    def counter():
+        nonlocal count
+        '''
+        note to self: nonlocal is keyword that allows 
+        you to assign to variables in outer 
+        (but non-global) scope.  
+        jsComp: in javascript no kw nonlocal (nor a need to use such a kw in this situation).      
+        '''
+        count += 1
+        return f"{csv_file_name_first_letter}_{count}"
+    return counter
 
-def create_id_with_unused_highest_sequence_nr_to_buy_product(path_to_id_with_highest_sequence_number):
+def create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user(path_to_id_with_highest_sequence_number):
     # uc: provide input for fn buy_product in directory utils.py
     # no other use cases. 
     '''
@@ -273,18 +312,10 @@ def create_id_with_unused_highest_sequence_nr_to_buy_product(path_to_id_with_hig
     return new_id_to_use_in_fn_buy_product
 
 
-def add_days_to_date2(date_string, days_to_add):
-    date = datetime.strptime(date_string, '%Y-%m-%d')
-    new_date = date + timedelta(days= days_to_add)
-    '''
-    pitfall:
-    new_date = date.replace(day=date.day+days_to_add) 
-    problem: if date.day+days_to_add > nr of days in month, then you get an error (e.g. 31+1=32, but no month has 32 days).
-    '''
-    return new_date.strftime('%Y-%m-%d')
 
 
-def generate_random_date_in_future_in_time_interval(interval_lower_boundary_year, 
+
+def generate_random_buy_date_for_buy_transaction_in_future_in_time_interval(interval_lower_boundary_year, 
                                                     interval_lower_boundary_month, 
                                                     interval_lower_boundary_day, 
                                                     nr_of_months_added_to_calculate_upper_boundary,
@@ -357,26 +388,7 @@ def get_system_date(path_to_system_date):
         print("fn get_system_date: trying to get system_date. Plz investigate error.")
     return system_date
 
-def make_id_for_each_row_in_csv_file(csv_file_name_first_letter, first_nr_in_range):
-    ''' 
-    scope: only used by script create_testdata_for_csv_files_bought_and_sold.py.
-    e.g. "b" is abbreviation of 'bought.csv'. This 'b' will be part of 
-    argparse argument, so needs to be concise for pleasant user 
-    experience.    
-    '''
-    count = first_nr_in_range
-    count -= 1 # to start with 1, not 0
-    def counter():
-        nonlocal count
-        '''
-        note to self: nonlocal is keyword that allows 
-        you to assign to variables in outer 
-        (but non-global) scope.  
-        jsComp: in javascript no kw nonlocal (nor a need to use such a kw in this situation).      
-        '''
-        count += 1
-        return f"{csv_file_name_first_letter}_{count}"
-    return counter
+
 
 def set_system_date_to(system_date, path_to_system_date):
     # system_date is datetime object, ex: '2020-01-01'

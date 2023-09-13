@@ -14,6 +14,7 @@
        etc.
 
 
+
 # TABLE OF CONTENTS:
 
 # ANALYSIS
@@ -22,7 +23,7 @@
 # DESIGN
 1. # CREATE datamodel / ERD (entity relationship diagram)  
 2. # CREATE FUNCTION create_testdata_for_csv_files_bought_and_sold.py 
-3. # USE CASES:
+3. # USE CASES (UCS):
         uc 01: set the system_date in time range
         uc 02: timetravel in time range.
         uc 03: buy product (and add to bought.csv) 
@@ -34,14 +35,19 @@
 
         uc 09 fill bought.csv and sold.csv with mock data via argparse cli.
 
-        uc 10: report inventory in time range between start_date and end_date inclusive
+        uc 10: calculate inventory on date
         uc 11: report expired products in time range between start_date and end_date inclusive
         uc 12: report sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
         uc 13: report costs in time range between start_date and end_date inclusive
         uc 14: report revenue in time range between start_date and end_date inclusive
         uc 15: report profit in time range between start_date and end_date inclusive
-4. # MVC: model, view, controller   
-5. # TDD: CODING STEPS TO IMPLEMENT EACH EACH UC
+4. # MVC: model, view, controller  
+5. # TASKS (not UCS )
+6. # TDD: CODING STEPS TO IMPLEMENT EACH EACH UC
+7. # IMPLEMENTATION ORDER OF UCS and TASKS (mandatory and optional)
+
+
+
 
 
 # ANALYSIS
@@ -62,12 +68,16 @@
             1               3         3
             2               3         6
             3               3         9
+            2.5             2         5
         (used in fn create_data_for_csv_files_bought_and_sold() )
 
 
     product_range == product_assortment == the amount of different products in a shop .
-    e.g. ['apple', 'cabbage', 'beetroot'], or e.g. ['coffee', 'potato', 'orange']
-    (used in fn create_data_for_csv_files_bought_and_sold() )
+        e.g. ['apple', 'cabbage', 'beetroot'], or e.g. ['coffee', 'potato', 'orange']
+        product_range is an operand in fn product from module itertools.
+        So more products in product_range lead to more rows in bought.csv.
+        (used in fn create_data_for_csv_files_bought_and_sold() )
+
 
     profit == total revenue minus total expenses in a certain time_interval
         ex: time_interval == from 23-09-12 until 23-12-15 (included)
@@ -88,7 +98,7 @@
         buy_date    expiry_date     shelf_life
         23-09-12     23-09-19         7
         23-09-12     23-09-20         8
-    (used in fn create_data_for_csv_files_bought_and_sold() )
+        (used in fn create_data_for_csv_files_bought_and_sold() )
 
 
      
@@ -101,11 +111,12 @@
 
     time_interval == amount of time (e.g. 3 days, or 4 months and 2 weeks, etc.) between lower boundary and  
         higher boundary.
-    (used in fn create_data_for_csv_files_bought_and_sold() )   
+        (used in fn create_data_for_csv_files_bought_and_sold() )   
 
 
-    "to report" == to calculate (e.g. inventory, see def above) + display the output of the calculation (e.g. in rich and/or matplotlib). The verb 'report' is used in the following ucs:
-        uc 10: report inventory in time range between start_date and end_date inclusive:
+    "to report" == to calculate (e.g. inventory, see def above) + display the output of the calculation (e.g. in
+        rich and/or matplotlib). The verb 'report' is used in the following ucs:
+        uc 10: calculate inventory on date
         uc 11: report expired products in time range between start_date and end_date inclusive:
         uc 12: report sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive: 
         uc 13: report costs in time range between start_date and end_date inclusive:
@@ -297,9 +308,14 @@
 2.  # CREATE FUNCTION create_testdata_for_csv_files_bought_and_sold() 
     precondition: ERD (see prev par) must be ready before creating script.
 
-    Fn create_testdata_for_csv_files_bought_and_sold() has 2 purposes:
+    Fn create_data_for_csv_files_bought_and_sold() has 2 purposes:
     1. provide pytest testcases (path: (...)superpy\dir test_utils) with testdata, both input as well
         as expected output to test a fn.
+
+        This data is created in directory: (...)\superpy\data_pytest_create_boughtcsv_and_soldcsv_for_pytestcases_here
+        with script 'create_testdata_for_csv_files_bought_and_sold.py'. The created files bought.csv and  sold.csv
+        are then moved to the relevant testcases inside directory (...)\superpy\test_utils. 
+
     2. provide application superpy with start data. In file super.py (path: (...)superpy\super.py)
         via argparse subparser ('generate_mock_data' or something similar) superpy-user can fill
         the application with data.
@@ -310,19 +326,22 @@
     The script by default creates random transactions in bought.csv and sold.csv 
 
     Fn create_testdata_for_csv_files_bought_and_sold() has the following configurable options:
-        nr_of_products_in_supermarket, 
+        product_range
         delete_every_nth_row,
-        nr_of_days_between_buying_a_product_and_its_expiry_date,
-        number_of_days_between_buying_and_selling_a_product,
-        price_margin_as_mulitplication_factor,
-        lower_year_of_time_interval_in_which_to_create_random_testdata,
-        lower_month_of_time_interval_in_which_to_create_random_testdata,
-        lower_week_of_time_interval_in_which_to_create_random_testdata,
-        nr_of_months_to_add_to_calculate_upper_boundary,
-        nr_of_weeks_to_add_to_calculate_upper_boundary,
-        nr_of_days_to_add_to_calculate_upper_boundary,
+        shelf_life,
+        turnover_time,
+        markup,
+        lower_boundary_year_of_time_interval_in_which_to_create_random_testdata,
+        lower_boundary_month_of_time_interval_in_which_to_create_random_testdata,
+        lower_boundary_week_of_time_interval_in_which_to_create_random_testdata,
+        upper_boundary_nr_of_months_to_add_to_calculate,
+        upper_boundary_nr_of_weeks_to_add_to_calculate,
+        upper_boundary_nr_of_days_to_add_to_calculate,
         path_to_file_bought_csv,
         path_to_file_sold_csv,
+        add_days_to_date,
+        create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv,
+        generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
 
         Inside this fn there is a long list with products from which to randomly select products
         to generate testdata. If needed, this list can also become a configurable fn-parameter.
@@ -524,8 +543,8 @@
         sell_date is optional argument with 'system_date' as default value.
         
         shell command plus argparse arguments:
-        py super.py sell apple 4.50 23-09-10 
-        py super.py sell apple 4.50 
+        py super.py sell apple 4.50 23-09-10  --> taking 23-09-10 as sell_date
+        py super.py sell apple 4.50  --> taking system_date as default sell_date.
 
         Rule 4: error if you If you try to sell product that has not been bought (so is not in the inventory)
             ex: there is no buy-transaction with id b_1004, then 
@@ -625,11 +644,11 @@
 
         pyt-fn: (status: working )
             def create_data_for_csv_files_bought_and_sold(
-                nr_of_different_products_in_supermarket, --> product range
-                delete_every_nth_row,
-                nr_of_days_between_buying_a_product_and_its_expiry_date, --> shelf_life
-                number_of_days_between_buying_and_selling_a_product, --> turnover_time
-                price_margin_as_mulitplication_factor, --> markup
+                product_range
+                delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling,
+                shelf_life,
+                turnover_time,
+                markup,
                 lower_boundary_year_of_time_interval_in_which_to_create_random_testdata,
                 lower_boundary_month_of_time_interval_in_which_to_create_random_testdata,
                 lower_boundary_week_of_time_interval_in_which_to_create_random_testdata,
@@ -639,8 +658,8 @@
                 path_to_file_bought_csv,
                 path_to_file_sold_csv,
                 add_days_to_date,
-                make_id_for_each_row_in_csv_file,
-                generate_random_date_in_future_in_time_interval
+                create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv,
+                generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
             ):     
 
         shell command plus argparse arguments:
@@ -689,11 +708,28 @@
             path_to_file_bought_csv,
             path_to_file_sold_csv,
             add_days_to_date,
-            make_id_for_each_row_in_csv_file,
-            generate_random_date_in_future_in_time_interval
+            create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv,
+            generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
 
 
-    - uc 10: calculate inventory in time range between start_date and end_date inclusive
+    - uc 10: calculate inventory on date
+
+        When calculating inventory something special is happening:
+        The inventory is calculated as the state at the end of a time range, just
+        like when calculating profit, revenue, costs, expired products, etc. 
+        
+        But unlike when  calculating profit, revenue, etc., as a super.py-user 
+        you CANNOT choose the lower boundary of the time range yourself. Instead, the lower 
+        boundary is ALWAYS the date on which the first product has been bought.
+        ex: 
+        week 1: buy 300 tins of beans 
+        week 2: buy 300 tins of beans
+        week 3: sell 300 tins of beans 
+        suppose you look at the inventory of week 2 and 3 (and ignore the inventory of week 1)
+        then the inventory at the end of week 3 would be: 0 tins of beans...but this is nonsense, because
+        you still have 300 tins of beans from week 1.
+        qed: lower boundary of time range is the date on which you (have) bought the first product. 
+
 
 
         It is management responsibility to ensure that there are always 
@@ -707,8 +743,10 @@
                 
         shell command plus argparse arguments:
         optional argument with 'system_date' as default value. 
-        py super.py inventory -p apple  230709 230909
-        py super.py inventory 230709  
+        py super.py inventory -p apple 230909  --> setting an end_date. "give me inventory of apples on 23-09-09". 
+        py super.py inventory -p coconut --> "give me inventory of coconut on system_date".  
+        py super.py inventory --> "give me inventory of all products on system_date".  
+
         (-p is flag for 'product_type')
 
         perhaps shorten inventory to inv.
@@ -718,7 +756,7 @@
         column 2: nr of products unsold and not yet expired.
 
         e.g. 
-        py s.py inventory  230709 230909 
+        py s.py inventory 230909 
         output:
         product_type    inventory:  
         apple           3
@@ -726,7 +764,7 @@
         etc.
 
         ex 2:
-        py s.py inventory -p apple  230709 230909 
+        py s.py inventory -p apple 230909 
         product_type   id       purchase_price  buy_date        expire_date  
         apple          b_5          0.20        2023-09-05      2323-09-20
         apple          b_12         0.25        2023-09-07      2323-09-22
@@ -735,6 +773,7 @@
         This info is necessary before you can decide to sell a product (e.g. sell b_5 as s_5) 
         for a certain price (e.g. 0.40 would be profitable but selling for 0.20 is acceptable if 
         b_5 is about to expire)
+
 
     - uc 11: calculate expired products in time range between start_date and end_date inclusive
 
@@ -824,6 +863,11 @@
         
         (implement if time left) 
 
+ 
+
+
+
+
 4. # MVC: model, view, controller 
 
     Looking at the ucs from previous chapter 3 from a bird's-eye view:
@@ -852,7 +896,7 @@
     MODEL / VIEW LAYER (MVC-model):
         The following ucs are partly in the View layer and partly in the Model layer (MVC-model) of the application, 
         because if you change change system_date, then the produced reports (in e.g. rich and matplotlib) will also change
-        uc 10: report inventory in time range between start_date and end_date inclusive
+        uc 10: calculate inventory on date
         uc 11: report expired products in time range between start_date and end_date inclusive
         uc 12: report sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
         uc 13: report costs in time range between start_date and end_date inclusive
@@ -868,9 +912,39 @@
     CONTROLLER LAYER (MVC-model):   
         The argparse cli in super.py ( (...)\superpy\super.py) acts as the controller between MODEL and VIEW. 
 
+5. # TASKS (not UCS )
+    - task 01: connect id-range of script 'create_testdata_for_csv_files_bought_and_sold' with id-range of 
+        buy-transactions that are manually added.
+        Currently id-range id_1 to id_299 are served for this script and range id_300 and beyond are 
+        reserved for buy_transactions that are added by super.py-user.
+        If script creates e.g. 167 buy_transactions (b_1 - b_167), and super.py-user then creates a few 
+        buy_transactions (starting at b_300), then currently there is a gap between the 2 ranges.
+
+        Goal of this task: connect the 2 ranges, nomatter how many buy_transactions the script creates.
+        So in ex above, the super.py-user manually creates a buy_transaction that gets assigned b_168 (intead
+        of b_300).
+        If script creates 17 buy_transactions (b_1 - b_17), then user creates its first buy_transaction with 
+        b_18 assigned to it, and so on.
+
+        (not a requirement, so implement only if time left) 
+
+    - task 01: write report (16 instead of uc 16 because this is not a uc)
+        Please include a short, 300-word report that highlights three technical elements of your implementation that you find notable.    
+        Explain what problem they solve and why you chose to implement them in this way.   
+        Include this in your repository as a report.md file.
+
+        Our tips regarding the report:
+
+        You may consider using Markdown for your report.
+
+        Markdown is a markup language you can use for styling your plain text. It is widely used in programming, so it could be a good choice, but it is not required.
+        To assist your explanation you may use code snippets.    
+
+        (this is a mandatory requirement)
 
 
-5. # TDD: CODING STEPS TO IMPLEMENT EACH EACH UC
+
+6. # TDD: CODING STEPS TO IMPLEMENT EACH EACH UC
     coding methodology for each uc: implement each use case in its own TDD-iteration
     Perform the following steps iteratively for each use case from chapter 'List with fn signatures and argparse-command signatures' above. 
     Workflow: 
@@ -956,9 +1030,41 @@
                 this test is supposed to pass). 
 
 
+7. # IMPLEMENTATION ORDER OF UCS and TASKS (mandatory and optional)
+    I first implement the mandatory requirements about super.py from Winc Academy. If time left / permits,
+    I will implement the rest as well.
+
+    Develop all use cases (ucs) with TDD ( == non-trivial feature 1). See previous chapter 6 for explanation 
+    of TDD-metholodogy. The code for each use case (uc) can be found in (...)\superpy\test_utils\"name of uc"
+    "name of uc" can be e.g. "fn_buy_product_testcases". 
+
+    - Mandatory Winc Academy Requirements: 2 implement first:
+    uc 01: set the system_date in time range
+    uc 02: timetravel in time range.
+    uc 03: buy product (and add to bought.csv) 
+    uc 04: sell product (and add to sold.csv)
+
+    uc 09 fill bought.csv and sold.csv with mock data via argparse cli. ( == non-trivial feature 2)
+
+    uc 14: report revenue in time range between start_date and end_date inclusive
+    uc 15: report profit in time range between start_date and end_date inclusive        
+
+    uc 14 and 15 display output in Rich ( == non-trivial feature 3)
 
 
 
+    - extra optional features: 2 implement next (if time permits):
+    uc 05: cancel_buy_transaction (cruD: Delete part 1)
+    uc 06: cancel_sell_transaction (cruD: Delete part 2)
+    uc 07: update_buy_transaction
+    uc 08: update_sell_transaction
+    
+    uc 10: calculate inventory on date
+    uc 11: report expired products in time range between start_date and end_date inclusive
+    uc 12: report sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+    uc 13: report costs in time range between start_date and end_date inclusive
+
+    uc 14 and 15 display output in Matplotlib ( == non-trivial feature 4)
 
 
 

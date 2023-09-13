@@ -10,7 +10,7 @@ from datetime import date
 
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
-from utils_superpy.utils import buy_product, create_id_with_unused_highest_sequence_nr_to_buy_product
+from utils_superpy.utils import buy_product, create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user
 from utils_superpy.utils import get_path_to_file, get_system_date
 from utils_superpy.utils import set_system_date_to, time_travel_system_date_with_nr_of_days
 
@@ -105,7 +105,7 @@ def main():
 
         path_to_id_with_highest_sequence_number = os.path.join(path_to_data_directory_inside_project_superpy, 'id_to_use_in_fn_buy_product.txt')
         # print(path_to_id_with_highest_sequence_number)
-        id_of_row_in_csv_file_bought = create_id_with_unused_highest_sequence_nr_to_buy_product(path_to_id_with_highest_sequence_number) 
+        id_of_row_in_csv_file_bought = create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user(path_to_id_with_highest_sequence_number) 
 
         path_to_csv_bought_input_file = os.path.join(path_to_data_directory_inside_project_superpy, 'bought.csv')
         path_to_csv_bought_output_file = path_to_csv_bought_input_file
