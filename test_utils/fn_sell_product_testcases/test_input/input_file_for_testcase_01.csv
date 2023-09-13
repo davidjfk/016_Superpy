@@ -1,6 +1,1 @@
-id,product,price,buy_date,expiry_date
-b_1,tomato,2.5,2023-10-01,2023-10-08
-b_2,chicken,1.1,2023-10-07,2023-10-14
-b_3,milk,5.2,2023-10-09,2023-10-16
-b_4,bread,2.5,2023-10-09,2023-10-16
-b_5,milk,0.5,2023-10-13,2023-10-20
+sell_id,buy_id,price,sell_date

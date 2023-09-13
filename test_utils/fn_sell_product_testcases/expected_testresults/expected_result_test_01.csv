@@ -1,3 +1,2 @@
-id_sold,id_bought,product,price,sold_date,expiry_date
-b_2,s_2,chicken,7.5,2023-10-10,2023-10-14
-
+sell_id,buy_id,price,sell_date
+s_2,b_2,4.6,2023-10-10
