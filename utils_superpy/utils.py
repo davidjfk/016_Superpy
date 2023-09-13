@@ -444,7 +444,7 @@ def sell_product(bought_product_id,
     # choose between option 1 and 2 (COMMENT OUT THE UNUSED OPTION)
     # option1of2: this alternative in write-mode works
     with open(path_to_csv_bought_output_file, 'w', newline='') as file: 
-        rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'price': price, 'sell_date': sell_date}) 
+        rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': price, 'sell_date': sell_date}) 
         writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
         # Dictwriter is a class. writer is its instanciated obj.
         writer.writeheader()

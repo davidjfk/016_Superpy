@@ -12,7 +12,7 @@ sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
 from utils_superpy.utils import buy_product, create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user
 from utils_superpy.utils import get_path_to_file, get_system_date
-from utils_superpy.utils import set_system_date_to, time_travel_system_date_with_nr_of_days
+from utils_superpy.utils import sell_product, set_system_date_to, time_travel_system_date_with_nr_of_days
 
 def main():
 
@@ -111,8 +111,9 @@ def main():
         path_to_csv_bought_output_file = path_to_csv_bought_input_file
         buy_product(args.product_name, args.price, args.buy_date, args.expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file, path_to_csv_bought_output_file) 
 
-
-
+    path_to_csv_bought_input_file = os.path.join(path_to_data_directory_inside_project_superpy, 'sold.csv')
+    path_to_csv_bought_output_file = path_to_csv_bought_input_file
+    sell_product("b_5", 10.09, "3333-03-12", path_to_csv_bought_input_file, path_to_csv_bought_output_file)
 
 if __name__ == "__main__":
     main()
