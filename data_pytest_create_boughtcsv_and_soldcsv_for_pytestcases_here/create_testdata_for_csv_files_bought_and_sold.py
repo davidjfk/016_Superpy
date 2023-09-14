@@ -17,14 +17,16 @@ file_path_to_directory_superpy =  parent_directory_of_current_directory
 sys.path.append(file_path_to_directory_superpy)
 
 # the following 4 imported fns are arguments in fn create_data_for_csv_files_bought_and_sold() below.
-from utils_superpy.utils import add_days_to_date, generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
-from utils_superpy.utils import get_path_to_directory_of_file, create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv
+from utils_superpy.utils import add_days_to_date
+from utils_superpy.utils import generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
+from utils_superpy.utils import create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv
+from utils_superpy.utils import get_path_to_directory_of_file
 
 from utils_superpy.utils import create_data_for_csv_files_bought_and_sold
 
 def main():
     # to create testdata for bought.csv and sold.csv configure following variables to your liking:
-    product_range = 4
+    product_range = 2
     # see produt_range definition in README_SOFTWARE_DESIGN.md --> ch definitions. 
 
      # variable 'every_nth_row' makes sense inside the assignment statement below it

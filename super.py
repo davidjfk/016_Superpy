@@ -10,9 +10,18 @@ from datetime import date
 
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
-from utils_superpy.utils import buy_product, create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user
+
+# the following 4 imported fns are arguments in fn create_data_for_csv_files_bought_and_sold() below.
+from utils_superpy.utils import add_days_to_date
+from utils_superpy.utils import generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
+from utils_superpy.utils import create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv
+from utils_superpy.utils import get_path_to_directory_of_file
+
+from utils_superpy.utils import buy_product, create_data_for_csv_files_bought_and_sold
+from utils_superpy.utils import create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user
 from utils_superpy.utils import get_path_to_file, get_system_date
 from utils_superpy.utils import sell_product, set_system_date_to, time_travel_system_date_with_nr_of_days
+
 
 def main():
 
@@ -86,7 +95,6 @@ def main():
         print(system_date)
 
 
-
     print('--------------------------------------------------')
     # goal: dry run: run fn time_travel() before executing this fn from command line with argparse:
     '''
@@ -101,7 +109,6 @@ def main():
 
 
     print('--------------------------------------------------')
- 
     # goal: dry run: run fn buy_product() before executing this fn from command line with argparse:
     '''
     path_to_id_with_highest_sequence_number = os.path.join(path_to_data_directory_inside_project_superpy, 'id_to_use_in_fn_buy_product.txt')
@@ -114,7 +121,6 @@ def main():
     '''
     if args.command == "buy":
         print("buy:")
-
         path_to_id_with_highest_sequence_number = os.path.join(path_to_data_directory_inside_project_superpy, 'id_to_use_in_fn_buy_product.txt')
         # print(path_to_id_with_highest_sequence_number)
         id_of_row_in_csv_file_bought = create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user(path_to_id_with_highest_sequence_number) 
@@ -123,22 +129,72 @@ def main():
         path_to_csv_bought_output_file = path_to_csv_bought_input_file # but not the same in pytest.
         buy_product(args.product_name, args.price, args.buy_date, args.expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file, path_to_csv_bought_output_file) 
 
+
     # goal: dry run: run fn sell_product() before executing this fn from command line with argparse:
     '''
     path_to_csv_sold_output_file = os.path.join(path_to_data_directory_inside_project_superpy, 'sold.csv')
     path_to_csv_sold_output_file = path_to_csv_bought_input_file
     sell_product("b_5", 1.09, "3333-03-12", path_to_csv_sold_output_file, path_to_csv_sold_output_file)
     '''
-
     if args.command == "sell":
         print("sell:")
-
         path_to_csv_sold_input_file = os.path.join(path_to_data_directory_inside_project_superpy, 'sold.csv')
         path_to_csv_sold_output_file = path_to_csv_sold_input_file # but not the same in pytest.
         sell_product(args.buy_id, args.price, args.sell_date, path_to_csv_sold_input_file, path_to_csv_sold_output_file)
 
 
+    # to create testdata for bought.csv and sold.csv configure following variables to your liking:
+    product_range = 2
+    # see produt_range definition in README_SOFTWARE_DESIGN.md --> ch definitions. 
 
+     # variable 'every_nth_row' makes sense inside the assignment statement below it
+    every_nth_row = 2
+    delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling = every_nth_row
+
+    shelf_life = 9
+    # see shelf_life definition in README_SOFTWARE_DESIGN.md --> ch definitions.
+
+    turnover_time = 3
+    # see turnover_time definition in README_SOFTWARE_DESIGN.md --> ch definitions.
+    
+    markup = 3
+    # see markup definition in README_SOFTWARE_DESIGN.md --> ch definitions.
+
+
+    # see time_interval definition in README_SOFTWARE_DESIGN.md --> ch definitions:
+    lower_boundary_year_of_time_interval_in_which_to_create_random_testdata = 2023
+    lower_boundary_month_of_time_interval_in_which_to_create_random_testdata = 10
+    lower_boundary_week_of_time_interval_in_which_to_create_random_testdata = 1
+    upper_boundary_nr_of_months_to_add_to_calculate = 2
+    upper_boundary_nr_of_weeks_to_add_to_calculate = 0
+    upper_boundary_nr_of_days_to_add_to_calculate = 0
+
+    # set path to file bought.csv:
+    path_to_directory_testdata = ''
+    path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
+    path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv')
+
+    # set path to file sold.csv:
+    path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv')
+
+    create_data_for_csv_files_bought_and_sold(
+        product_range,
+        delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling,
+        shelf_life,
+        turnover_time,
+        markup,
+        lower_boundary_year_of_time_interval_in_which_to_create_random_testdata,
+        lower_boundary_month_of_time_interval_in_which_to_create_random_testdata,
+        lower_boundary_week_of_time_interval_in_which_to_create_random_testdata,
+        upper_boundary_nr_of_months_to_add_to_calculate,
+        upper_boundary_nr_of_weeks_to_add_to_calculate,
+        upper_boundary_nr_of_days_to_add_to_calculate,
+        path_to_file_bought_csv,
+        path_to_file_sold_csv,
+        add_days_to_date,
+        create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv,
+        generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
+    )
 
 if __name__ == "__main__":
     main()

@@ -16,7 +16,7 @@ from copy import deepcopy
 # add_days_to_date(date_string, days_to_add)
 # buy_product(product,price,buy_date,expiry_date,id_of_row_in_csv_file_bought,path_to_csv_bought_input_file,path_to_csv_bought_output_file):
 # create_data_for_csv_files_bought_and_sold("long list of parameters")
-# create_id_for_each_row_in_boughtcsv_while_script_generates_boughtcsv(path_to_id_with_highest_sequence_number):
+# create_id_for_each_row_in_boughtcsv_while_script_generates_boughtcsv(path_to_id_with_highest_sequence_number)
 # create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user(path_to_id_with_highest_sequence_number):
 # generate_random_date_in_future_in_time_interval_of_2_months()
 # get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_path):
@@ -139,6 +139,8 @@ def create_data_for_csv_files_bought_and_sold(
 
         fn-parameters are not in a lookup-table / dictionary (e.g. config_variables = {} ), 
         because it could make parsing with argparse cli more difficult (not sure).
+
+        This fn cannot be tested with pytest, because I use random.sample() in this fn.
     
     '''
     # PART 1 OF 2: create testdata for bought.csv: 
@@ -148,13 +150,13 @@ def create_data_for_csv_files_bought_and_sold(
 
     # step 2: create list with products that are sold in supermarket:
     # rule: each product can only appear once in supermarket_products:    
-    supermarket_products = list(set(['fish', 'rice', 'potato', 'quinoa', 'bread', 'carrot', 'chicken', 'beef', 'bulgur',  
-                            'tomato', 'lettuce', 'beans', 'cheese', 'apple', 'beetroot', 'kiwi', 'onion', 'eggs', 
-                            'banana', 'oats', 'milk', 'pasta']))
+    supermarket_products = list(set(['fish', 'rice', 'potato', 'quinoa', 'bread', 'carrot', 'chicken', 'beef', 'bulgur','tomato', 'lettuce', 'beans', 'cheese', 'apple', 'beetroot', 'kiwi', 'onion', 'eggs', 'banana', 'oats', 'milk', 'pasta']))
    
     # step 3: create random list with products that are sold in supermarket:
     # product = '' # prevent UnboundLocalError: local variable 'product' referenced before assignment
-    products = random.sample(supermarket_products, product_range) 
+    products = random.sample(supermarket_products, product_range)
+    
+
     price_per_unit = [0.50, 1.10, 1.40, 2.50, 3.10, 4.00, 5.20]
 
     # step 4: generate all possible combinations of products and price_per_unit:
