@@ -89,7 +89,7 @@ def buy_product(product,
     # choose between option 1 and 2 (COMMENT OUT THE UNUSED OPTION)
     # option1of2: this alternative in write-mode works as well (but is more verbose and misuses write-mode):
     with open(path_to_csv_bought_output_file, 'w', newline='') as file: 
-        rows.append({'id': id_of_row_in_csv_file_bought, 'product': product, 'price': price, 'buy_date': buy_date, 'expiry_date': expiry_date}) 
+        rows.append({'buy_id': id_of_row_in_csv_file_bought, 'product': product, 'buy_price': price, 'buy_date': buy_date, 'expiry_date': expiry_date}) 
         writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
         # Dictwriter is a class. writer is its instanciated obj.
         writer.writeheader()

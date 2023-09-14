@@ -20,10 +20,10 @@ path_to_file_with_expected_result_01 = os.path.join(path_to_directory_of_testcas
 path_to_file_with_expected_result_02 = os.path.join(path_to_directory_of_testcase, "expected_testresults",  'expected_result_test_02.csv') 
 
 
-# def test_01_sell_1_product_happy_flow():
-#     filecmp.clear_cache()
-#     sell_product("b_2", 4.6,"2023-10-10", path_to_input_file_test_01, path_to_file_with_actual_result_test_01)
-#     assert filecmp.cmp(path_to_file_with_actual_result_test_01, path_to_file_with_expected_result_01, shallow=False)
+def test_01_sell_1_product_happy_flow():
+    filecmp.clear_cache()
+    sell_product("b_2", 4.6,"2023-10-10", path_to_input_file_test_01, path_to_file_with_actual_result_test_01)
+    assert filecmp.cmp(path_to_file_with_actual_result_test_01, path_to_file_with_expected_result_01, shallow=False)
 
 
 def test_02_sell_2_products_happy_flow():
