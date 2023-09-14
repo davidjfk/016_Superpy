@@ -89,7 +89,7 @@ def buy_product(product,
     # choose between option 1 and 2 (COMMENT OUT THE UNUSED OPTION)
     # option1of2: this alternative in write-mode works as well (but is more verbose and misuses write-mode):
     with open(path_to_csv_bought_output_file, 'w', newline='') as file: 
-        rows.append({'id': id_of_row_in_csv_file_bought, 'product': product, 'price': price, 'buy_date': buy_date, 'expiry_date': expiry_date}) 
+        rows.append({'buy_id': id_of_row_in_csv_file_bought, 'product': product, 'buy_price': price, 'buy_date': buy_date, 'expiry_date': expiry_date}) 
         writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
         # Dictwriter is a class. writer is its instanciated obj.
         writer.writeheader()
@@ -111,6 +111,8 @@ def buy_product(product,
     #     row = [id_of_row_in_csv_file_bought,product,price,buy_date,expiry_date]
     #     writer = csv.writer(file)
     #     writer.writerow(row)
+
+
 
 def create_data_for_csv_files_bought_and_sold(
     product_range, 
@@ -193,7 +195,7 @@ def create_data_for_csv_files_bought_and_sold(
     # step 9: save data to bought.csv:
     with open(path_to_file_bought_csv, 'w', newline='') as csvfile:    
         writer = csv.writer(csvfile)
-        writer.writerow(['id', 'product', 'price', 'buy_date', 'expiry_date'])
+        writer.writerow(['buy_id', 'product', 'buy_price', 'buy_date', 'expiry_date'])
         writer.writerows(products_with_bought_date) 
         # writerows() expects a list of lists.
 
@@ -217,10 +219,14 @@ def create_data_for_csv_files_bought_and_sold(
         sold_date = add_days_to_date(buy_date, turnover_time) 
         row[3] = sold_date # sell_date takes the place of buy_date in sold.csv
 
-        # about expiry_date:
+        # delete expiry_date from sold.csv to avoid redundancy:
         # expiry_date = row[4] 
-        # leave this value as is, because it is (and should be) the same as in bought.csv
-        # perhaps skip expiry_date from sold.csv, because expiry_date is in bought.csv as well.
+        del row[4] 
+
+        # delete product from sold.csv to avoid redundancy:
+        # product = row[1]
+        del row[1]
+
 
         # replace buy_id by sell_id: e.g. b_1 --> s_1, b_2 --> s_2, etc:
         id_of_record_in_bought_csv = row[0] # e.g. b_28
@@ -251,7 +257,7 @@ def create_data_for_csv_files_bought_and_sold(
     # step 4: save data to sold.csv:
     with open(path_to_file_sold_csv, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['id_sold', 'id_bought', 'product', 'price', 'sold_date', 'expiry_date'])
+        writer.writerow(['sell_id', 'buy_id', 'sell_price', 'sell_date'])
         writer.writerows(products_with_sold_date) # note to self: writerows() expects a list of lists.
 
 def create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv(csv_file_name_first_letter, first_nr_in_range):
@@ -388,6 +394,78 @@ def get_system_date(path_to_system_date):
         print("fn get_system_date: trying to get system_date. Plz investigate error.")
     return system_date
 
+def sell_product(bought_product_id, 
+                 price, 
+                 sell_date, 
+                 path_to_csv_bought_input_file, 
+                 path_to_csv_bought_output_file):
+
+    # more info: see comments in fn buy_product()
+    '''
+    About the input_file and output_file:
+    when using superpy as user, input and output csv file are the same.
+    Only when testing fn buy_product in pytest, input and output csv file are different.
+    reason: when testing fn buy_product in pytest, I want to keep the csv-file with testdata intact.
+    '''
+    with open(path_to_csv_bought_input_file, 'r', newline='') as file: 
+        #r+ == read and write. This makes the code below more compact. 
+        # newline='' is necessary to avoid empty lines in csv-file.
+        print('var file is an iterator obj:')
+        print(file) # <_io.TextIOWrapper name='test_file.csv' mode='r+' encoding='cp1252'>
+        print(type(file)) # <class '_io.TextIOWrapper'>
+        # file is an iterator with strings as elements. (!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
+        
+        print('-----------------------------------')
+        reader = csv.DictReader(file)
+        print('var reader is an iterator obj:')
+        print(reader) # <csv.DictReader object at 0x000002579966D600>
+        print(type(reader)) # <class 'csv.DictReader'>
+        # reader is an iterator with dictionaries as elements. (!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
+        # an: so at this point you are still working with an iterator, not with a list.
+
+        print('-----------------------------------')
+        print('var reader.fieldnames is a list:')   
+        print(reader.fieldnames) 
+        print(type(reader.fieldnames)) # <class 'list'>
+
+        print('-----------------------------------')
+        print('list stuff:')
+        print('convert iterator with dictionaries into list with dictionaries: ')
+        rows = list(reader)
+        # rows is a list with dictionaries as elements.
+
+        # print(rows)
+        print('type of rows:')
+        print(type(rows))
+        file.seek(0)
+
+        # create sold_product_id:
+        sold_product_id = bought_product_id.replace('b', 's')
+    # choose between option 1 and 2 (COMMENT OUT THE UNUSED OPTION)
+    # option1of2: this alternative in write-mode works
+    with open(path_to_csv_bought_output_file, 'w', newline='') as file: 
+        rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': price, 'sell_date': sell_date}) 
+        writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
+        # Dictwriter is a class. writer is its instanciated obj.
+        writer.writeheader()
+        writer.writerows(rows)
+        '''
+            in this alternative rows is a list with dictionaries. 
+            Apparently writerows() expects a list with dictionnaries to be passed as argument,
+            in order to update csv-file test_file.csv.        
+        '''
+
+    # option 2of2: 
+    '''
+    problem with this alternative in append-mode: data gets added to the file with actual testresult. 
+    So after each testrun the file with actual testresult gets longer and longer. So 2nd time 
+    you run pytest (and 3rd, etc.) the testcases will fail! Solution: as postperation remove the 
+    data that has been added to the actual testresult file during the testrun....I don't like this solution.
+    '''
+    # with open(path_to_csv_bought_output_file, 'a', newline='') as file:
+    #     row = [id_of_row_in_csv_file_bought,product,price,buy_date,expiry_date]
+    #     writer = csv.writer(file)
+    #     writer.writerow(row)
 
 
 def set_system_date_to(system_date, path_to_system_date):

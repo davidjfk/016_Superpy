@@ -1,3 +1,3 @@
-id,product,price,buy_date,expiry_date
+buy_id,product,buy_price,buy_date,expiry_date
 b_301,orange,0.75,3333-04-22,3333-04-28
 b_302,cabbage,1.2,3333-04-23,3333-04-30

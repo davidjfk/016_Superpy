@@ -23,24 +23,42 @@
 # DESIGN
 1. # CREATE datamodel / ERD (entity relationship diagram)  
 2. # CREATE FUNCTION create_testdata_for_csv_files_bought_and_sold.py 
-3. # USE CASES (UCS):
-        uc 01: set the system_date in time range
-        uc 02: timetravel in time range.
-        uc 03: buy product (and add to bought.csv) 
-        uc 04: sell product (and add to sold.csv)
-        uc 05: cancel_buy_transaction (cruD: Delete part 1)
-        uc 06: cancel_sell_transaction (cruD: Delete part 2)
-        uc 07: update_buy_transaction
-        uc 08: update_sell_transaction
+3. # USE CASES (UCS): 
 
-        uc 09 fill bought.csv and sold.csv with mock data via argparse cli.
+        Develop all use cases (ucs) with TDD ( == non-trivial feature 1). See chapter 6 about TDD-metholodogy. The testcode for each use case (uc) can be found in (...)\superpy\test_utils\"name of uc" . -->"name of uc" can be e.g. "fn_buy_product_testcases". 
+        uc_01: set the system_date in time range
+        uc_02: timetravel in time range.
+        uc_03: buy product (and add to bought.csv) 
+        uc_04: sell product (and add to sold.csv)
+        uc_05: cancel_buy_transaction (cruD: Delete part 1)
+        uc_06: cancel_sell_transaction (cruD: Delete part 2)
+        uc_07: update_buy_transaction
+        uc_08: update_sell_transaction
 
-        uc 10: calculate inventory on date
-        uc 11: report expired products in time range between start_date and end_date inclusive
-        uc 12: report sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
-        uc 13: report costs in time range between start_date and end_date inclusive
-        uc 14: report revenue in time range between start_date and end_date inclusive
-        uc 15: report profit in time range between start_date and end_date inclusive
+        uc_09 fill bought.csv and sold.csv with mock data via argparse cli ( == non-trivial feature 2).
+
+        uc_10: calculate inventory on date
+        uc_11: calculate expired products in time range between start_date and end_date inclusive
+        uc_12: calculate sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+        uc_13: calculate costs in time range between start_date and end_date inclusive
+        uc_14: calculate revenue in time range between start_date and end_date inclusive
+        uc_15: calculate profit in time range between start_date and end_date inclusive
+
+        Display output in Rich ( == non-trivial feature 3):
+        uc_16: display_in_rich_inventory on date
+        uc_17: display_in_rich_expired products in time range between start_date and end_date inclusive
+        uc_18: display_in_rich_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+        uc_19: display_in_rich_costs in time range between start_date and end_date inclusive
+        uc_20: display_in_rich_revenue in time range between start_date and end_date inclusive
+        uc_21: display_in_rich_profit in time range between start_date and end_date inclusive
+
+        Display output in Matplotlib ( == non-trivial feature 4):
+        uc_22: display_in_matplotlib_inventory on date
+        uc_23: display_in_rich_expired products in time range between start_date and end_date inclusive
+        uc_24: display_in_matplotlib_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+        uc_25: display_in_matplotlib_costs in time range between start_date and end_date inclusive
+        uc_26: display_in_matplotlib_revenue in time range between start_date and end_date inclusive
+        uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
 4. # MVC: model, view, controller  
 5. # TASKS (not UCS )
 6. # TDD: CODING STEPS TO IMPLEMENT EACH EACH UC
@@ -112,16 +130,6 @@
     time_interval == amount of time (e.g. 3 days, or 4 months and 2 weeks, etc.) between lower boundary and  
         higher boundary.
         (used in fn create_data_for_csv_files_bought_and_sold() )   
-
-
-    "to report" == to calculate (e.g. inventory, see def above) + display the output of the calculation (e.g. in
-        rich and/or matplotlib). The verb 'report' is used in the following ucs:
-        uc 10: calculate inventory on date
-        uc 11: report expired products in time range between start_date and end_date inclusive:
-        uc 12: report sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive: 
-        uc 13: report costs in time range between start_date and end_date inclusive:
-        uc 14: report revenue in time range between start_date and end_date inclusive:
-        uc 15: report profit in time range between start_date and end_date inclusive:
 
 
     turnover time == inventory turnover == the number of days between buying and selling a product  
@@ -413,7 +421,7 @@
         While creating the fn- and arparse-signatures, I check if they are compatible with the created ERD.
 
 
-    - uc 01: set the system_date in time range
+    - uc_01: set the system_date in time range
         This creates a baseline to timetravel ('back to the future, yeah, here I come')
 
         Order of events: 
@@ -438,7 +446,7 @@
 
 
     
-    - uc 02: timetravel in time range.
+    - uc_02: timetravel in time range.
         example code: $ py main.py time_travel 2
 
         To 'advance' means to move forward in purposeful way. But this superpy-app can also timetravel to 
@@ -462,7 +470,7 @@
 
 
 
-    - uc 03: buy product (and add to bought.csv) 
+    - uc_03: buy product (and add to bought.csv) 
 
         pyt fn:
         def buy_product(product_type, price_per_unit, buy_date, expiryDate):
@@ -524,7 +532,7 @@
             It would be very user-unfriendly to type in such an id when deleting e.g. a product with such an id.
 
 
-    - uc 04: sell product (and add to sold.csv)
+    - uc_04: sell product (and add to sold.csv)
         Rule 1: each id in buy.csv (e.g. b_08) and sell.csv (e.g. s_08) MUST be unique.
         Rule 2: a primary key id in sold.csv can only be created if there is a primary key in
             bought.csv with the same nr. examples:
@@ -537,25 +545,25 @@
             then b_17 cannot be sold a second time ("you cannot have your cake and eat it too")
 
         pyt fn:
-        def sell_product(product_type, price_per_unit, sell_date):
-        product_type is positional parameter.
+        def sell_product(bought_product_id, price_per_unit, sell_date):
+        bought_product_id (e.g. b_18) is positional parameter.
         price_per_unit is positional parameter.
         sell_date is optional argument with 'system_date' as default value.
         
         shell command plus argparse arguments:
-        py super.py sell apple 4.50 23-09-10  --> taking 23-09-10 as sell_date
-        py super.py sell apple 4.50  --> taking system_date as default sell_date.
+        py super.py sell b_18 4.50 23-09-10  --> taking 23-09-10 as sell_date
+        py super.py sell b_18 4.50  --> taking system_date as default sell_date.
 
         Rule 4: error if you If you try to sell product that has not been bought (so is not in the inventory)
             ex: there is no buy-transaction with id b_1004, then 
             the following argparse command will raise an exception:
             
-            py.super.py sell s_1004 0.50 
+            py.super.py sell b_1004 0.50 
             output:
             ERROR: Product not in stock.
 
 
-    - uc 05: cancel_buy_transaction (cruD: Delete part 1)
+    - uc_05: cancel_buy_transaction (cruD: Delete part 1)
         
         Rule 1: a bought product can be sold if it has not yet been sold. (exception: see rule 4)
         Rule 2: a bought product cannot be deleted if it has already been sold.
@@ -573,7 +581,7 @@
         Rule 4: after cancelling a sold transaction (see next uc: cancel_sell_transaction) (e.g. s_179), the 
             buy_transaction (here: b_179) can  now also be cancelled. 
     
-    - uc 06: cancel_sell_transaction (cruD: Delete part 2)
+    - uc_06: cancel_sell_transaction (cruD: Delete part 2)
         
         Rule 1: a sale (i.e. the sales transaction) of a product can  be undone / cancelled. 
         Rule 2: also the sales transaction of an  expired  product can be cancelled: it does 
@@ -599,7 +607,7 @@
 
         (implement only if there is time left)        
 
-    - uc 07: update_buy_transaction
+    - uc_07: update_buy_transaction
 
         update_buy_transaction = cancel_buy_transaction (uc 05) + buy_product (uc 03)
         So to update you first do cancel_buy_transaction (uc 05) and then buy the same product
@@ -614,7 +622,7 @@
         Nothing to do here.
         
 
-    - uc 08: update_sell_transaction
+    - uc_08: update_sell_transaction
 
         update_sell_transaction = cancel_sell_transaction (uc 06) + buy_product (uc 04)
         So to update you first do cancel_buy_transaction (uc 06) and then buy the same product
@@ -630,7 +638,7 @@
 
 
 
-    - uc 09: fill bought.csv and sold.csv with mock data
+    - uc_09: fill bought.csv and sold.csv with mock data
 
         goal: call fn def create_data_for_csv_files_bought_and_sold() in utils.py from argparse interface
               to quickly create specific (test) application data.
@@ -712,7 +720,7 @@
             generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
 
 
-    - uc 10: calculate inventory on date
+    - uc_10: calculate inventory on date
 
         When calculating inventory something special is happening:
         The inventory is calculated as the state at the end of a time range, just
@@ -775,7 +783,7 @@
         b_5 is about to expire)
 
 
-    - uc 11: calculate expired products in time range between start_date and end_date inclusive
+    - uc_11: calculate expired products in time range between start_date and end_date inclusive
 
         pyt fn:
         def calculate_expired_products(product_type, start_date, end_date):
@@ -795,7 +803,7 @@
 
         (2 flags: calculate_expired , ce)
 
-    - uc 12: calculate sales of number of products (Dutch: afzet) in time range between 
+    - uc_12: calculate sales of number of products (Dutch: afzet) in time range between 
         start_date and end_date inclusive 
         --> also serves as input to calculate revenue 
 
@@ -813,7 +821,7 @@
         
         (implement if time left) 
 
-    - uc 13: report costs in time range between start_date and end_date inclusive
+    - uc_13: calculate costs in time range between start_date and end_date inclusive
         --> also serves as input to calculate revenue 
 
         pyt fn:
@@ -830,7 +838,7 @@
         
         (implement if time left) 
 
-    - uc 14: report revenue in time range between start_date and end_date inclusive
+    - uc_14: calculate revenue in time range between start_date and end_date inclusive
 
         pyt fn:
         def calculate_revenue(product_type, start_date, end_date):
@@ -845,9 +853,9 @@
         py super.py revenue 230709 
         (-p is flag for 'product_type')
         
-        (implement if time left)
+        (mandatory Winc Academy requirement)
 
-    - uc 15: report profit in time range between start_date and end_date inclusive
+    - uc_15: calculate profit in time range between start_date and end_date inclusive
 
         pyt fn:
         def calculate_profit(product_type, start_date, end_date):
@@ -861,9 +869,23 @@
         py super.py profit 230709  
         (-p is flag for 'product_type')
         
-        (implement if time left) 
+        (mandatory Winc Academy requirement)
 
- 
+    Display output in Rich ( == non-trivial feature 3):
+    - uc_16: display_in_rich_inventory on date
+    - uc_17: display_in_rich_expired products in time range between start_date and end_date inclusive
+    - uc_18: display_in_rich_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+    - uc_19: display_in_rich_costs in time range between start_date and end_date inclusive
+    - uc_20: display_in_rich_revenue in time range between start_date and end_date inclusive
+    - uc_21: display_in_rich_profit in time range between start_date and end_date inclusive
+
+    Display output in Matplotlib ( == non-trivial feature 4):
+    - uc_22: display_in_matplotlib_inventory on date
+    - uc_23: display_in_rich_expired products in time range between start_date and end_date inclusive
+    - uc_24: display_in_matplotlib_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+    - uc_25: display_in_matplotlib_costs in time range between start_date and end_date inclusive
+    - uc_26: display_in_matplotlib_revenue in time range between start_date and end_date inclusive
+    - uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
 
 
 
@@ -873,39 +895,56 @@
     Looking at the ucs from previous chapter 3 from a bird's-eye view:
 
     MODEL LAYER (MVC-model):
-        The following ucs are in the Model layer (MVC-model) because they change state:
-        uc 01: set the system_date in time range
-        uc 02: timetravel in time range.
-        uc 03: buy product (and add to bought.csv) 
-        uc 04: sell product (and add to sold.csv)
-        uc 05: cancel_buy_transaction (cruD: Delete part 1)
-        uc 06: cancel_sell_transaction (cruD: Delete part 2)
-        uc 07: update_buy_transaction
-        uc 08: update_sell_transaction
+        The following ucs are in the Model layer (MVC-model):
+        uc_01: set the system_date in time range
+        uc_02: timetravel in time range.
+        uc_03: buy product (and add to bought.csv) 
+        uc_04: sell product (and add to sold.csv)
+        uc_05: cancel_buy_transaction (cruD: Delete part 1)
+        uc_06: cancel_sell_transaction (cruD: Delete part 2)
+        uc_07: update_buy_transaction
+        uc_08: update_sell_transaction
 
         They combine all CUD-operations (create, update, delete) that are allowed (within 
         the constraints of the rules in these ucs) on system_date.txt, bought.csv and sold.csv .
         These are the basic operations that must be in place before moving on
         with the following ucs (imho). 
 
-        Uc 09 creates realistic mock data via argparse interface, so as a super.py-user you do not have 
-        to start with entering a whole bunch of buy- and sell-records, before you can e.g. calculate
-        the inventory, costs, turnover and/or profit over a certain period in the upcoming ucs.
-        Uc 09 is also are in the Model layer (MVC-model) because it changes state.
 
-    MODEL / VIEW LAYER (MVC-model):
-        The following ucs are partly in the View layer and partly in the Model layer (MVC-model) of the application, 
-        because if you change change system_date, then the produced reports (in e.g. rich and matplotlib) will also change
-        uc 10: calculate inventory on date
-        uc 11: report expired products in time range between start_date and end_date inclusive
-        uc 12: report sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
-        uc 13: report costs in time range between start_date and end_date inclusive
-        uc 14: report revenue in time range between start_date and end_date inclusive
-        uc 15: report profit in time range between start_date and end_date inclusive
+        uc_09 fill bought.csv and sold.csv with mock data via argparse cli. ( == non-trivial feature 2).
+        Benefit: as a super.py-user you do not have to start with entering a whole 
+        bunch of buy- and sell-records, before you can e.g. calculate the inventory, costs, 
+        turnover and/or profit over a certain period in the upcoming ucs.
+        uc_09 is also are in the Model layer (MVC-model) because it changes state.
 
-        "to report" == to calculate (e.g. inventory) + display the output of the calculation in tool 'rich' and 'matplotlib'.
-        calculation-part is model.
-        display-part is view.
+
+        uc_10: calculate inventory on date
+        uc_11: calculate expired products in time range between start_date and end_date inclusive
+        uc_12: calculate sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+        uc_13: calculate costs in time range between start_date and end_date inclusive
+        uc_14: calculate revenue in time range between start_date and end_date inclusive
+        uc_15: calculate profit in time range between start_date and end_date inclusive
+
+
+    VIEW LAYER (MVC-model):
+        The following ucs are in the View layer (MVC-model) of the application, 
+        because they are about how the data is presented to the users (with 'rich' and/or
+        matplotlib).
+
+        uc_16: display_in_rich_inventory on date
+        uc_17: display_in_rich_expired products in time range between start_date and end_date inclusive
+        uc_18: display_in_rich_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+        uc_19: display_in_rich_costs in time range between start_date and end_date inclusive
+        uc_20: display_in_rich_revenue in time range between start_date and end_date inclusive
+        uc_21: display_in_rich_profit in time range between start_date and end_date inclusive
+
+        uc_22: display_in_matplotlib_inventory on date
+        uc_23: display_in_rich_expired products in time range between start_date and end_date inclusive
+        uc_24: display_in_matplotlib_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+        uc_25: display_in_matplotlib_costs in time range between start_date and end_date inclusive
+        uc_26: display_in_matplotlib_revenue in time range between start_date and end_date inclusive
+        uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
+
         I have selected tool 'rich' instead of tool 'tabulate' because of the better rating on 
         https://www.libhunt.com/compare-python-tabulate-vs-rich (especially with regard to amount of stars)
         
@@ -1031,40 +1070,57 @@
 
 
 7. # IMPLEMENTATION ORDER OF UCS and TASKS (mandatory and optional)
-    I first implement the mandatory requirements about super.py from Winc Academy. If time left / permits,
-    I will implement the rest as well.
+    First implement the mandatory requirements about super.py from Winc Academy. 
 
     Develop all use cases (ucs) with TDD ( == non-trivial feature 1). See previous chapter 6 for explanation 
-    of TDD-metholodogy. The code for each use case (uc) can be found in (...)\superpy\test_utils\"name of uc"
+    of TDD-metholodogy. The testcode for each use case (uc) can be found in (...)\superpy\test_utils\"name of uc" -->
     "name of uc" can be e.g. "fn_buy_product_testcases". 
 
-    - Mandatory Winc Academy Requirements: 2 implement first:
-    uc 01: set the system_date in time range
-    uc 02: timetravel in time range.
-    uc 03: buy product (and add to bought.csv) 
-    uc 04: sell product (and add to sold.csv)
+    - MANDATORY Winc Academy Requirements: 2 implement first:
+    uc_01: set the system_date in time range
+    uc_02: timetravel in time range.
+    uc_03: buy product (and add to bought.csv) 
+    uc_04: sell product (and add to sold.csv)
 
-    uc 09 fill bought.csv and sold.csv with mock data via argparse cli. ( == non-trivial feature 2)
+    uc_09 fill bought.csv and sold.csv with mock data via argparse cli. ( == non-trivial feature 2)
 
-    uc 14: report revenue in time range between start_date and end_date inclusive
-    uc 15: report profit in time range between start_date and end_date inclusive        
-
-    uc 14 and 15 display output in Rich ( == non-trivial feature 3)
-
-
-
-    - extra optional features: 2 implement next (if time permits):
-    uc 05: cancel_buy_transaction (cruD: Delete part 1)
-    uc 06: cancel_sell_transaction (cruD: Delete part 2)
-    uc 07: update_buy_transaction
-    uc 08: update_sell_transaction
+    uc_14: calculate revenue in time range between start_date and end_date inclusive
+    uc_13: calculate costs in time range between start_date and end_date inclusive
+            profit == revenue minus costs. So  to calculate profit in uc_15 next, I must calculate
+            cost first.
     
-    uc 10: calculate inventory on date
-    uc 11: report expired products in time range between start_date and end_date inclusive
-    uc 12: report sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
-    uc 13: report costs in time range between start_date and end_date inclusive
+    uc_15: calculate profit in time range between start_date and end_date inclusive        
 
-    uc 14 and 15 display output in Matplotlib ( == non-trivial feature 4)
+
+    
+
+    - EXTRA OPTIONAL features: 
+    uc_05: cancel_buy_transaction (cruD: Delete part 1)
+    uc_06: cancel_sell_transaction (cruD: Delete part 2)
+    uc_07: update_buy_transaction
+    uc_08: update_sell_transaction
+    
+    uc_10: calculate inventory on date
+    uc_11: calculate expired products in time range between start_date and end_date inclusive
+    uc_12: calculate sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+    
+
+    Display output in Rich ( == non-trivial feature 3):
+    uc_16: display_in_rich_inventory on date
+    uc_17: display_in_rich_expired products in time range between start_date and end_date inclusive
+    uc_18: display_in_rich_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+    uc_19: display_in_rich_costs in time range between start_date and end_date inclusive
+    uc_20: display_in_rich_revenue in time range between start_date and end_date inclusive
+    uc_21: display_in_rich_profit in time range between start_date and end_date inclusive
+
+    Display output in Matplotlib ( == non-trivial feature 4):
+    uc_22: display_in_matplotlib_inventory on date
+    uc_23: display_in_rich_expired products in time range between start_date and end_date inclusive
+    uc_24: display_in_matplotlib_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+    uc_25: display_in_matplotlib_costs in time range between start_date and end_date inclusive
+    uc_26: display_in_matplotlib_revenue in time range between start_date and end_date inclusive
+    uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
+
 
 
 

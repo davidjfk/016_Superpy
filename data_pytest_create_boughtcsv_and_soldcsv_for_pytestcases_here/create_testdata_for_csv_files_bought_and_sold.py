@@ -31,10 +31,10 @@ def main():
     every_nth_row = 2
     delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling = every_nth_row
 
-    shelf_life = 2
+    shelf_life = 9
     # see shelf_life definition in README_SOFTWARE_DESIGN.md --> ch definitions.
 
-    turnover_time = 5
+    turnover_time = 3
     # see turnover_time definition in README_SOFTWARE_DESIGN.md --> ch definitions.
     
     markup = 3
