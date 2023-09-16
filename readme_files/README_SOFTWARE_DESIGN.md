@@ -834,8 +834,7 @@
 
     - uc_12: calculate sales of number of products (Dutch: afzet) in time range between 
         start_date and end_date inclusive 
-        --> this uc serves as necessary input to calculate revenue 
-        (calculate revenue is mandatory) 
+        (implement if time left)
 
         pyt fn:
         def calculate_sales_number(product_type, start_date, end_date):
@@ -864,8 +863,9 @@
 
         shell command plus argparse arguments:
         py super.py cost 230709 230909 
-        py super.py cost -p apple  230709 230909
         py super.py cost 230709  
+
+        py super.py cost -p apple  230709 230909 (--> implement if time left)
         (-p is flag for 'product_type')
 
         Display output in Rich and/or Matplotlib. See ucs further down below.
@@ -879,11 +879,11 @@
         end_date is optional argument with 'system_date' as default value.
         product_type is optional argument with "all products" as default value.
         
-
         shell command plus argparse arguments:
-        py super.py revenue 230709 230909 
-        py super.py revenue -p apple  230709 230909 
+        py super.py revenue 230709 230909  
         py super.py revenue 230709 
+
+        py super.py revenue -p apple  230709 230909 (--> implement if time left)
         (-p is flag for 'product_type')
 
         Display output in Rich and/or Matplotlib. See ucs further down below.
@@ -900,8 +900,9 @@
         
         shell command plus argparse arguments: 
         py super.py profit 230709 230909 
-        py super.py profit -p apple  230709 230909
-        py super.py profit 230709  
+        py super.py profit 230709 
+
+        py super.py profit -p apple  230709 230909 (--> implement if time left)
         (-p is flag for 'product_type')
 
         Display output in Rich and/or Matplotlib. See ucs further down below.         

@@ -116,7 +116,39 @@ def buy_product(product,
     #     writer.writerow(row)
 
 
+# def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_input_file):
+#     pass
 
+def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
+    '''
+    Goal of fn: calculate revenue in time range between start_date and end_date inclusive.
+    hardcoded variables in fn: sell_date, sell_price .
+    These variables refer to column names in sold.csv. 
+    (for now no need to make them dynamic, i.e. no need to turn them into fn-parameters)
+    
+    ex of start_date: '2023-09-01'
+    ex of end_date: '2023-12-21'
+    '''
+    # print('start_date:')
+    start_date = datetime.strptime(str(start_date), '%Y-%m-%d')
+    # print(start_date)
+    # print('end_date:')
+    end_date = datetime.strptime(str(end_date), '%Y-%m-%d')
+    # print(end_date)
+
+    revenue = 0
+    with open(path_to_csv_sold_file, 'r', newline='') as file: 
+        reader = csv.DictReader(file)
+        for row in reader:
+            # print('row:')
+            # print(row)
+            sell_date = row['sell_date']
+            sell_date = datetime.strptime(sell_date, '%Y-%m-%d')
+            if start_date <= sell_date <= end_date:
+                # print(revenue)
+                revenue += float(row['sell_price'])
+                revenue_rounded = round(revenue, 2)
+    return revenue_rounded
 
 
 def create_data_for_csv_files_bought_and_sold(

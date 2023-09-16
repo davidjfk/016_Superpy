@@ -25,6 +25,7 @@ from utils_superpy.utils import create_id_with_unused_highest_sequence_nr_to_buy
 from utils_superpy.utils import get_path_to_file, get_system_date
 from utils_superpy.utils import sell_product, set_system_date_to, time_travel_system_date_with_nr_of_days
 from utils_superpy.utils import show_csv_file_in_console_with_module_rich
+from utils_superpy.utils import calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive
 
 
 def main():
@@ -81,7 +82,7 @@ def main():
 
     subparser_create_mock_data.add_argument("-product_range", "-pr", default=3, type=int, help=" ") 
     subparser_create_mock_data.add_argument("-delete_every_nth_row", "-del_nth_row", default=3, type=int, help=" ") 
-    subparser_create_mock_data.add_argument("-shelf_life", "-sl", default=999, type=int, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
+    subparser_create_mock_data.add_argument("-shelf_life", "-sl", default=10, type=int, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
     subparser_create_mock_data.add_argument("-turnover_time", "-tt", default=3, type=int, help=" ")
     subparser_create_mock_data.add_argument("-markup", "-mu", default=3, type=int, help=" ")
 
@@ -96,7 +97,7 @@ def main():
     subparser_create_mock_data.add_argument("-lower_boundary_month_of_time_interval_in_which_to_create_random_testdata","-lower_boundary_month", "-lbm", default=default_month, type=int, help="lower_boundary_month_of_time_interval_in_which_to_create_random_testdata")
     subparser_create_mock_data.add_argument("-lower_boundary_day_of_time_interval_in_which_to_create_random_testdata","-lower_boundary_day", "-lbd", default=default_day, type=int, help="lower_boundary_day_of_time_interval_in_which_to_create_random_testdata")
 
-    subparser_create_mock_data.add_argument("-upper_boundary_nr_of_months_to_add_to_calculate","-upper_boundary_month", "-ubm", "-upper_boundary_nr_of_months_to_add_to_calculate", default=2, type=int, help="upper_boundary_nr_of_months_to_add_to_calculate")
+    subparser_create_mock_data.add_argument("-upper_boundary_nr_of_months_to_add_to_calculate","-upper_boundary_month", "-ubm", "-ubm", default=2, type=int, help="upper_boundary_nr_of_months_to_add_to_calculate")
     subparser_create_mock_data.add_argument("-upper_boundary_nr_of_weeks_to_add_to_calculate","-upper_boundary_week", "-ubw", "-upper_boundary_nr_of_weeks_to_add_to_calculate", default=0, type=int, help="upper_boundary_nr_of_weeks_to_add_to_calculate")
     subparser_create_mock_data.add_argument("-upper_boundary_nr_of_days_to_add_to_calculate","-upper_boundary_day", "-ubd", "-upper_boundary_nr_of_days_to_add_to_calculate", default=0, type=int, help="upper_boundary_nr_of_days_to_add_to_calculate")
  
@@ -120,6 +121,15 @@ def main():
 
     # SHOW_SOLD_CSV: Create subparser "show_sold_csv" with help text and add it to the container "command":
     subparser_show_sold_csv = subparsers.add_parser("show_sold_csv", help="goal: show all data in sold.csv on the command line with tool rich. \n   ex: py super.py show_sold_csv \n   result: sold.csv is shown in the terminal.   \n\n") 
+
+
+    # SHOW_REVENUE: Create subparser "show_revenue" with help text and add it to the container "command":
+    subparser_show_revenue = subparsers.add_parser("show_revenue", help="goal: show revenue in time range between start_date and end_date inclusive. \n   ex: py super.py show_revenue 2023-10-11 2023-10-13 \n   result: revenue is shown in the terminal. \n   ex: 'Revenue from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n   arg1: start_date in format 'YYYY-MM-DD'. ex: 2023-09-01 \n   arg2: end_date in format 'YYYY-MM-DD'. ex: 2023-10-15   \n\n")
+    #step: add the positional and optional arguments to 'subparser_show_revenue':
+    subparser_show_revenue.add_argument("start_date", type=str, help="specify the start date in format YYYY-MM-DD")
+    subparser_show_revenue.add_argument("end_date", type=str, help="specify the end date in format YYYY-MM-DD")
+
+
 
     #step: parse the arguments
     args = parser.parse_args()
@@ -289,6 +299,23 @@ def main():
         path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
         show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
 
+    # dry run before calling this fn from command line with argparse:
+    # path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', "sold.csv")
+    # revenue = calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive('2023-09-01', '2023-12-21', path_to_csv_sold_file)
+    # print(f"Revenue: {revenue}")
+
+
+    if args.command == "show_revenue":
+        # set path to file sold.csv:
+        path_to_directory_testdata = ''
+        path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
+        path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
+        revenue = calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_sold_csv)
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')
+        print(f"Revenue from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {revenue}")
+        print('                                                                                                   ')
+        print('---------------------------------------------------------------------------------------------------')
 
 if __name__ == "__main__":
     main()

@@ -47,8 +47,8 @@ def main():
     lower_boundary_year_of_time_interval_in_which_to_create_random_testdata = 2023
     lower_boundary_month_of_time_interval_in_which_to_create_random_testdata = 10
     lower_boundary_week_of_time_interval_in_which_to_create_random_testdata = 1
-    upper_boundary_nr_of_months_to_add_to_calculate = 2
-    upper_boundary_nr_of_weeks_to_add_to_calculate = 0
+    upper_boundary_nr_of_months_to_add_to_calculate = 0
+    upper_boundary_nr_of_weeks_to_add_to_calculate = 4
     upper_boundary_nr_of_days_to_add_to_calculate = 0
 
     # set path to file bought.csv:
