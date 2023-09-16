@@ -37,6 +37,7 @@
 
         uc_09 fill bought.csv and sold.csv with mock data via argparse cli ( == non-trivial feature 2).
 
+
         uc_10: calculate inventory on date
         uc_11: calculate expired products in time range between start_date and end_date inclusive
         uc_12: calculate sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
@@ -59,6 +60,12 @@
         uc_25: display_in_matplotlib_costs in time range between start_date and end_date inclusive
         uc_26: display_in_matplotlib_revenue in time range between start_date and end_date inclusive
         uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
+
+
+        more features along the way: (I do not want to keep renumbering ucs, so any new functionality that pops up, gets a uc-nr, starting in the 40-range.)
+        uc_40: delete all data from bought.csv and  sold.csv via argparse cli (== feature 3) 
+
+
 4. # MVC: model, view, controller  
 5. # TASKS (not UCS )
 6. # TDD: CODING STEPS TO IMPLEMENT EACH EACH UC
@@ -734,6 +741,9 @@
             generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
 
 
+    
+
+
     - uc_10: calculate inventory on date
         (implement if time left) 
 
@@ -914,7 +924,23 @@
     - uc_26: display_in_matplotlib_revenue in time range between start_date and end_date inclusive
     - uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
 
+    Extra features
+    - uc_40: delete all data in bought.csv and sold.csv  (implemented on branch 'branch_07_uc_create_mock_data_in_csv_files_bought_and_sold_via_argparse_cli')
+        This isnot a Winc Requirement, but makes superpy application more  fun to use:
+        step 1: add mock data with uc_09 'fill bought.csv and sold.csv with mock data'
+        step 2: add buy transactions to bought.csv
+        step 3: add sell transactions to sold.csv
+        step 4: delete all the data
+        step 5: add mock data with uc_09 'fill bought.csv and sold.csv with mock data'
+        step 6: etc.
 
+        How to implement:
+        call fn create_data_for_csv_files_bought_and_sold("loads of fn-parameters") with
+        fn-argument product_range with value 0 (== no products)
+
+        shell command plus argparse arguments:
+        py super.py delete 
+        'delete' is a subparser without any arguments.
 
 
 4. # MVC: model, view, controller 
@@ -952,6 +978,7 @@
         uc_14: calculate revenue in time range between start_date and end_date inclusive
         uc_15: calculate profit in time range between start_date and end_date inclusive
 
+        uc_40: delete all data in bought.csv and sold.csv
 
     VIEW LAYER (MVC-model):
         The following ucs are in the View layer (MVC-model) of the application, 
@@ -1148,9 +1175,7 @@
     uc_26: display_in_matplotlib_revenue in time range between start_date and end_date inclusive
     uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
 
-
-
-
+    uc_40: delete all data from bought.csv and  sold.csv via argparse cli (== feature 5)
 
 
 

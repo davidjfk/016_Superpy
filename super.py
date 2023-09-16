@@ -107,7 +107,8 @@ def main():
     # subparser_create_mock_data.add_argument("-expiry_date", "-e", default="does not expire", type=str, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
 
-
+    # CREATE_MOCK_DATE: Create subparser "delete" with help text and add it to the container "command":
+    subparser_create_mock_data = subparsers.add_parser("delete", help="goal: delete all data in bought.csv and sold.csv. \n   ex: py super.py delete \n   result: bought.csv and sold.csv are empty.   \n\n")
 
     #step: parse the arguments
     args = parser.parse_args()
@@ -202,58 +203,65 @@ def main():
             generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
         )
 
-    # # to create testdata for bought.csv and sold.csv configure following variables to your liking:
-    # product_range = 2
-    # # see produt_range definition in README_SOFTWARE_DESIGN.md --> ch definitions. 
-
-    #  # variable 'every_nth_row' makes sense inside the assignment statement below it
-    # every_nth_row = 2
-    # delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling = every_nth_row
-
-    # shelf_life = 9
-    # # see shelf_life definition in README_SOFTWARE_DESIGN.md --> ch definitions.
-
-    # turnover_time = 3
-    # # see turnover_time definition in README_SOFTWARE_DESIGN.md --> ch definitions.
-    
-    # markup = 3
-    # # see markup definition in README_SOFTWARE_DESIGN.md --> ch definitions.
+    if args.command == "delete":
+        print("delete:")
+        path_to_csv_bought_input_file = os.path.join(path_to_data_directory_inside_project_superpy, 'bought.csv')
+        path_to_csv_sold_input_file = os.path.join(path_to_data_directory_inside_project_superpy, 'sold.csv')
+        # step: delete all data in bought.csv and sold.csv:
 
 
-    # # see time_interval definition in README_SOFTWARE_DESIGN.md --> ch definitions:
-    # lower_boundary_year_of_time_interval_in_which_to_create_random_testdata = 2023
-    # lower_boundary_month_of_time_interval_in_which_to_create_random_testdata = 10
-    # lower_boundary_week_of_time_interval_in_which_to_create_random_testdata = 1
-    # upper_boundary_nr_of_months_to_add_to_calculate = 2
-    # upper_boundary_nr_of_weeks_to_add_to_calculate = 0
-    # upper_boundary_nr_of_days_to_add_to_calculate = 0
+        # to delete all data in bought.csv and sold.csv, all you need to do is set product_range to 0.
+        # it does not matter what the values of the other fn-arguments are.
+        product_range = 0
+        # see produt_range definition in README_SOFTWARE_DESIGN.md --> ch definitions. 
 
-    # # set path to file bought.csv:
-    # path_to_directory_testdata = ''
-    # path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
-    # path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv')
+         # variable 'every_nth_row' makes sense inside the assignment statement below it
+        every_nth_row = 2
+        delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling = every_nth_row
 
-    # # set path to file sold.csv:
-    # path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv')
+        shelf_life = 9
+        # see shelf_life definition in README_SOFTWARE_DESIGN.md --> ch definitions.
 
-    # create_data_for_csv_files_bought_and_sold(
-    #     product_range,
-    #     delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling,
-    #     shelf_life,
-    #     turnover_time,
-    #     markup,
-    #     lower_boundary_year_of_time_interval_in_which_to_create_random_testdata,
-    #     lower_boundary_month_of_time_interval_in_which_to_create_random_testdata,
-    #     lower_boundary_week_of_time_interval_in_which_to_create_random_testdata,
-    #     upper_boundary_nr_of_months_to_add_to_calculate,
-    #     upper_boundary_nr_of_weeks_to_add_to_calculate,
-    #     upper_boundary_nr_of_days_to_add_to_calculate,
-    #     path_to_file_bought_csv,
-    #     path_to_file_sold_csv,
-    #     add_days_to_date,
-    #     create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv,
-    #     generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
-    # )
+        turnover_time = 3
+        # see turnover_time definition in README_SOFTWARE_DESIGN.md --> ch definitions.
+        
+        markup = 3
+        # see markup definition in README_SOFTWARE_DESIGN.md --> ch definitions.
+
+        # see time_interval definition in README_SOFTWARE_DESIGN.md --> ch definitions:
+        lower_boundary_year_of_time_interval_in_which_to_create_random_testdata = 2023
+        lower_boundary_month_of_time_interval_in_which_to_create_random_testdata = 10
+        lower_boundary_week_of_time_interval_in_which_to_create_random_testdata = 1
+        upper_boundary_nr_of_months_to_add_to_calculate = 2
+        upper_boundary_nr_of_weeks_to_add_to_calculate = 0
+        upper_boundary_nr_of_days_to_add_to_calculate = 0
+
+        # set path to file bought.csv:
+        path_to_directory_testdata = ''
+        path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
+        path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv')
+
+        # set path to file sold.csv:
+        path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv')
+
+        create_data_for_csv_files_bought_and_sold(
+            product_range,
+            delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling,
+            shelf_life,
+            turnover_time,
+            markup,
+            lower_boundary_year_of_time_interval_in_which_to_create_random_testdata,
+            lower_boundary_month_of_time_interval_in_which_to_create_random_testdata,
+            lower_boundary_week_of_time_interval_in_which_to_create_random_testdata,
+            upper_boundary_nr_of_months_to_add_to_calculate,
+            upper_boundary_nr_of_weeks_to_add_to_calculate,
+            upper_boundary_nr_of_days_to_add_to_calculate,
+            path_to_file_bought_csv,
+            path_to_file_sold_csv,
+            add_days_to_date,
+            create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv,
+            generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
+        )
 
 if __name__ == "__main__":
     main()
