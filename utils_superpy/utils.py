@@ -5,6 +5,8 @@ import datetime
 import random
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
+from rich.table import Table
+from rich.console import Console
 
 # only used in fn create_data_for_csv_files_bought_and_sold():
 from itertools import product
@@ -16,11 +18,12 @@ from copy import deepcopy
 # add_days_to_date(date_string, days_to_add)
 # buy_product(product,price,buy_date,expiry_date,id_of_row_in_csv_file_bought,path_to_csv_bought_input_file,path_to_csv_bought_output_file):
 # create_data_for_csv_files_bought_and_sold("long list of parameters")
-# create_id_for_each_row_in_boughtcsv_while_script_generates_boughtcsv(path_to_id_with_highest_sequence_number):
+# create_id_for_each_row_in_boughtcsv_while_script_generates_boughtcsv(path_to_id_with_highest_sequence_number)
 # create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user(path_to_id_with_highest_sequence_number):
 # generate_random_date_in_future_in_time_interval_of_2_months()
 # get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_path):
 # set_system_date_to(system_date, path_to_system_date, system_date_file='system_date.txt'): (created in TDD fashion)
+# show_csv_file_in_console_with_module_rich(path_to_csv_file):
 # time_travel_system_date_with_nr_of_days(nr_of_days_to_travel, path_to_input_file, path_to_output_file):
 
 
@@ -114,6 +117,8 @@ def buy_product(product,
 
 
 
+
+
 def create_data_for_csv_files_bought_and_sold(
     product_range, 
     delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling,
@@ -139,6 +144,8 @@ def create_data_for_csv_files_bought_and_sold(
 
         fn-parameters are not in a lookup-table / dictionary (e.g. config_variables = {} ), 
         because it could make parsing with argparse cli more difficult (not sure).
+
+        This fn cannot be tested with pytest, because I use random.sample() in this fn.
     
     '''
     # PART 1 OF 2: create testdata for bought.csv: 
@@ -148,13 +155,13 @@ def create_data_for_csv_files_bought_and_sold(
 
     # step 2: create list with products that are sold in supermarket:
     # rule: each product can only appear once in supermarket_products:    
-    supermarket_products = list(set(['fish', 'rice', 'potato', 'quinoa', 'bread', 'carrot', 'chicken', 'beef', 'bulgur',  
-                            'tomato', 'lettuce', 'beans', 'cheese', 'apple', 'beetroot', 'kiwi', 'onion', 'eggs', 
-                            'banana', 'oats', 'milk', 'pasta']))
+    supermarket_products = list(set(['fish', 'rice', 'potato', 'quinoa', 'bread', 'carrot', 'chicken', 'beef', 'bulgur','tomato', 'lettuce', 'beans', 'cheese', 'apple', 'beetroot', 'kiwi', 'onion', 'eggs', 'banana', 'oats', 'milk', 'pasta']))
    
     # step 3: create random list with products that are sold in supermarket:
     # product = '' # prevent UnboundLocalError: local variable 'product' referenced before assignment
-    products = random.sample(supermarket_products, product_range) 
+    products = random.sample(supermarket_products, product_range)
+    
+
     price_per_unit = [0.50, 1.10, 1.40, 2.50, 3.10, 4.00, 5.20]
 
     # step 4: generate all possible combinations of products and price_per_unit:
@@ -227,14 +234,13 @@ def create_data_for_csv_files_bought_and_sold(
         # product = row[1]
         del row[1]
 
-
         # replace buy_id by sell_id: e.g. b_1 --> s_1, b_2 --> s_2, etc:
-        id_of_record_in_bought_csv = row[0] # e.g. b_28
-        row.insert(1, id_of_record_in_bought_csv) # e.g. b_28, so an exact copy of this immutable string.
+        buy_id_in_record_in_bought_csv = row[0] # e.g. b_28
+        row.insert(1, buy_id_in_record_in_bought_csv) # e.g. b_28, so an exact copy of this immutable string.
 
-        id_of_record_in_sold_csv = row[1]
-        id_of_record_in_sold_csv = id_of_record_in_sold_csv.replace('b', 's') # e.g. b_28 --> s_28
-        row[1] = id_of_record_in_sold_csv # e.g. s_28
+        sell_id_of_record_in_sold_csv = row[0]
+        sell_id_of_record_in_sold_csv = sell_id_of_record_in_sold_csv.replace('b', 's') # e.g. b_28 --> s_28
+        row[0] = sell_id_of_record_in_sold_csv # e.g. s_28
 
     # step 3: delete each nth list in list: (so each nth row will expire in sold.csv while time traveling to the future)
     products_with_sold_date = [row for row in products_with_sold_date if int(row[0].split("_")[1]) % 
@@ -362,7 +368,7 @@ def get_path_to_directory_of_file(directory_of_file):
         for name in dirs:
             if name == directory_of_file: 
                 path_to_directory_of_this_file = os.path.abspath(os.path.join(root, name))
-                print(os.path.abspath(os.path.join(root, name)))
+                # print(os.path.abspath(os.path.join(root, name)))
                 break # break coz I only want first (one and supposedly only) result.
     return path_to_directory_of_this_file
 
@@ -385,11 +391,11 @@ def get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_
 
 def get_system_date(path_to_system_date):
     # system_date is datetime object, ex: '2020-01-01'
-    print(path_to_system_date)
+    # print(path_to_system_date)
     try:
         with open(path_to_system_date, 'r', newline='') as file:
             system_date = file.read()
-            print(system_date)
+            # print(system_date)
     except IOError:
         print("fn get_system_date: trying to get system_date. Plz investigate error.")
     return system_date
@@ -497,6 +503,17 @@ def set_system_date_to_OLD__DO_NOT_USE(system_date, path_to_system_date, system_
             file.write(system_date)
     return system_date
 
+def show_csv_file_in_console_with_module_rich(path_to_csv_file):
+    console = Console()
+    table = Table(show_header=True, header_style="bold magenta")
+    with open(path_to_csv_file, 'r') as file:
+        csv_reader = csv.reader(file)
+        header = next(csv_reader)  
+        for column in header:
+            table.add_column(column)
+        for row in csv_reader:
+            table.add_row(*row)
+    console.print(table)
 
 def time_travel_system_date_with_nr_of_days(
         nr_of_days_to_travel, 
