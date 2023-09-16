@@ -81,7 +81,7 @@ def main():
 
     subparser_create_mock_data.add_argument("-product_range", "-pr", default=3, type=int, help=" ") 
     subparser_create_mock_data.add_argument("-delete_every_nth_row", "-del_nth_row", default=3, type=int, help=" ") 
-    subparser_create_mock_data.add_argument("-shelf_life", "-sl", default=999, type=int, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
+    subparser_create_mock_data.add_argument("-shelf_life", "-sl", default=10, type=int, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
     subparser_create_mock_data.add_argument("-turnover_time", "-tt", default=3, type=int, help=" ")
     subparser_create_mock_data.add_argument("-markup", "-mu", default=3, type=int, help=" ")
 
@@ -96,7 +96,7 @@ def main():
     subparser_create_mock_data.add_argument("-lower_boundary_month_of_time_interval_in_which_to_create_random_testdata","-lower_boundary_month", "-lbm", default=default_month, type=int, help="lower_boundary_month_of_time_interval_in_which_to_create_random_testdata")
     subparser_create_mock_data.add_argument("-lower_boundary_day_of_time_interval_in_which_to_create_random_testdata","-lower_boundary_day", "-lbd", default=default_day, type=int, help="lower_boundary_day_of_time_interval_in_which_to_create_random_testdata")
 
-    subparser_create_mock_data.add_argument("-upper_boundary_nr_of_months_to_add_to_calculate","-upper_boundary_month", "-ubm", "-upper_boundary_nr_of_months_to_add_to_calculate", default=2, type=int, help="upper_boundary_nr_of_months_to_add_to_calculate")
+    subparser_create_mock_data.add_argument("-upper_boundary_nr_of_months_to_add_to_calculate","-upper_boundary_month", "-ubm", "-ubm", default=2, type=int, help="upper_boundary_nr_of_months_to_add_to_calculate")
     subparser_create_mock_data.add_argument("-upper_boundary_nr_of_weeks_to_add_to_calculate","-upper_boundary_week", "-ubw", "-upper_boundary_nr_of_weeks_to_add_to_calculate", default=0, type=int, help="upper_boundary_nr_of_weeks_to_add_to_calculate")
     subparser_create_mock_data.add_argument("-upper_boundary_nr_of_days_to_add_to_calculate","-upper_boundary_day", "-ubd", "-upper_boundary_nr_of_days_to_add_to_calculate", default=0, type=int, help="upper_boundary_nr_of_days_to_add_to_calculate")
  

@@ -116,6 +116,9 @@ def buy_product(product,
     #     writer.writerow(row)
 
 
+def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_input_file):
+    pass
+
 
 
 
