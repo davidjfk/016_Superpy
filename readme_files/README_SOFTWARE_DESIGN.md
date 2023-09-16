@@ -63,8 +63,8 @@
 
 
         more features along the way: (I do not want to keep renumbering ucs, so any new functionality that pops up, gets a uc-nr, starting in the 40-range.)
-        uc_40: delete all data from bought.csv and  sold.csv via argparse cli (== feature 3) 
-
+        uc_40: delete all data from bought.csv and  sold.csv via argparse cli (== feature 5) 
+        uc_41: show bought.csv in console with module rich (== feature 6)
 
 4. # MVC: model, view, controller  
 5. # TASKS (not UCS )
@@ -926,7 +926,7 @@
 
     Extra features
     - uc_40: delete all data in bought.csv and sold.csv  (implemented on branch 'branch_07_uc_create_mock_data_in_csv_files_bought_and_sold_via_argparse_cli')
-        This isnot a Winc Requirement, but makes superpy application more  fun to use:
+        This is not a Winc Requirement, but makes superpy application more  fun to use:
         step 1: add mock data with uc_09 'fill bought.csv and sold.csv with mock data'
         step 2: add buy transactions to bought.csv
         step 3: add sell transactions to sold.csv
@@ -941,6 +941,13 @@
         shell command plus argparse arguments:
         py super.py delete 
         'delete' is a subparser without any arguments.
+
+    - uc_41: show bought.csv in console with module rich (implemented on branch 'branch_07_uc_create_mock_data_in_csv_files_bought_and_sold_via_argparse_cli')
+        Why this functionality is necessary: selling a product takes place with the buy_id. 
+        Ex: py super.py sell b_18 3.10 23-10-21. This means: sell transaction with buy_id 'b_18' for 3.10 euro on 2023-10-21.
+        Ex: py super.py sell b_37 6.30 . This means: sell transaction with buy_id 'b_37' for 6.30 euro on system_date (e.g. 2023-09-16)
+        So right before you sell a product, you need to have an overview in the console with all bought products.
+
 
 
 4. # MVC: model, view, controller 
@@ -998,6 +1005,8 @@
         uc_25: display_in_matplotlib_costs in time range between start_date and end_date inclusive
         uc_26: display_in_matplotlib_revenue in time range between start_date and end_date inclusive
         uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
+
+        uc_41: show bought.csv in console with module rich (== feature 6)
 
         I have selected tool 'rich' instead of tool 'tabulate' because of the better rating on 
         https://www.libhunt.com/compare-python-tabulate-vs-rich (especially with regard to amount of stars)
@@ -1176,6 +1185,6 @@
     uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
 
     uc_40: delete all data from bought.csv and  sold.csv via argparse cli (== feature 5)
-
+    uc_41: show bought.csv in console with module rich (== feature 6)
 
 

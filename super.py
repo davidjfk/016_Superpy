@@ -8,6 +8,9 @@ import argparse, os, sys
 import csv
 from datetime import date
 
+from rich.table import Table
+from rich.console import Console
+
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
 
@@ -21,6 +24,7 @@ from utils_superpy.utils import buy_product, create_data_for_csv_files_bought_an
 from utils_superpy.utils import create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user
 from utils_superpy.utils import get_path_to_file, get_system_date
 from utils_superpy.utils import sell_product, set_system_date_to, time_travel_system_date_with_nr_of_days
+from utils_superpy.utils import show_csv_file_in_console_with_module_rich
 
 
 def main():
@@ -107,8 +111,15 @@ def main():
     # subparser_create_mock_data.add_argument("-expiry_date", "-e", default="does not expire", type=str, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
 
-    # CREATE_MOCK_DATE: Create subparser "delete" with help text and add it to the container "command":
-    subparser_create_mock_data = subparsers.add_parser("delete", help="goal: delete all data in bought.csv and sold.csv. \n   ex: py super.py delete \n   result: bought.csv and sold.csv are empty.   \n\n")
+    # DELETE: Create subparser "delete" with help text and add it to the container "command":
+    subparser_delete_data = subparsers.add_parser("delete", help="goal: delete all data in bought.csv and sold.csv. \n   ex: py super.py delete \n   result: bought.csv and sold.csv are empty.   \n\n")
+    # subparser does not need any arguments. 
+
+    # SHOW_BOUGHT_CSV: Create subparser "show_bought_csv" with help text and add it to the container "command":
+    subparser_show_bought_csv = subparsers.add_parser("show_bought_csv", help="goal: show all data in bought.csv. \n   ex: py super.py show_bought_csv \n   result: bought.csv is shown in the terminal.   \n\n")   
+
+    # SHOW_SOLD_CSV: Create subparser "show_sold_csv" with help text and add it to the container "command":
+    subparser_show_sold_csv = subparsers.add_parser("show_sold_csv", help="goal: show all data in sold.csv on the command line with tool rich. \n   ex: py super.py show_sold_csv \n   result: sold.csv is shown in the terminal.   \n\n") 
 
     #step: parse the arguments
     args = parser.parse_args()
@@ -262,6 +273,15 @@ def main():
             create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv,
             generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
         )
+
+
+    if args.command == "show_bought_csv":
+        # set path to file bought.csv:
+        path_to_directory_testdata = ''
+        path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
+        path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv') 
+        show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
+
 
 if __name__ == "__main__":
     main()

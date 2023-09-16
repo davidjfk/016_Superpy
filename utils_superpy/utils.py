@@ -5,6 +5,8 @@ import datetime
 import random
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
+from rich.table import Table
+from rich.console import Console
 
 # only used in fn create_data_for_csv_files_bought_and_sold():
 from itertools import product
@@ -21,6 +23,7 @@ from copy import deepcopy
 # generate_random_date_in_future_in_time_interval_of_2_months()
 # get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_path):
 # set_system_date_to(system_date, path_to_system_date, system_date_file='system_date.txt'): (created in TDD fashion)
+# show_csv_file_in_console_with_module_rich(path_to_csv_file):
 # time_travel_system_date_with_nr_of_days(nr_of_days_to_travel, path_to_input_file, path_to_output_file):
 
 
@@ -389,7 +392,7 @@ def get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_
 
 def get_system_date(path_to_system_date):
     # system_date is datetime object, ex: '2020-01-01'
-    print(path_to_system_date)
+    # print(path_to_system_date)
     try:
         with open(path_to_system_date, 'r', newline='') as file:
             system_date = file.read()
@@ -501,6 +504,17 @@ def set_system_date_to_OLD__DO_NOT_USE(system_date, path_to_system_date, system_
             file.write(system_date)
     return system_date
 
+def show_csv_file_in_console_with_module_rich(path_to_csv_file):
+    console = Console()
+    table = Table(show_header=True, header_style="bold magenta")
+    with open(path_to_csv_file, 'r') as file:
+        csv_reader = csv.reader(file)
+        header = next(csv_reader)  
+        for column in header:
+            table.add_column(column)
+        for row in csv_reader:
+            table.add_row(*row)
+    console.print(table)
 
 def time_travel_system_date_with_nr_of_days(
         nr_of_days_to_travel, 
