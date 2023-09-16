@@ -25,6 +25,7 @@ from utils_superpy.utils import create_id_with_unused_highest_sequence_nr_to_buy
 from utils_superpy.utils import get_path_to_file, get_system_date
 from utils_superpy.utils import sell_product, set_system_date_to, time_travel_system_date_with_nr_of_days
 from utils_superpy.utils import show_csv_file_in_console_with_module_rich
+from utils_superpy.utils import calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive
 
 
 def main():
@@ -288,6 +289,11 @@ def main():
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
         show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
+
+    # dry run before calling this fn from command line with argparse:
+    path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', "sold.csv")
+    revenue = calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive('2023-09-01', '2023-12-21', path_to_csv_sold_file)
+    print(f"Revenue: {revenue}")
 
 
 if __name__ == "__main__":
