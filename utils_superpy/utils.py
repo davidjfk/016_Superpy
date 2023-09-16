@@ -234,14 +234,13 @@ def create_data_for_csv_files_bought_and_sold(
         # product = row[1]
         del row[1]
 
-
         # replace buy_id by sell_id: e.g. b_1 --> s_1, b_2 --> s_2, etc:
-        id_of_record_in_bought_csv = row[0] # e.g. b_28
-        row.insert(1, id_of_record_in_bought_csv) # e.g. b_28, so an exact copy of this immutable string.
+        buy_id_in_record_in_bought_csv = row[0] # e.g. b_28
+        row.insert(1, buy_id_in_record_in_bought_csv) # e.g. b_28, so an exact copy of this immutable string.
 
-        id_of_record_in_sold_csv = row[1]
-        id_of_record_in_sold_csv = id_of_record_in_sold_csv.replace('b', 's') # e.g. b_28 --> s_28
-        row[1] = id_of_record_in_sold_csv # e.g. s_28
+        sell_id_of_record_in_sold_csv = row[0]
+        sell_id_of_record_in_sold_csv = sell_id_of_record_in_sold_csv.replace('b', 's') # e.g. b_28 --> s_28
+        row[0] = sell_id_of_record_in_sold_csv # e.g. s_28
 
     # step 3: delete each nth list in list: (so each nth row will expire in sold.csv while time traveling to the future)
     products_with_sold_date = [row for row in products_with_sold_date if int(row[0].split("_")[1]) % 

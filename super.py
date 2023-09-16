@@ -282,6 +282,13 @@ def main():
         path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv') 
         show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
 
+    if args.command == "show_sold_csv":
+        # set path to file sold.csv:
+        path_to_directory_testdata = ''
+        path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
+        path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
+        show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
+
 
 if __name__ == "__main__":
     main()
