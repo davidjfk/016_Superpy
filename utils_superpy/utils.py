@@ -114,6 +114,8 @@ def buy_product(product,
 
 
 
+
+
 def create_data_for_csv_files_bought_and_sold(
     product_range, 
     delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling,
@@ -364,7 +366,7 @@ def get_path_to_directory_of_file(directory_of_file):
         for name in dirs:
             if name == directory_of_file: 
                 path_to_directory_of_this_file = os.path.abspath(os.path.join(root, name))
-                print(os.path.abspath(os.path.join(root, name)))
+                # print(os.path.abspath(os.path.join(root, name)))
                 break # break coz I only want first (one and supposedly only) result.
     return path_to_directory_of_this_file
 
@@ -391,7 +393,7 @@ def get_system_date(path_to_system_date):
     try:
         with open(path_to_system_date, 'r', newline='') as file:
             system_date = file.read()
-            print(system_date)
+            # print(system_date)
     except IOError:
         print("fn get_system_date: trying to get system_date. Plz investigate error.")
     return system_date

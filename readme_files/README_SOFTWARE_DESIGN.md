@@ -93,7 +93,7 @@
     product_range == product_assortment == the amount of different products in a shop .
         e.g. ['apple', 'cabbage', 'beetroot'], or e.g. ['coffee', 'potato', 'orange']
         product_range is an operand in fn product from module itertools.
-        So more products in product_range lead to more rows in bought.csv.
+        So more products in product_range lead to more rows in bought.csv and sold.csv.
         (used in fn create_data_for_csv_files_bought_and_sold() )
 
 
@@ -476,7 +476,11 @@
         def buy_product(product_type, price_per_unit, buy_date, expiryDate):
         
         shell command plus argparse arguments:
-        py super.py buy apple 4.50 23-09-07 23-09-20 
+        py super.py buy apple 1.50 23-09-07 23-09-20 --> buy_date is 23-09-07 and expiry_date is 23-09-20
+        py super.py buy pear 2.50 23-09-20 --> taking system_date as default buy_date. expiry_date is 23-09-20
+        py super.py buy magazine 3.50 --> taking system_date as default sell_date, and
+            'does not expire' as default expiry_date
+
 
         design:
         fn-parameter buy_date in argparse is optional argument with default value 'system_date'.
@@ -673,10 +677,11 @@
         shell command plus argparse arguments:
         All arguments in this fn are optional arguments with a default value:
     
-       
+        # fn-argument 1
         py super.py create_data -product_range 5       default value: 3
         (2 flags for the same parameter: -pr, -product_range)
 
+        # fn-argument 2
         py super.py create_data -delete_every_nth_row 5       default value: 3
         (2 flags for the same parameter: -del_row,  -delete_every_nth_row)
 
@@ -685,32 +690,41 @@
         By time travelling to the future these bought_products (e.g. every 3rd row)
         will expire. 
 
+        # fn-argument 3
         py super.py create_data -shelf_life 4       default value: 2
         (2 flags for the same parameter: -sl, -shelf_life)
 
+        # fn-argument 4
         py super.py create_data -turnover_time 4       default value: 2
         (2 flags for the same parameter: -tt, -turnover_time)
 
+        # fn-argument 5
         py super.py create_data -markup 2       default value: 3
         (2 flags for the same parameter: -mu, -markup)
 
-        py super.py create_data -lby 2024       default value: 2023
+        # fn-argument 6
+        py super.py create_data -lby 2024       default value: year of system_date
         (2 flags for the same parameter: -lby, -lower_boundary_year)
 
-        py super.py create_data -lbm 11       default value: 10
+        # fn-argument 7
+        py super.py create_data -lbm 11       default value: month of system_date
         (2 flags for the same parameter: -lbm, -lower_boundary_month)       
 
-        py super.py create_data -lbw 2       default value: 4
-        (2 flags for the same parameter: -lbw, -lower_boundary_week)   
+        # fn-argument 8
+        py super.py create_data -lbd 2       default value: day of system_date
+        (2 flags for the same parameter: -lbd, -lower_boundary_day)   
 
-        py super.py create_data -uby 1       default value: 0
-        (2 flags for the same parameter: -uby, -upper_boundary_year)
-
+        # fn-argument 9
         py super.py create_data -ubm 1       default value: 0
-        (2 flags for the same parameter: -ubm, -upper_boundary_month)       
+        (2 flags for the same parameter: -ubm, -upper_boundary_month)
 
-        py super.py create_data -ubw 2       default value: 4
-        (2 flags for the same parameter: -ubw, -upper_boundary_week)   
+        # fn-argument 10
+        py super.py create_data -ubw 1       default value: 4  --> this makes the default time_interval 4 weeks.
+        (2 flags for the same parameter: -ubw, -upper_boundary_week)       
+
+        # fn-argument 11
+        py super.py create_data -ubd 2       default value: 4
+        (2 flags for the same parameter: -ubd, -upper_boundary_day)   
 
         The remaining fn-arguments are NOT supposed to be changed via argparse-cli: 
             path_to_file_bought_csv,
@@ -721,6 +735,7 @@
 
 
     - uc_10: calculate inventory on date
+        (implement if time left) 
 
         When calculating inventory something special is happening:
         The inventory is calculated as the state at the end of a time range, just
@@ -782,8 +797,11 @@
         for a certain price (e.g. 0.40 would be profitable but selling for 0.20 is acceptable if 
         b_5 is about to expire)
 
+        Display output in Rich and/or Matplotlib. See ucs further down below.
+
 
     - uc_11: calculate expired products in time range between start_date and end_date inclusive
+        (implement if time left) 
 
         pyt fn:
         def calculate_expired_products(product_type, start_date, end_date):
@@ -798,14 +816,15 @@
         (-p is flag for 'product_type')
 
         Perhaps shorten expired to exp.
-        
-        (implement if time left) 
-
         (2 flags: calculate_expired , ce)
+
+        Display output in Rich and/or Matplotlib. See ucs further down below.
+
 
     - uc_12: calculate sales of number of products (Dutch: afzet) in time range between 
         start_date and end_date inclusive 
-        --> also serves as input to calculate revenue 
+        --> this uc serves as necessary input to calculate revenue 
+        (calculate revenue is mandatory) 
 
         pyt fn:
         def calculate_sales_number(product_type, start_date, end_date):
@@ -819,10 +838,12 @@
         py super.py sales_nr 230709  
         (-p is flag for 'product_type')
         
-        (implement if time left) 
+        Display output in Rich and/or Matplotlib. See ucs further down below.        
+
 
     - uc_13: calculate costs in time range between start_date and end_date inclusive
-        --> also serves as input to calculate revenue 
+        --> this uc serves as necessary input to calculate revenue 
+        (calculate revenue is mandatory) 
 
         pyt fn:
         def calculate_costs(product_type, start_date, end_date):
@@ -835,10 +856,11 @@
         py super.py cost -p apple  230709 230909
         py super.py cost 230709  
         (-p is flag for 'product_type')
-        
-        (implement if time left) 
+
+        Display output in Rich and/or Matplotlib. See ucs further down below.
 
     - uc_14: calculate revenue in time range between start_date and end_date inclusive
+        (mandatory Winc Academy requirement)
 
         pyt fn:
         def calculate_revenue(product_type, start_date, end_date):
@@ -852,10 +874,12 @@
         py super.py revenue -p apple  230709 230909 
         py super.py revenue 230709 
         (-p is flag for 'product_type')
-        
-        (mandatory Winc Academy requirement)
+
+        Display output in Rich and/or Matplotlib. See ucs further down below.
+
 
     - uc_15: calculate profit in time range between start_date and end_date inclusive
+        (mandatory Winc Academy requirement)
 
         pyt fn:
         def calculate_profit(product_type, start_date, end_date):
@@ -863,13 +887,16 @@
         end_date is optional argument with 'system_date' as default value.
         product_type is optional argument with "all products" as default value.
         
-        shell command plus argparse arguments:
+        shell command plus argparse arguments: 
         py super.py profit 230709 230909 
         py super.py profit -p apple  230709 230909
         py super.py profit 230709  
         (-p is flag for 'product_type')
+
+        Display output in Rich and/or Matplotlib. See ucs further down below.         
         
-        (mandatory Winc Academy requirement)
+
+
 
     Display output in Rich ( == non-trivial feature 3):
     - uc_16: display_in_rich_inventory on date
