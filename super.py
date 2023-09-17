@@ -26,6 +26,8 @@ from utils_superpy.utils import get_path_to_file, get_system_date
 from utils_superpy.utils import sell_product, set_system_date_to, time_travel_system_date_with_nr_of_days
 from utils_superpy.utils import show_csv_file_in_console_with_module_rich
 from utils_superpy.utils import calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive
+from utils_superpy.utils import get_highest_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv
+from utils_superpy.utils import set_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv
 
 
 def main():
@@ -132,9 +134,11 @@ def main():
     year = int(system_date[:4]) # this ties the year of current financial year to the system_date.
     # month = int(system_date[5:7])
     # day = int(system_date[8:])
-    start_date_of_current_financial_year = date(year, 1, 1) # output: e.g. 2023-01-01 (i.e. in prescribed format '%Y-%m-%d')
-
-    subparser_show_revenue.add_argument("-start_date","-sd",default=start_date_of_current_financial_year, type=str, help="specify the start date in format YYYY-MM-DD")
+    start_date_of_current_financial_year_unformatted = date(year, 1, 1) # date object does not have a format. It is just a date object.
+    # type of start_date_of_current_financial_year_unformatted: <class 'datetime.date'>
+    start_date_of_current_financial_year_formatted = start_date_of_current_financial_year_unformatted.strftime('%Y-%m-%d') # output: e.g. 2023-01-01 (i.e. in prescribed format '%Y-%m-%d')
+    # type of start_date_of_current_financial_year_formatted: <class 'str'>
+    subparser_show_revenue.add_argument("-start_date","-sd",default=start_date_of_current_financial_year_formatted, type=str, help="specify the start date in format YYYY-MM-DD")
     subparser_show_revenue.add_argument("-end_date","-ed",default=get_system_date(path_to_system_date), type=str, help="specify the end date in format YYYY-MM-DD")
 
 
@@ -231,6 +235,41 @@ def main():
             create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv,
             generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
         )
+        '''
+        status: mock data has now/just been created for bought.csv and sold.csv.
+        next step is to add a buy transaction to bought.csv and a sell transaction to sold.csv (as a supermarket employee).
+        Suppose that 131 buy_transactions have been added to bought.csv. That means that the last issued id is b_131.
+
+        So if I add another buy_transaction to bought.csv, then the id of this buy_transaction must be b_132, and  so on.
+        Challenge: the number of buy_transactions in bought.csv is not known in advance.
+        Furthermore, there is also the option to delete all data from bought.csv and sold.csv (see py super.py -h).
+        In that case the id of the next buy_transaction must be b_1, the next one b_2, and so on.
+
+        fn create_data_for_csv_files_bought_and_sold itself can only have one responsibility, so I do not want to do 
+        the following as a side effect inside this fn:   
+
+        2do if time left.
+        '''
+        path_to_csv_bought_file = get_path_to_file("data_used_in_superpy", "bought.csv")
+
+        highest_buy_id_in_boughtcsv = get_highest_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv(path_to_csv_bought_file)
+        print(f"highest_buy_id_from_boughtcsv: {highest_buy_id_in_boughtcsv}")
+        # pitfall: do not increment buy_id with 1: e.g. b_1 --> b_2. This will be done at other point in the code. 
+
+        path_to_file_with_name_id_to_use_in_fn_buy_product = get_path_to_file("data_used_in_superpy", "id_to_use_in_fn_buy_product.txt")
+
+        buy_id = set_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv(highest_buy_id_in_boughtcsv, path_to_file_with_name_id_to_use_in_fn_buy_product)
+        print(f"new_system_date: {buy_id}")
+        '''
+        suppose fn 'create_data_for_csv_files_bought_and_sold' has just created 132 rows of mock data for bought.csv 
+        (the nr of rows in sold.csv depend on how many are deleted from these 132 rows by the script).
+        That means that the nex buy_transaction to be added to bought.csv by the USER of the superpy-app, must have buy_id b_133. 
+        For this to happen, in directory 'data_used_in_superpy': file 'id_to_use_in_fn_buy_product.txt' must now be set to buy_id 'b_132'.
+        
+        When creating this next buy_transaction, fn 'create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user 
+        will increment 'b_132' with 1, so this next transaction will show up in bought.csv as 'b_133'.
+        '''
+        
 
     if args.command == "delete":
         print("delete:")
