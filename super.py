@@ -29,6 +29,7 @@ from utils_superpy.utils import calculate_revenue_in_time_range_between_start_da
 from utils_superpy.utils import get_highest_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv
 from utils_superpy.utils import set_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv
 from utils_superpy.utils import calculate_cost_in_time_range_between_start_date_and_end_date_inclusive
+from utils_superpy.utils import calculate_profit_in_time_range_between_start_date_and_end_date_inclusive
 
 
 def main():
@@ -144,8 +145,8 @@ def main():
 
 
     # SHOW_COST: Create subparser "show_cost" with help text and add it to the container "command":
-    subparser_show_cost = subparsers.add_parser("show_cost", help="goal: show cost in time range between start_date and end_date inclusive. \n   ex1: py super.py show_cost -sd 2023-09-01 -ed 2023-10-10 \n   result in terminal: \n   'Cost from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_cost -ed 2023-10-05 \n   result in terminal: \n   'Cost from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6' \n   start_date is start of financial  year of system_date. e.g. system_date 23-06-08 --> 23-01-01.  \n\n   ex3: py super.py show_revenue -sd 2023-07-01 \n   result in terminal: \n   'Cost from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date is system_date.  \n\n   arg1: start_date in format 'YYYY-MM-DD'. ex: 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the cost of the current financial year until today inclusive. \n\n   arg2: end_date in format 'YYYY-MM-DD'. ex: 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
-    #step: add the positional and optional arguments to 'subparser_show_revenue':
+    subparser_show_cost = subparsers.add_parser("show_cost", help="goal: show cost in time range between start_date and end_date inclusive. \n   ex1: py super.py show_cost -sd 2023-09-01 -ed 2023-10-10 \n   result in terminal: \n   'Cost from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_cost -ed 2023-10-05 \n   result in terminal: \n   'Cost from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6' \n   start_date is start of financial  year of system_date. e.g. system_date 23-06-08 --> 23-01-01.  \n\n   ex3: py super.py show_profit -sd 2023-07-01 \n   result in terminal: \n   'Cost from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date is system_date.  \n\n   arg1: start_date in format 'YYYY-MM-DD'. ex: 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the cost of the current financial year until today inclusive. \n\n   arg2: end_date in format 'YYYY-MM-DD'. ex: 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
+    #step: add the positional and optional arguments to 'subparser_show_cost':
 
     system_date = get_system_date(path_to_system_date)
     year = int(system_date[:4]) # this ties the year of current financial year to the system_date.
@@ -157,6 +158,24 @@ def main():
     # type of start_date_of_current_financial_year_formatted: <class 'str'>
     subparser_show_cost.add_argument("-start_date","-sd",default=start_date_of_current_financial_year_formatted, type=str, help="specify the start date in format YYYY-MM-DD")
     subparser_show_cost.add_argument("-end_date","-ed",default=get_system_date(path_to_system_date), type=str, help="specify the end date in format YYYY-MM-DD")
+
+
+    # SHOW_PROFIT: Create subparser "show_profit" with help text and add it to the container "command":
+    subparser_show_cost = subparsers.add_parser("show_profit", help="goal: show profit in time range between start_date and end_date inclusive. \n   ex1: py super.py show_profit -sd 2023-09-01 -ed 2023-10-10 \n   result in terminal: \n   'Profit from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_profit -ed 2023-10-05 \n   result in terminal: \n   'Profit from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6' \n   start_date is start of financial  year of system_date. e.g. system_date 23-06-08 --> 23-01-01.  \n\n   ex3: py super.py show_profit -sd 2023-07-01 \n   result in terminal: \n   'Profit from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date is system_date.  \n\n   arg1: start_date in format 'YYYY-MM-DD'. ex: 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the profit of the current financial year until today inclusive. \n\n   arg2: end_date in format 'YYYY-MM-DD'. ex: 2023-10-15 \n   default value is system_date, because often you want to know the profit of the current financial year until today  inclusive.  \n\n")
+    #step: add the positional and optional arguments to 'subparser_show_profit':
+
+    system_date = get_system_date(path_to_system_date)
+    year = int(system_date[:4]) # this ties the year of current financial year to the system_date.
+    # month = int(system_date[5:7])
+    # day = int(system_date[8:])
+    start_date_of_current_financial_year_unformatted = date(year, 1, 1) # date object does not have a format. It is just a date object.
+    # type of start_date_of_current_financial_year_unformatted: <class 'datetime.date'>
+    start_date_of_current_financial_year_formatted = start_date_of_current_financial_year_unformatted.strftime('%Y-%m-%d') # output: e.g. 2023-01-01 (i.e. in prescribed format '%Y-%m-%d')
+    # type of start_date_of_current_financial_year_formatted: <class 'str'>
+    subparser_show_cost.add_argument("-start_date","-sd",default=start_date_of_current_financial_year_formatted, type=str, help="specify the start date in format YYYY-MM-DD")
+    subparser_show_cost.add_argument("-end_date","-ed",default=get_system_date(path_to_system_date), type=str, help="specify the end date in format YYYY-MM-DD")
+
+
 
     #step: parse the arguments
     args = parser.parse_args()
@@ -408,6 +427,27 @@ def main():
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')
         print(f"Cost from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {cost}")
+        print('                                                                                                   ')
+        print('---------------------------------------------------------------------------------------------------')
+
+
+
+    # dry run before calling this fn from command line with argparse:
+    # path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', "sold.csv")
+    # path_to_csv_bought_file = get_path_to_file('data_used_in_superpy', "bought.csv")
+    # start_date = '2023-09-01'
+    # end_date = '2023-12-21'
+    # profit = calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive)
+    # print(f"Profit: {profit}")
+
+    if args.command == "show_profit":
+        # set path to file sold.csv:
+        path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', "sold.csv")
+        path_to_csv_bought_file = get_path_to_file('data_used_in_superpy', "bought.csv")
+        profit = calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive)
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')
+        print(f"Profit from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {profit}")
         print('                                                                                                   ')
         print('---------------------------------------------------------------------------------------------------')
 
