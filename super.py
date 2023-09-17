@@ -6,7 +6,7 @@ __human_name__ = "superpy"
 # Imports
 import argparse, os, sys
 import csv
-from datetime import date
+from datetime import date, datetime
 
 from rich.table import Table
 from rich.console import Console
@@ -32,6 +32,7 @@ def main():
 
     DATA_DIRECTORY = "data_used_in_superpy"
     FILE_WITH_SYSTEM_DATE = "system_date.txt"
+    path_to_system_date = get_path_to_file(DATA_DIRECTORY , FILE_WITH_SYSTEM_DATE)
 
     #step: initialize parser
     parser = argparse.ArgumentParser(prog='super.py',description="Welcome to inventory management tool Superpy.", epilog="The line between disorder and order lies in logistics.", formatter_class=argparse.RawTextHelpFormatter)
@@ -58,7 +59,7 @@ def main():
     subparser_buy_product.add_argument("product_name", type=str, help="e.g. apple, carrot, oats, etc.") 
     subparser_buy_product.add_argument("price", type=float, help="e.g. 1.20 means 1 euro and 20 cents. 0.2 or 0.20 means 20 cents.") 
     # -buy_date gets its default value from file system_date.txt in the DATA_DIRECTORY:
-    path_to_system_date = get_path_to_file(DATA_DIRECTORY , FILE_WITH_SYSTEM_DATE)
+    # path_to_system_date = get_path_to_file(DATA_DIRECTORY , FILE_WITH_SYSTEM_DATE)
     subparser_buy_product.add_argument("-buy_date", "-b", default=get_system_date(path_to_system_date), type=str, help="date object with string representation following the format: '%Y-%m-%d'. ex: 2026-10-21 ") 
     subparser_buy_product.add_argument("-expiry_date", "-e", default="does not expire", type=str, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
@@ -124,10 +125,17 @@ def main():
 
 
     # SHOW_REVENUE: Create subparser "show_revenue" with help text and add it to the container "command":
-    subparser_show_revenue = subparsers.add_parser("show_revenue", help="goal: show revenue in time range between start_date and end_date inclusive. \n   ex: py super.py show_revenue 2023-10-11 2023-10-13 \n   result: revenue is shown in the terminal. \n   ex: 'Revenue from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n   arg1: start_date in format 'YYYY-MM-DD'. ex: 2023-09-01 \n   arg2: end_date in format 'YYYY-MM-DD'. ex: 2023-10-15   \n\n")
+    subparser_show_revenue = subparsers.add_parser("show_revenue", help="goal: show revenue in time range between start_date and end_date inclusive. \n   ex1: py super.py show_revenue -sd 2023-09-01 -ed 2023-10-10 \n   result in terminal: \n   'Revenue from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_revenue -ed 2023-10-05 \n   result in terminal: \n   'Revenue from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6' \n   start_date is start of financial  year of system_date. e.g. system_date 23-06-08 --> 23-01-01.  \n\n   ex3: py super.py show_revenue -sd 2023-07-01 \n   result in terminal: \n   'Revenue from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date is system_date.  \n\n   arg1: start_date in format 'YYYY-MM-DD'. ex: 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the revenue of the current financial year until today inclusive. \n\n   arg2: end_date in format 'YYYY-MM-DD'. ex: 2023-10-15 \n   default value is system_date, because often you want to know the revenue of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_revenue':
-    subparser_show_revenue.add_argument("start_date", type=str, help="specify the start date in format YYYY-MM-DD")
-    subparser_show_revenue.add_argument("end_date", type=str, help="specify the end date in format YYYY-MM-DD")
+
+    system_date = get_system_date(path_to_system_date)
+    year = int(system_date[:4]) # this ties the year of current financial year to the system_date.
+    # month = int(system_date[5:7])
+    # day = int(system_date[8:])
+    start_date_of_current_financial_year = date(year, 1, 1) # output: e.g. 2023-01-01 (i.e. in prescribed format '%Y-%m-%d')
+
+    subparser_show_revenue.add_argument("-start_date","-sd",default=start_date_of_current_financial_year, type=str, help="specify the start date in format YYYY-MM-DD")
+    subparser_show_revenue.add_argument("-end_date","-ed",default=get_system_date(path_to_system_date), type=str, help="specify the end date in format YYYY-MM-DD")
 
 
 
