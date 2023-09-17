@@ -121,6 +121,9 @@ def buy_product(product,
 # def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_input_file):
 #     pass
 
+def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
+    pass
+
 def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
     '''
     Goal of fn: calculate revenue in time range between start_date and end_date inclusive.

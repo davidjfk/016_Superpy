@@ -83,7 +83,7 @@ def main():
     subparser_create_mock_data = subparsers.add_parser("create_mock_data", help="goal: create mock data for bought.csv and sold.csv. \n   ex: py super.py create_mock_data \n   result: bought.csv and sold.csv are filled with mockdata that has \n   been created with default values.   \n\narg1 = product_range.     product_range == product_assortment == the amount of different products in a shop . \n   e.g. ['apple', 'cabbage', 'beetroot'], or e.g. ['coffee', 'potato', 'orange']. \n   more products in product_range lead to more rows in bought.csv and sold.csv. \n   flags: -pr, -product_range \n   ex: py super.py -pr 3 \n   result: 3 random products are selected from a pre-filled list to \n   create the testdata. The more products, the more records in bought.csv and \n   sold.csv will be generated. \n\narg2 = delete_every_nth_row == 'deleting each nth list in list': this sets nr of rows \n   to delete from sold.csv: \n   flags: -del_row, -delete_every_nth_row  \n   ex: py super.py -del_row 3 \n   result: delete every 3rd row in sold.csv\n   The idea behind this fn-argument is the following \n   fn creates data for bought.csv. Then to create sold.csv a deepcopy is made from \n   bought.csv . Then rows are deleted from sold.csv (e.g. every 3rd row). \n   By time travelling to the future these bought_products (e.g. every 3rd row) will expire.  \n\narg3 = shelf_life. shelf_life == shelf_time == number of days between buying a product and \n   its expiry_date. ex: 3 is three days. \n   flags: -sl, -shelf_life  \n   ex: py super.py -sl 10 \n   result: a bought product will expire after 10 days.\n\narg4 = turnover_time == inventory turnover == the number of days \n   between buying and selling a product. \n   flags:  \n   ex: py super.py  \n   result:  \n\narg5 = markup = the amount of money a business adds to the cost of a product or service in order to make a profit. \n   In super.py markup is calculated as a factor: ex: if buy_price is 3 euro and sell_price is 4 euro, then markup is 4/3 = 1.33 \n   flags: -mu, -markup  \n   ex: py super.py -mu 3  \n   result: if price_bought is 3 euro, then price_sell will be 9 euro.  \n\narg6 = lower_boundary_year_of_time_interval_in_which_to_create_random_testdata. \n   flags: -lby, -lower_boundary_year  \n   ex: py super.py -lby 2024  \n   result: lower boundary year of time interval in which to create data is 2024. \n   system_date provides default value. \n\narg7 = lower_boundary_month_of_time_interval_in_which_to_create_random_testdata. \n   flags: -lbm, -lower_boundary_month  \n   ex: py super.py -lbm 10  \n   result: lower boundary month of time interval in which to create data is October.  \n   system_date provides default value.\n\narg8 = lower_boundary_day_of_time_interval_in_which_to_create_random_testdata.  \n   flags: -lbd, -lower_boundary_day  \n   ex: py super.py -lbd 15  \n   result: lower boundary day of time interval in which to create data is day 15 \n   system_date provides default value.\n\narg9 = upper_boundary_nr_of_months_to_add_to_calculate.  \n   flags: -ubm, -upper_boundary_month   \n   ex: py super.py -ubm 3  \n   result: upper boundary month of time interval in which to create data is 3 months in the future. \n   default value: 0 months.  \n\narg10 = upper_boundary_nr_of_weeks_to_add_to_calculate. \n   flags: -ubw, -upper_boundary_week  \n   ex: py super.py -ubm 8  \n   result: upper boundary week of time interval in which to create data is 8 weeks in the future.  \n   default value: 4 weeks. So by default time interval is from system_date as lower \n   boundary to 4 weeks in the future as its upper boundary.\n\narg11 = upper_boundary_nr_of_days_to_add_to_calculate. \n   flags: -ubd, -upper_boundary_day  \n   ex: py super.py  -ubd 3  \n   result: upper boundary day of time interval in which to create data is 3 days in the future.  \n   default value: 0 days.\n\n")
     #step: add the optional arguments to 'subparser_create_mock_data': 
 
-    subparser_create_mock_data.add_argument("-product_range", "-pr", default=3, type=int, help=" ") 
+    subparser_create_mock_data.add_argument("-product_range", "-pr", default=2, type=int, help=" ") 
     subparser_create_mock_data.add_argument("-delete_every_nth_row", "-del_nth_row", default=3, type=int, help=" ") 
     subparser_create_mock_data.add_argument("-shelf_life", "-sl", default=10, type=int, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
     subparser_create_mock_data.add_argument("-turnover_time", "-tt", default=3, type=int, help=" ")
@@ -236,19 +236,32 @@ def main():
             generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
         )
         '''
-        status: mock data has now/just been created for bought.csv and sold.csv.
-        next step is to add a buy transaction to bought.csv and a sell transaction to sold.csv (as a supermarket employee).
-        Suppose that 131 buy_transactions have been added to bought.csv. That means that the last issued id is b_131.
 
-        So if I add another buy_transaction to bought.csv, then the id of this buy_transaction must be b_132, and  so on.
-        Challenge: the number of buy_transactions in bought.csv is not known in advance.
-        Furthermore, there is also the option to delete all data from bought.csv and sold.csv (see py super.py -h).
-        In that case the id of the next buy_transaction must be b_1, the next one b_2, and so on.
+        subject: synchronize buy_ids that can be created and deleted by user in following ways: 
 
-        fn create_data_for_csv_files_bought_and_sold itself can only have one responsibility, so I do not want to do 
-        the following as a side effect inside this fn:   
+        There are 2 ways in the superpy-app to create buy_ids:
 
-        2do if time left.
+        a. in argparse cli interface, user can create mock data with
+        with following command: python super.py --create_mock_data (plus
+        optional parameters) --> invoking fn create_data_for_csv_files_bought_and_sold right above this comment.
+
+        b. in argparse cli interface, user can create buy-transaction with e.g.
+        following command: python super.py --buy apple 0.39 (plus optional parameters)
+
+        There is 1 way in the superpy-app to delete buy_ids:
+        c. in argparse cli interface, user can delete all data from bought.csv and sold.csv
+        with following command: python super.py delete
+
+
+        If e.g. script creates 149 buy-transactions (b_1, b_2, (...) b_149), 
+        then the next buy-transaction should start with b_150. 
+        Challenge: created mock data can contain any number of buy-transactions.
+        Another challenge: script can delete all data from bought.csv and sold.csv.
+        No matter how a. , b. and c. are mixed together, the next buy-transaction created by the user must be 
+        either b_1 (if bought.csv is empty) or be the next buy_id in bought.csv (if e.g. bought.csv has 149 rows, then last
+        buy_id is b_149, so the next buy_id must be b_150)
+        
+        The following code makes that happen:
         '''
         path_to_csv_bought_file = get_path_to_file("data_used_in_superpy", "bought.csv")
 
