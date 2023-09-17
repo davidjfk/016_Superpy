@@ -28,6 +28,7 @@ from utils_superpy.utils import show_csv_file_in_console_with_module_rich
 from utils_superpy.utils import calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive
 from utils_superpy.utils import get_highest_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv
 from utils_superpy.utils import set_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv
+from utils_superpy.utils import calculate_cost_in_time_range_between_start_date_and_end_date_inclusive
 
 
 def main():
@@ -376,6 +377,14 @@ def main():
         print(f"Revenue from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {revenue}")
         print('                                                                                                   ')
         print('---------------------------------------------------------------------------------------------------')
+
+
+    # dry run before calling this fn from command line with argparse:
+    path_to_csv_bought_file = get_path_to_file('data_used_in_superpy', "bought.csv")
+    cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive('2023-09-01', '2023-12-21', path_to_csv_bought_file)
+    print(f"Cost: {cost}")
+
+
 
 if __name__ == "__main__":
     main()
