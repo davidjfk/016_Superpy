@@ -17,6 +17,9 @@ from copy import deepcopy
 # list of functions:
 # add_days_to_date(date_string, days_to_add)
 # buy_product(product,price,buy_date,expiry_date,id_of_row_in_csv_file_bought,path_to_csv_bought_input_file,path_to_csv_bought_output_file):
+# calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_bought_file):
+# calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive):
+# calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
 # create_data_for_csv_files_bought_and_sold("long list of parameters")
 # create_id_for_each_row_in_boughtcsv_while_script_generates_boughtcsv(path_to_id_with_highest_sequence_number)
 # create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user(path_to_id_with_highest_sequence_number):
@@ -152,6 +155,8 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start
                 cost_rounded = round(cost, 2)
     return cost_rounded
 
+def calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive):
+    pass
 
 
 def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
