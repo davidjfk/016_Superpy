@@ -26,7 +26,7 @@ from utils_superpy.utils import create_data_for_csv_files_bought_and_sold
 
 def main():
     # to create testdata for bought.csv and sold.csv configure following variables to your liking:
-    product_range = 2
+    product_range = 3
     # see produt_range definition in README_SOFTWARE_DESIGN.md --> ch definitions. 
 
      # variable 'every_nth_row' makes sense inside the assignment statement below it
