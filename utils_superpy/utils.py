@@ -137,8 +137,8 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start
     # print('end_date:')
     end_date = datetime.strptime(str(end_date), '%Y-%m-%d')
     # print(end_date)
-
     cost = 0
+    cost_rounded = 0
     with open(path_to_csv_bought_file, 'r', newline='') as file: 
         reader = csv.DictReader(file)
         for row in reader:
@@ -172,6 +172,7 @@ def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(st
     # print(end_date)
 
     revenue = 0
+    revenue_rounded = 0
     with open(path_to_csv_sold_file, 'r', newline='') as file: 
         reader = csv.DictReader(file)
         for row in reader:

@@ -143,6 +143,20 @@ def main():
     subparser_show_revenue.add_argument("-end_date","-ed",default=get_system_date(path_to_system_date), type=str, help="specify the end date in format YYYY-MM-DD")
 
 
+    # SHOW_COST: Create subparser "show_cost" with help text and add it to the container "command":
+    subparser_show_cost = subparsers.add_parser("show_cost", help="goal: show cost in time range between start_date and end_date inclusive. \n   ex1: py super.py show_cost -sd 2023-09-01 -ed 2023-10-10 \n   result in terminal: \n   'Cost from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_cost -ed 2023-10-05 \n   result in terminal: \n   'Cost from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6' \n   start_date is start of financial  year of system_date. e.g. system_date 23-06-08 --> 23-01-01.  \n\n   ex3: py super.py show_revenue -sd 2023-07-01 \n   result in terminal: \n   'Cost from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date is system_date.  \n\n   arg1: start_date in format 'YYYY-MM-DD'. ex: 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the cost of the current financial year until today inclusive. \n\n   arg2: end_date in format 'YYYY-MM-DD'. ex: 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
+    #step: add the positional and optional arguments to 'subparser_show_revenue':
+
+    system_date = get_system_date(path_to_system_date)
+    year = int(system_date[:4]) # this ties the year of current financial year to the system_date.
+    # month = int(system_date[5:7])
+    # day = int(system_date[8:])
+    start_date_of_current_financial_year_unformatted = date(year, 1, 1) # date object does not have a format. It is just a date object.
+    # type of start_date_of_current_financial_year_unformatted: <class 'datetime.date'>
+    start_date_of_current_financial_year_formatted = start_date_of_current_financial_year_unformatted.strftime('%Y-%m-%d') # output: e.g. 2023-01-01 (i.e. in prescribed format '%Y-%m-%d')
+    # type of start_date_of_current_financial_year_formatted: <class 'str'>
+    subparser_show_cost.add_argument("-start_date","-sd",default=start_date_of_current_financial_year_formatted, type=str, help="specify the start date in format YYYY-MM-DD")
+    subparser_show_cost.add_argument("-end_date","-ed",default=get_system_date(path_to_system_date), type=str, help="specify the end date in format YYYY-MM-DD")
 
     #step: parse the arguments
     args = parser.parse_args()
@@ -379,12 +393,23 @@ def main():
         print('---------------------------------------------------------------------------------------------------')
 
 
+
     # dry run before calling this fn from command line with argparse:
-    path_to_csv_bought_file = get_path_to_file('data_used_in_superpy', "bought.csv")
-    cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive('2023-09-01', '2023-12-21', path_to_csv_bought_file)
-    print(f"Cost: {cost}")
+    # path_to_csv_bought_file = get_path_to_file('data_used_in_superpy', "bought.csv")
+    # cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive('2023-09-01', '2023-12-21', path_to_csv_bought_file)
+    # print(f"Cost: {cost}")
 
-
+    if args.command == "show_cost":
+        # set path to file sold.csv:
+        path_to_directory_testdata = ''
+        path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
+        path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv') 
+        cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_bought_csv)
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')
+        print(f"Cost from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {cost}")
+        print('                                                                                                   ')
+        print('---------------------------------------------------------------------------------------------------')
 
 if __name__ == "__main__":
     main()
