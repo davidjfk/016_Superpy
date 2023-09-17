@@ -29,6 +29,7 @@ from utils_superpy.utils import calculate_revenue_in_time_range_between_start_da
 from utils_superpy.utils import get_highest_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv
 from utils_superpy.utils import set_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv
 from utils_superpy.utils import calculate_cost_in_time_range_between_start_date_and_end_date_inclusive
+from utils_superpy.utils import calculate_profit_in_time_range_between_start_date_and_end_date_inclusive
 
 
 def main():
@@ -410,6 +411,18 @@ def main():
         print(f"Cost from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {cost}")
         print('                                                                                                   ')
         print('---------------------------------------------------------------------------------------------------')
+
+
+
+    # dry run before calling this fn from command line with argparse:
+    path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', "sold.csv")
+    path_to_csv_bought_file = get_path_to_file('data_used_in_superpy', "bought.csv")
+    start_date = '2023-09-01'
+    end_date = '2023-12-21'
+    profit = calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive)
+    print(f"Profit: {profit}")
+
+
 
 if __name__ == "__main__":
     main()

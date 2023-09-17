@@ -21,7 +21,7 @@ def test_01_calculate_profit_in_time_range_between_start_date_and_end_date_inclu
     filecmp.clear_cache()
     start_date = "2023-10-05"
     end_date = "2023-10-25"
-    expected_test_result = 36.5 # cost: 41.5 , revenue: 78  --> profit: 78 - 41.5 = 36.5
+    expected_test_result = 37.2 # revenue: 78 ,  cost: 40.8  --> profit: 78 - 40.8 = 37.2
     actual_result = calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(
         start_date, 
         end_date, 
@@ -37,7 +37,7 @@ def test_02_calculate_profit_in_time_range_between_start_date_and_end_date_inclu
     filecmp.clear_cache()
     start_date = "2023-10-14"
     end_date = "2023-10-26"
-    expected_test_result = 33.1 # cost: 52.1 , revenue: 85.2  --> profit: 85.2 - 52.1 = 33.1
+    expected_test_result = -2.7 # revenue: 49 , cost: 51.7 --> profit: 49 - 51.7 = -2.7
     actual_result = calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(
         start_date, 
         end_date, 
