@@ -30,6 +30,7 @@ from utils_superpy.utils import get_highest_buy_id_after_running_script_to_creat
 from utils_superpy.utils import set_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv
 from utils_superpy.utils import calculate_cost_in_time_range_between_start_date_and_end_date_inclusive
 from utils_superpy.utils import calculate_profit_in_time_range_between_start_date_and_end_date_inclusive
+from utils_superpy.utils import calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive
 
 
 def main():
@@ -450,6 +451,15 @@ def main():
         print(f"Profit from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {profit}")
         print('                                                                                                   ')
         print('---------------------------------------------------------------------------------------------------')
+
+
+    # dry run before calling this fn from command line with argparse:
+    path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', "sold.csv")
+    start_date = '2023-09-01'
+    end_date = '2023-12-21'
+    sales_volume_in_number_of_products_sold_in_time_range = calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file)
+    print(f"Sales volume in number of products: {sales_volume_in_number_of_products_sold_in_time_range}")
+
 
 if __name__ == "__main__":
     main()

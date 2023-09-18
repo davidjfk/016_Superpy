@@ -3,7 +3,7 @@ sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
 from utils_superpy.utils import calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive, get_path_to_directory_of_file
 
-directory_of_testcase = "fn_calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive" 
+directory_of_testcase = "fn_calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive" 
 path_to_directory_of_testcase = get_path_to_directory_of_file(directory_of_testcase)
 
 # input test files:
@@ -26,5 +26,4 @@ def test_02_calculate_sales_volume_in_time_range_between_start_date_and_end_date
     expected_test_result = 54 # number of items sold in time range between start_date and end_date inclusive
     actual_result = calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_input_file_test_02)
     assert actual_result == expected_test_result
-
 
