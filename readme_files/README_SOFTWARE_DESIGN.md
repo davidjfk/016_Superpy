@@ -847,22 +847,27 @@
         suppose you look at the inventory of week 2 and 3 (and ignore the inventory of week 1)
         then atthe end of week 3 you conclude that 600 tins of beans have expired....but that is nonsense, because
         in week 1 300 tins of beans have also expired. 
-        qed: lower boundary of time range is the date on which you (have) bought the first product. 
+        qed: lower boundary of time range is the start date ('-sd') on which you (have) bought the first product in super.py. Superpy automatically sets this value, but NOT the superpy-user.  
 
 
 
         pyt fn:
-        def calculate_expired_products(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file):
-        start_date is positional argument with mandatory argument 'first day on which product was bought in super.py'.
-        end_date is positional argument with 'system_date' as default value.
+        def calculate_expired_products(date, path_to_csv_sold_file, path_to_csv_bought_file):
+        
+        date has format 'YYYY-MM-DD'. ex: 2023-09-01.
+        date is positional argument with 'system_date' as default value. reason: products
+        that expire on system_date (i.e. "the today" in the system) can be sold at a discount.
+        So determining which products are about  to expire will happen  often.
+        
 
-                
+
         shell command plus argparse arguments:
         py super.py expired  -ed 230909 
         py super.py expired   --> default value for end_date is system_date
        
         1 flag: -ed == end_date       
 
+        the  'start_date' 
 
         on product backlog:
             py super.py expired -p apple  -sd 230709 -ed 230909 
