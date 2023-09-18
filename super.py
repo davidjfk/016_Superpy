@@ -32,6 +32,7 @@ from utils_superpy.utils import calculate_cost_in_time_range_between_start_date_
 from utils_superpy.utils import calculate_profit_in_time_range_between_start_date_and_end_date_inclusive
 from utils_superpy.utils import calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive
 from utils_superpy.utils import calculate_expired_products_on_day
+from utils_superpy.utils import show_list_with_nested_lists_in_console_with_module_rich
 
 
 def main():
@@ -425,6 +426,7 @@ def main():
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
         revenue = calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_sold_csv)
+        show_csv_file_in_console_with_module_rich
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')
         print(f"Revenue from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {revenue}")
@@ -509,12 +511,13 @@ def main():
             path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
             path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
             expired_products = calculate_expired_products_on_day(args.date, path_to_file_sold_csv, path_to_file_bought_csv)
+            
             print('---------------------------------------------------------------------------------------------------')
             print('                                                                                                   ')
-            print(f"Expired products on date: {args.date}: {expired_products}")
+            print(f"Expired products on date: {args.date}: ")
             print('                                                                                                   ')
-            print('---------------------------------------------------------------------------------------------------')
-
+            
+            show_list_with_nested_lists_in_console_with_module_rich(expired_products)
 
 
 if __name__ == "__main__":

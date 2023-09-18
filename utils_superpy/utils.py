@@ -158,10 +158,10 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start
 def calculate_expired_products_on_day(date_on_which_to_calculate_expired_products, path_to_csv_sold_file, path_to_csv_bought_file):
     # system_date = datetime.today().date()
     # print(system_date)
-    print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' has datatype <class 'str'>
+    # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' has datatype <class 'str'>
     date_on_which_to_calculate_expired_products = datetime.strptime(date_on_which_to_calculate_expired_products, '%Y-%m-%d').date()
-    print(date_on_which_to_calculate_expired_products)
-    print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' now has datatype <class 'datetime.date'> and that is what I neeed. 
+    # print(date_on_which_to_calculate_expired_products)
+    # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' now has datatype <class 'datetime.date'> and that is what I need. 
 
     # sold.csv:
     sell_data = {}
@@ -172,8 +172,8 @@ def calculate_expired_products_on_day(date_on_which_to_calculate_expired_product
             sell_id, buy_id, sell_price, sell_date = row
             sell_data[buy_id] = sell_date if sell_date else None
 
-    print('sell_data:')
-    print(sell_data)
+    # print('sell_data:')
+    # print(sell_data)
 
 
     # bought.csv:
@@ -693,6 +693,21 @@ def set_system_date_to_OLD__DO_NOT_USE(system_date, path_to_system_date, system_
         with open(os.path.join(path_to_system_date, system_date_file), 'w', newline='') as file:
             file.write(system_date)
     return system_date
+
+def show_list_with_nested_lists_in_console_with_module_rich(list):
+    rich_table = Table(show_header=True, header_style="bold magenta")
+    # (future reference: column names hardcoded. Currently no need
+    # to make dynamic).
+    rich_table.add_column('buy_id', style="dim", width=12)
+    rich_table.add_column('product', style="dim", width=12)
+    rich_table.add_column('buy_price', style="dim", width=12)
+    rich_table.add_column('buy_date', style="dim", width=12)
+    rich_table.add_column('expiry_date', style="dim", width=12)
+    for row in list:
+        rich_table.add_row(*row)
+    console = Console()
+    console.print(rich_table)
+    return rich_table
 
 def show_csv_file_in_console_with_module_rich(path_to_csv_file):
     console = Console()
