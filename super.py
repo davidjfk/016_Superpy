@@ -33,6 +33,7 @@ from utils_superpy.utils import calculate_profit_in_time_range_between_start_dat
 from utils_superpy.utils import calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive
 from utils_superpy.utils import calculate_expired_products_on_day
 from utils_superpy.utils import show_list_with_nested_lists_in_console_with_module_rich
+from utils_superpy.utils import calculate_inventory_on_day
 
 
 def main():
@@ -519,6 +520,14 @@ def main():
             
             show_list_with_nested_lists_in_console_with_module_rich(expired_products)
 
+    path_to_directory_testdata = ''
+    path_to_file_bought_csv = ''
+    path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', "bought.csv")
+    path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
+    path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
+    inventory = calculate_inventory_on_day("2023-11-18", path_to_file_sold_csv, path_to_file_bought_csv)
+    print('inventory: ')
+    print(inventory)
 
 if __name__ == "__main__":
     main()
