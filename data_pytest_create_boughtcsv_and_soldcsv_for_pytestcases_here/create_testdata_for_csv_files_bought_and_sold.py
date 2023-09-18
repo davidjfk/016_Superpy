@@ -26,11 +26,11 @@ from utils_superpy.utils import create_data_for_csv_files_bought_and_sold
 
 def main():
     # to create testdata for bought.csv and sold.csv configure following variables to your liking:
-    product_range = 8
+    product_range = 9
     # see produt_range definition in README_SOFTWARE_DESIGN.md --> ch definitions. 
 
      # variable 'every_nth_row' makes sense inside the assignment statement below it
-    every_nth_row = 2
+    every_nth_row = 3
     delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling = every_nth_row
 
     shelf_life = 15
@@ -39,16 +39,16 @@ def main():
     turnover_time = 4
     # see turnover_time definition in README_SOFTWARE_DESIGN.md --> ch definitions.
     
-    markup = 2
+    markup = 5
     # see markup definition in README_SOFTWARE_DESIGN.md --> ch definitions.
 
 
     # see time_interval definition in README_SOFTWARE_DESIGN.md --> ch definitions:
-    lower_boundary_year_of_time_interval_in_which_to_create_random_testdata = 2023
-    lower_boundary_month_of_time_interval_in_which_to_create_random_testdata = 10
+    lower_boundary_year_of_time_interval_in_which_to_create_random_testdata = 2024
+    lower_boundary_month_of_time_interval_in_which_to_create_random_testdata = 1
     lower_boundary_week_of_time_interval_in_which_to_create_random_testdata = 1
-    upper_boundary_nr_of_months_to_add_to_calculate = 0
-    upper_boundary_nr_of_weeks_to_add_to_calculate = 8
+    upper_boundary_nr_of_months_to_add_to_calculate = 6
+    upper_boundary_nr_of_weeks_to_add_to_calculate = 0
     upper_boundary_nr_of_days_to_add_to_calculate = 0
 
     # set path to file bought.csv:

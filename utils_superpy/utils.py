@@ -159,9 +159,9 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start
 def calculate_expired_products_on_day(date_on_which_to_calculate_expired_products, path_to_csv_sold_file, path_to_csv_bought_file):
     # system_date = datetime.today().date()
     # print(system_date)
-    print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' has datatype <class 'str'>
+    # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' has datatype <class 'str'>
     date_on_which_to_calculate_expired_products = datetime.strptime(date_on_which_to_calculate_expired_products, '%Y-%m-%d').date()
-    print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' now has datatype <class 'datetime.date'> and that is what I neeed. 
+    # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' now has datatype <class 'datetime.date'> and that is what I neeed. 
 
     # sold.csv:
     sell_data = {}
@@ -254,6 +254,8 @@ def calculate_expired_products_on_day_old(date_on_which_to_calculate_expired_pro
     print(expired_products)
     return expired_products
 
+def calculate_inventory_on_day(date_on_which_to_calculate_products_in_inventory, path_to_csv_sold_file, path_to_csv_bought_file):
+    pass
 
 def calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive):
     cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_bought_file)
