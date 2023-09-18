@@ -155,7 +155,59 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start
                 cost_rounded = round(cost, 2)
     return cost_rounded
 
+
 def calculate_expired_products_on_day(date_on_which_to_calculate_expired_products, path_to_csv_sold_file, path_to_csv_bought_file):
+    # system_date = datetime.today().date()
+    # print(system_date)
+    # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' has datatype <class 'str'>
+    date_on_which_to_calculate_expired_products = datetime.strptime(date_on_which_to_calculate_expired_products, '%Y-%m-%d').date()
+    # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' now has datatype <class 'datetime.date'> and that is what I neeed. 
+
+    # sold.csv:
+    sell_data = {}
+    with open(path_to_csv_sold_file, 'r') as file_object:
+        reader = csv.reader(file_object)
+        next(reader)  
+        for row in reader:
+            sell_id, buy_id, sell_price, sell_date = row
+            sell_data[buy_id] = sell_date if sell_date else None
+
+    # print(sell_data)
+    # bought.csv:
+    expired_products = []
+    with open(path_to_csv_bought_file, 'r') as file_object:
+        reader = csv.reader(file_object)
+        next(reader)  
+        for row in reader:
+            # I have access to sold.csv and bought.csv:
+            buy_id, product, buy_price, buy_date, expiry_date = row
+            buy_date = datetime.strptime(buy_date, '%Y-%m-%d').date()
+            '''
+            about 'does not expire': 
+            uc: if user buys a product via argparse cli ( calling fn buy_product) without setting expiry_date as a flag, then
+            default value for expiry_date is 'does not expire'. Reason: supermarket also sells e.g. magazines, 
+            light bulbs, etc. that do not expire)
+            '''
+            if expiry_date == 'does not expire':
+                if date_on_which_to_calculate_expired_products > buy_date and expiry_date == 'does not expire' and sell_data.get(buy_id) is None:
+                    expired_products.append(row)
+            else: 
+                expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date() 
+                if date_on_which_to_calculate_expired_products > buy_date and date_on_which_to_calculate_expired_products > expiry_date and sell_data.get(buy_id) is None:
+                    expired_products.append(row)             
+            '''
+            there is only 1 difference between  this fn and fn calculate_expired_products_on_day: 
+            "<" in "date_on_which_to_calculate_products_in_inventory < expiry_date" above.
+
+            in bought.csv: (by convention) buy_date is always set with either an expiry_date or 'does not expire'.
+
+            about 'does not expire': 
+            uc: if user buys a product via argparse cli (fn buy_product) without setting expiry_date, then
+            default value for expiry_date is 'does not expire' (supermarket also sells e.g. magazines, light bulbs, etc. that do not expire)
+            '''
+    return expired_products
+
+def calculate_expired_products_on_day_old(date_on_which_to_calculate_expired_products, path_to_csv_sold_file, path_to_csv_bought_file):
     # system_date = datetime.today().date()
     # print(system_date)
     # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' has datatype <class 'str'>
@@ -202,6 +254,59 @@ def calculate_expired_products_on_day(date_on_which_to_calculate_expired_product
     print(expired_products)
     return expired_products
 
+
+def calculate_inventory_on_day(date_on_which_to_calculate_products_in_inventory, path_to_csv_sold_file, path_to_csv_bought_file):
+    # system_date = datetime.today().date()
+    # print(system_date)
+    # print(type(date_on_which_to_calculate_products_in_inventory)) # e.g. '2023-10-01' has datatype <class 'str'>
+    date_on_which_to_calculate_products_in_inventory = datetime.strptime(date_on_which_to_calculate_products_in_inventory, '%Y-%m-%d').date()
+    # print(type(date_on_which_to_calculate_products_in_inventory)) # e.g. '2023-10-01' now has datatype <class 'datetime.date'> and that is what I neeed. 
+
+    # sold.csv:
+    sell_data = {}
+    with open(path_to_csv_sold_file, 'r') as file_object:
+        reader = csv.reader(file_object)
+        next(reader)  
+        for row in reader:
+            sell_id, buy_id, sell_price, sell_date = row
+            sell_data[buy_id] = sell_date if sell_date else None
+
+    # print(sell_data)
+    # bought.csv:
+    products_in_inventory = []
+    with open(path_to_csv_bought_file, 'r') as file_object:
+        reader = csv.reader(file_object)
+        next(reader)  
+        for row in reader:
+            # I have access to sold.csv and bought.csv:
+            buy_id, product, buy_price, buy_date, expiry_date = row
+            buy_date = datetime.strptime(buy_date, '%Y-%m-%d').date()
+            # print(f"buy_date: {buy_date}")
+            # print(type(buy_date))
+            '''
+            about 'does not expire': 
+            uc: if user buys a product via argparse cli ( calling fn buy_product) without setting expiry_date as a flag, then
+            default value for expiry_date is 'does not expire'. Reason: supermarket also sells e.g. magazines, 
+            light bulbs, etc. that do not expire)
+            '''
+            if expiry_date == 'does not expire':
+                if date_on_which_to_calculate_products_in_inventory > buy_date and expiry_date == 'does not expire' and sell_data.get(buy_id) is None:
+                    products_in_inventory.append(row)
+            else: 
+                expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date() 
+                if date_on_which_to_calculate_products_in_inventory > buy_date and date_on_which_to_calculate_products_in_inventory < expiry_date and sell_data.get(buy_id) is None:
+                    products_in_inventory.append(row) 
+            '''
+            there is only 1 difference between  this fn and fn calculate_expired_products_on_day: 
+            "<" in "date_on_which_to_calculate_products_in_inventory < expiry_date" above.
+
+            in bought.csv: (by convention) buy_date is always set with either an expiry_date or 'does not expire'.
+
+            about 'does not expire': 
+            uc: if user buys a product via argparse cli (fn buy_product) without setting expiry_date, then
+            default value for expiry_date is 'does not expire' (supermarket also sells e.g. magazines, light bulbs, etc. that do not expire)
+            '''
+    return products_in_inventory
 
 def calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive):
     cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_bought_file)
