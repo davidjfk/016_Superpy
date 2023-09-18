@@ -142,8 +142,8 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start
     # print(end_date)
     cost = 0
     cost_rounded = 0
-    with open(path_to_csv_bought_file, 'r', newline='') as file: 
-        reader = csv.DictReader(file)
+    with open(path_to_csv_bought_file, 'r', newline='') as file_object: 
+        reader = csv.DictReader(file_object)
         for row in reader:
             print('row:')
             print(row)
@@ -155,8 +155,53 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start
                 cost_rounded = round(cost, 2)
     return cost_rounded
 
-def calculate_expired_products_on_day(date, path_to_csv_sold_file, path_to_csv_bought_file):
-    pass
+def calculate_expired_products_on_day(date_on_which_to_calculate_expired_products, path_to_csv_sold_file, path_to_csv_bought_file):
+    # system_date = datetime.today().date()
+    # print(system_date)
+    print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' has datatype <class 'str'>
+    date_on_which_to_calculate_expired_products = datetime.strptime(date_on_which_to_calculate_expired_products, '%Y-%m-%d').date()
+    print(date_on_which_to_calculate_expired_products)
+    print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' now has datatype <class 'datetime.date'> and that is what I neeed. 
+
+    # sold.csv:
+    sell_data = {}
+    with open(path_to_csv_sold_file, 'r') as file_object:
+        reader = csv.reader(file_object)
+        next(reader)  
+        for row in reader:
+            sell_id, buy_id, sell_price, sell_date = row
+            sell_data[buy_id] = sell_date if sell_date else None
+
+    print('sell_data:')
+    print(sell_data)
+
+
+    # bought.csv:
+    expired_products = []
+    with open(path_to_csv_bought_file, 'r') as file_object:
+        reader = csv.reader(file_object)
+        next(reader)  
+        for row in reader:
+            # I have access to sold.csv and bought.csv:
+            buy_id, product, buy_price, buy_date, expiry_date = row
+            buy_date = datetime.strptime(buy_date, '%Y-%m-%d').date()
+            '''
+            # about 'does not expire': 
+            # uc: if user buys a product via argparse cli (fn buy_product) without setting expiry_date, then
+            # default value for expiry_date is 'does not expire' (supermarket also sells e.g. magazines, light bulbs, etc. that do not expire)
+            '''
+            expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date() if expiry_date != 'does not expire' else 'does not expire'
+
+            # filter expired products: 
+            if date_on_which_to_calculate_expired_products > buy_date and (expiry_date != 'does_not_expire' and \
+               expiry_date is not None and date_on_which_to_calculate_expired_products > expiry_date) and sell_data.get(buy_id) is None:
+               expired_products.append(row)
+            # in bought.csv: (by convention) buy_date is always set with either an expiry_date or 'does not expire'. To make
+            # code future proof, I also check if expiry_date is None.
+    print('expired_products:')
+    print(expired_products)
+    return expired_products
+
 
 def calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive):
     cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_bought_file)
@@ -178,8 +223,8 @@ def calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusi
     start_date = datetime.strptime(str(start_date), '%Y-%m-%d')
     end_date = datetime.strptime(str(end_date), '%Y-%m-%d')
     sales_volume = 0
-    with open(path_to_csv_sold_file, 'r', newline='') as file: 
-        reader = csv.DictReader(file)
+    with open(path_to_csv_sold_file, 'r', newline='') as file_object: 
+        reader = csv.DictReader(file_object)
         for row in reader:
             sell_date = row['sell_date']
             sell_date = datetime.strptime(sell_date, '%Y-%m-%d')

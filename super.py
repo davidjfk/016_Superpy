@@ -31,6 +31,7 @@ from utils_superpy.utils import set_buy_id_after_running_script_to_create_mock_d
 from utils_superpy.utils import calculate_cost_in_time_range_between_start_date_and_end_date_inclusive
 from utils_superpy.utils import calculate_profit_in_time_range_between_start_date_and_end_date_inclusive
 from utils_superpy.utils import calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive
+from utils_superpy.utils import calculate_expired_products_on_day
 
 
 def main():
@@ -189,6 +190,11 @@ def main():
     # type of start_date_of_current_financial_year_formatted: <class 'str'>
     subparser_show_revenue.add_argument("-start_date","-sd",default=start_date_of_current_financial_year_formatted, type=str, help="specify the start date in format YYYY-MM-DD")
     subparser_show_revenue.add_argument("-end_date","-ed",default=get_system_date(path_to_system_date), type=str, help="specify the end date in format YYYY-MM-DD")
+
+
+    # EXPIRED_PRODUCTS: create subparser "exired_products" with help text and add it to the container "command":
+    subparser_buy_product = subparsers.add_parser("show_expired_products", help="goal: calculate expired products on a day in format 'YYYY-MM-DD' (e.g. 2023-09-18) \n   ex: py super.py expired_products -d 23-09-28  \n   result is displayed in a table in the console. \n   ex: py super.py expired_products.\n   results is displayed in a table in the console. \n\n   arg1: date is optional argument in following format: 'YYYY-MM-DD'. ex: 2026-10-21 \n   default value is system_date.  \n\n") 
+    subparser_buy_product.add_argument("-date", "-d", default=get_system_date(path_to_system_date), type=str, help="date in followoing format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
 
     #step: parse the arguments
@@ -485,6 +491,31 @@ def main():
         print(f"Sales volume from start_date: {args.start_date} to end_date: {args.end_date} inclusive: {sales_volume} products")
         print('                                                                                                   ')
         print('---------------------------------------------------------------------------------------------------')
+
+
+    # path_to_directory_testdata = ''
+    # path_to_file_bought_csv = ''
+    # path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', "bought.csv")
+    # path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
+    # path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
+    # expired_products = calculate_expired_products_on_day("2023-12-18", path_to_file_sold_csv, path_to_file_bought_csv)
+    # print(expired_products)
+
+    if args.command == "show_expired_products":
+            # set path to file sold.csv:
+            path_to_directory_testdata = ''
+            path_to_file_bought_csv = ''
+            path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', "bought.csv")
+            path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
+            path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
+            expired_products = calculate_expired_products_on_day(args.date, path_to_file_sold_csv, path_to_file_bought_csv)
+            print('---------------------------------------------------------------------------------------------------')
+            print('                                                                                                   ')
+            print(f"Expired products on date: {args.date}: {expired_products}")
+            print('                                                                                                   ')
+            print('---------------------------------------------------------------------------------------------------')
+
+
 
 if __name__ == "__main__":
     main()
