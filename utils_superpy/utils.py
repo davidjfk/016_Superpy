@@ -155,6 +155,9 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start
                 cost_rounded = round(cost, 2)
     return cost_rounded
 
+def calculate_expired_products_on_day(date, path_to_csv_sold_file, path_to_csv_bought_file):
+    pass
+
 def calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive):
     cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_bought_file)
     revenue = calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file)
