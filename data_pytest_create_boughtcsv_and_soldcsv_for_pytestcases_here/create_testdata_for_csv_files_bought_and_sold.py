@@ -26,20 +26,20 @@ from utils_superpy.utils import create_data_for_csv_files_bought_and_sold
 
 def main():
     # to create testdata for bought.csv and sold.csv configure following variables to your liking:
-    product_range = 4
+    product_range = 17
     # see produt_range definition in README_SOFTWARE_DESIGN.md --> ch definitions. 
 
      # variable 'every_nth_row' makes sense inside the assignment statement below it
     every_nth_row = 3
     delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling = every_nth_row
 
-    shelf_life = 12
+    shelf_life = 15
     # see shelf_life definition in README_SOFTWARE_DESIGN.md --> ch definitions.
 
-    turnover_time = 4
+    turnover_time = 3
     # see turnover_time definition in README_SOFTWARE_DESIGN.md --> ch definitions.
     
-    markup = 2
+    markup = 3
     # see markup definition in README_SOFTWARE_DESIGN.md --> ch definitions.
 
 
@@ -48,7 +48,7 @@ def main():
     lower_boundary_month_of_time_interval_in_which_to_create_random_testdata = 10
     lower_boundary_week_of_time_interval_in_which_to_create_random_testdata = 1
     upper_boundary_nr_of_months_to_add_to_calculate = 0
-    upper_boundary_nr_of_weeks_to_add_to_calculate = 4
+    upper_boundary_nr_of_weeks_to_add_to_calculate = 8
     upper_boundary_nr_of_days_to_add_to_calculate = 0
 
     # set path to file bought.csv:

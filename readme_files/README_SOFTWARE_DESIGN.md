@@ -39,7 +39,7 @@
 
 
         uc_10: calculate inventory on date
-        uc_11: calculate expired products in time range between start_date and end_date inclusive
+        uc_11: calculate expired products on date
         uc_12: calculate sales volume in time range between start_date and end_date inclusive
         uc_13: calculate costs in time range between start_date and end_date inclusive
         uc_14: calculate revenue in time range between start_date and end_date inclusive
@@ -748,7 +748,7 @@
     
 
 
-    - uc_10: calculate inventory on system_date
+    - uc_10: calculate inventory on date
         (implement if time left) 
 
         business logic:
@@ -820,7 +820,7 @@
 
 
 
-    - uc_11: calculate expired products on system_date
+    - uc_11: calculate expired products on date
         (implement if time left) 
 
         business logic:
@@ -1074,7 +1074,7 @@
 
 
         uc_10: calculate inventory on date
-        uc_11: calculate expired products in time range between start_date and end_date inclusive
+        uc_11: calculate expired products on date
         uc_12: calculate sales volume in time range between start_date and end_date inclusive
         uc_13: calculate costs in time range between start_date and end_date inclusive
         uc_14: calculate revenue in time range between start_date and end_date inclusive
@@ -1260,7 +1260,7 @@
     uc_08: update_sell_transaction
     
     uc_10: calculate inventory on date
-    uc_11: calculate expired products in time range between start_date and end_date inclusive
+    uc_11: calculate expired products on date
     uc_12: calculate sales volume in time range between start_date and end_date inclusive
     
 
