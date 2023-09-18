@@ -39,8 +39,8 @@
 
 
         uc_10: calculate inventory on date
-        uc_11: calculate expired products in time range between start_date and end_date inclusive
-        uc_12: calculate sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+        uc_11: calculate expired products on date
+        uc_12: calculate sales volume in time range between start_date and end_date inclusive
         uc_13: calculate costs in time range between start_date and end_date inclusive
         uc_14: calculate revenue in time range between start_date and end_date inclusive
         uc_15: calculate profit in time range between start_date and end_date inclusive
@@ -118,6 +118,9 @@
         --> each product is bought and sold 1-unit-at-a-time, so revenue == sum of all sales prices of all sold proudcts
         in a certain time_interval. 
         So this definition deviates from the general definition of revenue: "average sales price * number of units sold".
+
+    sales_volume == (Dutch: afzet) == the quantity of items a business sells during a given period, such as a year or fiscal quarter. 
+        It is a measure of the total number of units sold, regardless of the type or category of the product.
 
     shelf_life == shelf_time == number of days between buying a product and its expiry_date.
         ex: buy an apple:
@@ -748,13 +751,15 @@
     - uc_10: calculate inventory on date
         (implement if time left) 
 
-        When calculating inventory something special is happening:
-        The inventory is calculated as the state at the end of a time range, just
-        like when calculating profit, revenue, costs, expired products, etc. 
+        business logic:
+        UPPER BOUNDARY OF THE TIME INTERVAL:
+            system_date > buy_date AND system_date < expiry_date AND sell_date is None (i.e. no sell date)
+            (just 1 tiny difference with calculating expired products in uc_11)
         
-        But unlike when  calculating profit, revenue, etc., as a super.py-user 
-        you CANNOT choose the lower boundary of the time range yourself. Instead, the lower 
-        boundary is ALWAYS the date on which the first product has been bought.
+        LOWER BOUNDARY OF THE TIME INTERVAL:
+        As a super.py-user you CANNOT choose the lower boundary of the time range yourself. 
+        (by comparison: you can when you calculate revenue, cost and profit)
+        Instead, the lower boundary is ALWAYS the date on which the first product has been /was bought.
         ex: 
         week 1: buy 300 tins of beans 
         week 2: buy 300 tins of beans
@@ -765,90 +770,145 @@
         qed: lower boundary of time range is the date on which you (have) bought the first product. 
 
 
-
-        It is management responsibility to ensure that there are always 
-        products available to sell at any given system_date. 
-        
         pyt fn:
         def calculate_inventory(product_type, start_date, end_date):
-        product_type is optional argument with "all products" as default value.
-        start_date is positional argument.
-        end_date is optional argument with 'system_date' as default value.
+        start_date is positional argument with mandatory argument 'first day on which product was bought in super.py'.
+        end_date is positional argument with 'system_date' as default value.
                 
         shell command plus argparse arguments:
-        optional argument with 'system_date' as default value. 
-        py super.py inventory -p apple 230909  --> setting an end_date. "give me inventory of apples on 23-09-09". 
-        py super.py inventory -p coconut --> "give me inventory of coconut on system_date".  
-        py super.py inventory --> "give me inventory of all products on system_date".  
+        end_date is positional argument with 'system_date' as default value. 
+        py super.py inventory apple 230909  --> setting an end_date. "give me inventory of all products on 23-09-09". 
+        py super.py inventory  --> "give me inventory of all products on system_date".  
+ 
 
-        (-p is flag for 'product_type')
+        result is shown in a table in python module Rich:
+            column 1: product_type
+            column 2: nr of products unsold and not yet expired.
 
-        perhaps shorten inventory to inv.
-
-        result is shown in a table:
-        column 1: product_type
-        column 2: nr of products unsold and not yet expired.
-
-        e.g. 
-        py s.py inventory 230909 
-        output:
-        product_type    inventory:  
-        apple           3
-        pear            5
-        etc.
-
-        ex 2:
-        py s.py inventory -p apple 230909 
-        product_type   id       purchase_price  buy_date        expire_date  
-        apple          b_5          0.20        2023-09-05      2323-09-20
-        apple          b_12         0.25        2023-09-07      2323-09-22
-        apple          b_100        0.50        2023-09-09      2323-09-24
-
-        This info is necessary before you can decide to sell a product (e.g. sell b_5 as s_5) 
-        for a certain price (e.g. 0.40 would be profitable but selling for 0.20 is acceptable if 
-        b_5 is about to expire)
-
-        Display output in Rich and/or Matplotlib. See ucs further down below.
+            e.g. 
+            py s.py inventory 230909 
+            output:
+            product_type    inventory:  
+            apple           3
+            pear            5
+            etc.
 
 
-    - uc_11: calculate expired products in time range between start_date and end_date inclusive
+        on product backlog:
+                shell command plus argparse arguments:
+                py super.py inventory -p apple 230909  --> setting an end_date. "give me inventory of apples on 23-09-09". 
+                py super.py inventory -p coconut --> "give me inventory of coconut on system_date".
+                py super.py expired -p apple 230909 
+                (-p is flag for 'product_type')
+            
+                Add 'product' as fn-argument.
+
+                product_type is optional argument '-p' with "all products" as default value.
+
+                ex 2:
+                py s.py inventory -p apple 230909 
+                product_type   id       purchase_price  buy_date        expire_date  
+                apple          b_5          0.20        2023-09-05      2323-09-20
+                apple          b_12         0.25        2023-09-07      2323-09-22
+                apple          b_100        0.50        2023-09-09      2323-09-24
+
+                This info is necessary before you can decide to sell a product (e.g. sell b_5 as s_5) 
+                for a certain price (e.g. 0.40 would be profitable but selling for 0.20 is acceptable if 
+                b_5 is about to expire)
+
+                Display output in Matplotlib as well. 
+
+
+
+    - uc_11: calculate expired products on date
         (implement if time left) 
 
+        business logic:
+        UPPER BOUNDARY OF THE TIME INTERVAL:
+            system_date > buy_date AND system_date > expiry_date AND sell_date is None (i.e. no sell date)
+            (just 1 tiny difference with calculating inventory in uc_10)
+
+            AS upper boundary I can choose date or an interval:
+            suppose I take range of 10 days. product foo expires on day 6...
+            then wrong to say 'in day-range 1-10 product IS expired' (i.e. as a state). It would be correct to say 
+            that it HAS expired (i.e. as an action) somewhere during this period of 10 days. This makes 
+            the calculation more complex, but adds little extra management insight (imho).
+            qed: as upper boundary I select a date instead of a range. 
+
+
+        LOWER BOUNDARY OF THE TIME INTERVAL:
+        As a super.py-user you CANNOT choose the lower boundary of the time range yourself. 
+        (by comparison: you can when you calculate revenue, cost and profit)
+        Instead, the lower boundary is ALWAYS the date on which the first product has been /was bought.
+        ex: 
+        week 1: buy 300 tins of beans expired
+        week 2: buy 300 tins of beans expired
+        week 3: sell 300 tins of beans expired
+        suppose you look at the inventory of week 2 and 3 (and ignore the inventory of week 1)
+        then atthe end of week 3 you conclude that 600 tins of beans have expired....but that is nonsense, because
+        in week 1 300 tins of beans have also expired. 
+        qed: lower boundary of time range is the date on which you (have) bought the first product. 
+
+
+
         pyt fn:
-        def calculate_expired_products(product_type, start_date, end_date):
-        product_type is optional argument with "all products" as default value.
-        start_date is positional argument.
-        end_date is optional argument with 'system_date' as default value.
+        def calculate_expired_products(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file):
+        start_date is positional argument with mandatory argument 'first day on which product was bought in super.py'.
+        end_date is positional argument with 'system_date' as default value.
+
                 
         shell command plus argparse arguments:
-        py super.py expired 230709 230909 
-        py super.py expired -p apple  230709 230909
-        py super.py expired 230709  
-        (-p is flag for 'product_type')
-
-        Perhaps shorten expired to exp.
-        (2 flags: calculate_expired , ce)
-
-        Display output in Rich and/or Matplotlib. See ucs further down below.
+        py super.py expired  -ed 230909 
+        py super.py expired   --> default value for end_date is system_date
+       
+        1 flag: -ed == end_date       
 
 
-    - uc_12: calculate sales of number of products (Dutch: afzet) in time range between 
+        on product backlog:
+            py super.py expired -p apple  -sd 230709 -ed 230909 
+            (-p is flag for 'product_type')
+            Add 'product' as fn-argument.
+
+            product_type is optional argument with "all products" as default value.
+        
+            Display output in Matplotlib. See ucs further down below. 
+
+
+
+
+    - uc_12: calculate sales volume in time range between 
         start_date and end_date inclusive 
-        (implement if time left)
 
         pyt fn:
-        def calculate_sales_number(product_type, start_date, end_date):
-        product_type is optional argument with "all products" as default value.
-        start_date is positional argument.
-        end_date is optional argument with 'system_date' as default value.
+        def calculate_sales_volume(start_date, end_date, path_to_csv_sold_file):
+        
+        arg1: start_date is optional argument in format 'YYYY-MM-DD'. ex: 2023-09-01
+        default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01.
+        reason: often you want to know the revenue of the current financial year until today inclusive.
+
+        arg2: end_date is optional argument in format 'YYYY-MM-DD'. ex: 2023-10-15
+        default value is system_date.
+        reason: often you want to know the revenue of the current financial year until today  inclusive.
 
         shell command plus argparse arguments:
-        py super.py sales_nr 230709 230909 
-        py super.py sales_nr -p apple  230709 230909
-        py super.py sales_nr 230709  
-        (-p is flag for 'product_type')
+        py super.py sales_volume -sd 230709 -ed 230909 
+        py super.py sales_volume -sd 230709  --> end_date is system_date
+        py super.py sales_volume -ed 230909  --> start_date is january 1st of year from system_date.
+        py super.py sales_volume --> start_date is january 1st of year from system_date AND end_date is system_date. 
+
+        flags:
+            -sd == start_date of time range
+            -ed == end_date of time range
+
+        on product backlog:
+            py super.py sales_volume -p apple  230709 230909 
+            (-p is flag for 'product_type')
+            Add 'product' as fn-argument.
+
+            product_type is optional argument with "all products" as default value.
         
-        Display output in Rich and/or Matplotlib. See ucs further down below.        
+            Display output in Rich and/or Matplotlib. See ucs further down below.        
+
 
 
     - uc_13: calculate costs in time range between start_date and end_date inclusive
@@ -856,57 +916,86 @@
         (calculate revenue is mandatory) 
 
         pyt fn:
-        def calculate_costs(product_type, start_date, end_date):
-        product_type is optional argument with "all products" as default value.
-        start_date is positional argument.
-        end_date is optional argument with 'system_date' as default value.
+        def calculate_costs(start_date, end_date, path_to_csv_bought_file):
+        
+        arg1: start_date in format 'YYYY-MM-DD'. ex: 2023-09-01
+        default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01.
+        reason: often you want to know the cost of the current financial year until today inclusive.
+
+        arg2: end_date in format 'YYYY-MM-DD'. ex: 2023-10-15
+        default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.
 
         shell command plus argparse arguments:
         py super.py cost 230709 230909 
         py super.py cost 230709  
 
-        py super.py cost -p apple  230709 230909 (--> implement if time left)
-        (-p is flag for 'product_type')
+        on product backlog:
+            product_type is optional argument with "all products" as default value.
+            
+            py super.py cost -p apple  230709 230909 
+            (-p is flag for 'product_type')
 
-        Display output in Rich and/or Matplotlib. See ucs further down below.
+            Display output in Rich and/or Matplotlib. See ucs further down below.
+
+
 
     - uc_14: calculate revenue in time range between start_date and end_date inclusive
         (mandatory Winc Academy requirement)
 
         pyt fn:
-        def calculate_revenue(product_type, start_date, end_date):
-        start_date is positional argument.
-        end_date is optional argument with 'system_date' as default value.
-        product_type is optional argument with "all products" as default value.
+        def calculate_costs(start_date, end_date, path_to_csv_sold_file):
+
+        arg1: start_date is optional argument in format 'YYYY-MM-DD'. ex: 2023-09-01
+        default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01.
+        reason: often you want to know the revenue of the current financial year until today inclusive.
+
+        arg2: end_date is optional argument in format 'YYYY-MM-DD'. ex: 2023-10-15
+        default value is system_date, because often you want to know the revenue of the current financial year until today  inclusive.
+
         
         shell command plus argparse arguments:
         py super.py revenue 230709 230909  
         py super.py revenue 230709 
 
-        py super.py revenue -p apple  230709 230909 (--> implement if time left)
-        (-p is flag for 'product_type')
+        on product backlog:
+            product_type is optional argument with "all products" as default value.
 
-        Display output in Rich and/or Matplotlib. See ucs further down below.
+            py super.py revenue -p apple  230709 230909 
+            (-p is flag for 'product_type')
+
+            Display output in Rich and/or Matplotlib. See ucs further down below.
+
 
 
     - uc_15: calculate profit in time range between start_date and end_date inclusive
         (mandatory Winc Academy requirement)
 
         pyt fn:
-        def calculate_profit(product_type, start_date, end_date):
-        start_date is positional argument.
-        end_date is optional argument with 'system_date' as default value.
-        product_type is optional argument with "all products" as default value.
+        def calculate_profit(start_date, end_date, path_to_csv_bought_file, path_to_csv_bought_file):
+        
+        arg1: start_date is optional argument in format 'YYYY-MM-DD'. ex: 2023-09-01
+        default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01.
+        reason: often you want to know the profit of the current financial year until today inclusive.
+        
+        arg2: end_date is optional argument in format 'YYYY-MM-DD'. ex: 2023-10-15
+        default value is system_date, because often you want to know the profit of the current financial year until today  inclusive.   
+        
         
         shell command plus argparse arguments: 
-        py super.py profit 230709 230909 
-        py super.py profit 230709 
+        py super.py profit -sd 230709 -ed 230909 
+        py super.py profit -sd 230709 
+        py super.py profit -ed 231014
+        py super.py profit          
 
-        py super.py profit -p apple  230709 230909 (--> implement if time left)
-        (-p is flag for 'product_type')
+        on product backlog:
+            product_type is optional argument with "all products" as default value.
+         
+            py super.py profit -p apple  230709 230909 
+            (-p is flag for 'product_type')
 
-        Display output in Rich and/or Matplotlib. See ucs further down below.         
-        
+            Display output in Rich and/or Matplotlib. See ucs further down below.
+
+
 
     Display output in Rich ( == non-trivial feature 3):
     - uc_16: display_in_rich_inventory on date
@@ -985,8 +1074,8 @@
 
 
         uc_10: calculate inventory on date
-        uc_11: calculate expired products in time range between start_date and end_date inclusive
-        uc_12: calculate sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+        uc_11: calculate expired products on date
+        uc_12: calculate sales volume in time range between start_date and end_date inclusive
         uc_13: calculate costs in time range between start_date and end_date inclusive
         uc_14: calculate revenue in time range between start_date and end_date inclusive
         uc_15: calculate profit in time range between start_date and end_date inclusive
@@ -1171,8 +1260,8 @@
     uc_08: update_sell_transaction
     
     uc_10: calculate inventory on date
-    uc_11: calculate expired products in time range between start_date and end_date inclusive
-    uc_12: calculate sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
+    uc_11: calculate expired products on date
+    uc_12: calculate sales volume in time range between start_date and end_date inclusive
     
 
     Display output in Rich ( == non-trivial feature 3):
