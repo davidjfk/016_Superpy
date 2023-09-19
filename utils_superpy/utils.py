@@ -14,22 +14,50 @@ from copy import deepcopy
 
 
 
-# list of functions:
+# LIST OF FUNCTIONS:
 # add_days_to_date(date_string, days_to_add)
-# buy_product(product,price,buy_date,expiry_date,id_of_row_in_csv_file_bought,path_to_csv_bought_input_file,path_to_csv_bought_output_file):
+
+# buy_product(product, price, buy_date, expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file,       path_to_csv_bought_output_file):
+
 # calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_bought_file):
+
+# calculate_expired_products_on_day(date_on_which_to_calculate_expired_products, path_to_csv_sold_file, path_to_csv_bought_file):
+
+# calculate_inventory_on_day(date_on_which_to_calculate_products_in_inventory, path_to_csv_sold_file, path_to_csv_bought_file):
+
 # calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive):
+
 # calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
-# create_data_for_csv_files_bought_and_sold("long list of parameters")
-# create_id_for_each_row_in_boughtcsv_while_script_generates_boughtcsv(path_to_id_with_highest_sequence_number)
+
+# calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
+
+# create_data_for_csv_files_bought_and_sold(product_range, delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling, shelf_life, turnover_time, markup, lower_boundary_year_of_time_interval_in_which_to_create_random_testdata, lower_boundary_month_of_time_interval_in_which_to_create_random_testdata, lower_boundary_week_of_time_interval_in_which_to_create_random_testdata, upper_boundary_nr_of_months_to_add_to_calculate, upper_boundary_nr_of_weeks_to_add_to_calculate, upper_boundary_nr_of_days_to_add_to_calculate, path_to_file_bought_csv, path_to_file_sold_csv, add_days_to_date, create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv, generate_random_buy_date_for_buy_transaction_in_future_in_time_interval):
+
+# create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv(csv_file_name_first_letter, first_nr_in_range):
 # create_id_with_unused_highest_sequence_nr_to_buy_product_as_superpy_user(path_to_id_with_highest_sequence_number):
-# generate_random_date_in_future_in_time_interval_of_2_months()
-# get_highest_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv(path_to_csv_bought_file)
+
+# generate_random_buy_date_for_buy_transaction_in_future_in_time_interval(interval_lower_boundary_year,            interval_lower_boundary_month, interval_lower_boundary_day, nr_of_months_added_to_calculate_upper_boundary,            nr_of_weeks_added_to_calculate_upper_boundary, nr_of_days_added_to_calculate_upper_boundary):
+
+# get_highest_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv(path_to_csv_bought_file):
+
+# get_path_to_directory_of_file(directory_of_file):
+
 # get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_path):
-# set_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id, path_to_buy_id_file)
-# set_system_date_to(system_date, path_to_system_date, system_date_file='system_date.txt'): (created in TDD fashion)
+
+# get_system_date(path_to_system_date):
+
+# sell_product(bought_product_id, price, sell_date, path_to_csv_bought_input_file, path_to_csv_bought_output_file):
+
+# set_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id, path_to_buy_id_file):
+
+# set_system_date_to(system_date, path_to_system_date):
+
+# show_list_with_nested_lists_in_console_with_module_rich(list):
+
 # show_csv_file_in_console_with_module_rich(path_to_csv_file):
+
 # time_travel_system_date_with_nr_of_days(nr_of_days_to_travel, path_to_input_file, path_to_output_file):
+
 
 
 def add_days_to_date(date_string, days_to_add):
@@ -205,53 +233,6 @@ def calculate_expired_products_on_day(date_on_which_to_calculate_expired_product
             uc: if user buys a product via argparse cli (fn buy_product) without setting expiry_date, then
             default value for expiry_date is 'does not expire' (supermarket also sells e.g. magazines, light bulbs, etc. that do not expire)
             '''
-    return expired_products
-
-def calculate_expired_products_on_day_old(date_on_which_to_calculate_expired_products, path_to_csv_sold_file, path_to_csv_bought_file):
-    # system_date = datetime.today().date()
-    # print(system_date)
-    # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' has datatype <class 'str'>
-    date_on_which_to_calculate_expired_products = datetime.strptime(date_on_which_to_calculate_expired_products, '%Y-%m-%d').date()
-    # print(date_on_which_to_calculate_expired_products)
-    # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' now has datatype <class 'datetime.date'> and that is what I need. 
-
-    # sold.csv:
-    sell_data = {}
-    with open(path_to_csv_sold_file, 'r') as file_object:
-        reader = csv.reader(file_object)
-        next(reader)  
-        for row in reader:
-            sell_id, buy_id, sell_price, sell_date = row
-            sell_data[buy_id] = sell_date if sell_date else None
-
-    # print('sell_data:')
-    # print(sell_data)
-
-
-    # bought.csv:
-    expired_products = []
-    with open(path_to_csv_bought_file, 'r') as file_object:
-        reader = csv.reader(file_object)
-        next(reader)  
-        for row in reader:
-            # I have access to sold.csv and bought.csv:
-            buy_id, product, buy_price, buy_date, expiry_date = row
-            buy_date = datetime.strptime(buy_date, '%Y-%m-%d').date()
-            '''
-            # about 'does not expire': 
-            # uc: if user buys a product via argparse cli (fn buy_product) without setting expiry_date, then
-            # default value for expiry_date is 'does not expire' (supermarket also sells e.g. magazines, light bulbs, etc. that do not expire)
-            '''
-            expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date() if expiry_date != 'does not expire' else 'does not expire'
-
-            # filter expired products: 
-            if date_on_which_to_calculate_expired_products > buy_date and (expiry_date != 'does_not_expire' and \
-               expiry_date is not None and date_on_which_to_calculate_expired_products > expiry_date) and sell_data.get(buy_id) is None:
-               expired_products.append(row)
-            # in bought.csv: (by convention) buy_date is always set with either an expiry_date or 'does not expire'. To make
-            # code future proof, I also check if expiry_date is None.
-    print('expired_products:')
-    print(expired_products)
     return expired_products
 
 
@@ -779,25 +760,6 @@ def set_system_date_to(system_date, path_to_system_date):
         print("Inside fn set_system_date_to() --> Plz investigate IOError.  ")
     return system_date
 
-def set_system_date_to_OLD__DO_NOT_USE(system_date, path_to_system_date, system_date_file='system_date.txt'):
-    # system_date is datetime object, ex: '2020-01-01'
-    print('inside set_system_date_to()')
-    print(path_to_system_date)
-    
-    # defensive programming: (over-engineering here?)
-    # if not os.path.exists(path_to_system_date):
-    #     os.makedirs(path_to_system_date)
-    try:
-        with open(os.path.join(path_to_system_date, system_date_file), 'w', newline='') as file:
-            file.write(system_date)
-            print('inside try')
-    except IOError:
-        print("Error: File is already / still open. Plz investigate.")
-        file.close()
-        print("status: File has been closed (as a work-around). But error must still be investigated.")
-        with open(os.path.join(path_to_system_date, system_date_file), 'w', newline='') as file:
-            file.write(system_date)
-    return system_date
 
 def show_list_with_nested_lists_in_console_with_module_rich(list):
     rich_table = Table(show_header=True, header_style="bold magenta")
@@ -852,42 +814,3 @@ def time_travel_system_date_with_nr_of_days(
             file.write(current_system_date)
     # returning new_system_date for testing purposes only (returned value is not used in the code)    
     return new_system_date
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import os
-print(os.getcwd())
-
-import site 
-print(site.getsitepackages())
-
-
-
