@@ -19,7 +19,7 @@ sys.path.append(file_path_to_directory_superpy)
 # the following 4 imported fns are arguments in fn create_data_for_csv_files_bought_and_sold() below.
 from utils_superpy.utils import add_days_to_date
 from utils_superpy.utils import generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
-from utils_superpy.utils import create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv
+from utils_superpy.utils import create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created
 from utils_superpy.utils import get_path_to_directory_of_file
 
 from utils_superpy.utils import create_data_for_csv_files_bought_and_sold
@@ -74,7 +74,7 @@ def main():
         path_to_file_bought_csv,
         path_to_file_sold_csv,
         add_days_to_date,
-        create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv,
+        create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created,
         generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
     )
 

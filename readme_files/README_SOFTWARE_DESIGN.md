@@ -156,8 +156,23 @@
 
 1. # CREATE datamodel / ERD (entity relationship diagram)
     Goal: decide about how to connect csv-tables bought.csv and sold.csv.
-    -- design idea 1: bought.csv and sold.csv not connected via primary and foreign keys 
-        (tldr; bad idea for practical coding reasons).
+    -- design idea 1: all data in 1 big csv-file
+      (tldr; bad idea: readability, performance, security).
+      1 buy-transaction leads to 1 sell-transaction. So a 1-to-1 relationship between
+      bought.csv and sold.csv. That means that I can "squash" all data together into 1 big csv.
+      Disadvantages: (in general, not specific about superpy)
+      a. Readability: Separate tables can make it easier to read and understand the data, 
+        especially when more columns are added later on.
+      b. Performance: If superpy gets a very large number of records, storing them in separate csv-files 
+        (or db-tables) can improve the performance of the database. By separating the data, you can reduce the 
+        amount of data that needs to be loaded into memory and processed each time you query the database.
+      c.  Security: If you need to restrict access to certain records (ex: employee foo
+        only has permission to see the bought products, but not the sold-products), you can 
+        do so more easily by using separate csv-files (or db-tables). For example, you might want to create a separate table for buy 
+        records and only grant access to that table to authorized users.
+    
+    -- design idea 2: bought.csv and sold.csv not connected via primary and foreign keys 
+        (tldr; bad idea: difficult to track individual products).
 
         The supermarket strictly uses logistic principle FIFO (first in first out).
 
@@ -219,7 +234,7 @@
         QED: a lot of work / toil as a consequence of disconnecting bought.csv from sold.csv in the erd.
 
 
-    -- design idea 2: use primary and foreign key to connect bought.csv and sold.csv (my choice)
+    -- design idea 3: use primary and foreign key to connect bought.csv and sold.csv (my choice)
         Winc assignment suggests the use of primary and foreign keys to connect bought.csv and sold.csv. 
         I connect each transaction  in sold.csv via a foreign key in sold.csv to a primary key
         in bought.csv 
