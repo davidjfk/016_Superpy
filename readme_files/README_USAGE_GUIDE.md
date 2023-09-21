@@ -1,34 +1,15 @@
-# Table of  contents
-[table of contents at the start of markdown file](#table-of-contents)
-- Introduction
-- Installation
-- Definitions
-- Data model
-- Usage:
-- Examples
-- Troubleshooting
-- FAQ
-- Support 
+## TABLE OF CONTENTS: click link to goto chapter: (press CTRL-key)
+### INTRO
+### INSTALLATION
+### DEFINITIONS
+### DATA-MODEL
+### USAGE
+### EXAMPLES
+### TROUBLE-SHOOTING
+### FAQ
+### SUPPORT 
 
-- click link to goto chapter in table of contents above:
-### introduction
-### installation
-### definitions
-### data-model
-### usage
-### examples
-### trouble-shooting
-### faq
-### support 
-
-
-
-
-
-
-
-
-# Introduction
+# INTRO
 [goto Table of Contents at start of markdown file: ](#introduction) 
 Application Superpy can be used to buy and sell products. In addition to that
 all kinds of reports can be created: revenue, cost,  profit, inventory, expired_products, etc.
@@ -40,7 +21,7 @@ To learn superpy faster, the following 2 features can be used via the cli:
 The target group of this usage guide are Winc students. Winc students are familiar with python, vsCode 
 and running applications via argparse cli.
 
-# Installation
+# INSTALLATION
 [goto Table of Contents at start of markdown file: ](#installation)
 1. The latest version of Superpy is in Github: https://github.com/davidjfk/David_Sneek_Superpy . Check if there is a newer version.
 2. In Powershell navigate into folder Superpy 
@@ -67,8 +48,8 @@ and running applications via argparse cli.
 7. (To deactivate virtual environment, enter 'deactivate' in cli and press enter. )
 
 
-# DEFINITIONS:
-[goto Table of Contents at start of markdown file: ](#definitions) <br />
+# DEFINITIONS
+[goto Table of Contents at start of markdown file: ](#DEFINITIONS) <br />
 
     business task = activity that is carried out in Superpy, e.g. buy a product, show 
        an overview of profit in a certain time interval.
@@ -147,7 +128,7 @@ and running applications via argparse cli.
         (used in fn create_data_for_csv_files_bought_and_sold() )
 
 
-# Data model
+# DATA-MODEL
 [goto Table of Contents at start of markdown file: ](#data-model)
 Before moving on, please have a look at the data model. This provides some context to  
 better understand the business tasks of Superpy in next chapter Usage.
@@ -158,17 +139,16 @@ better understand the business tasks of Superpy in next chapter Usage.
 
 
 # Usage 
-[goto Table of Contents at start of markdown file: ](#usage)
-This chapter explains how to use Superpy's command-line interface. Three questions are answered:
-1. Which business tasks does Superpy fulfill? (e.g. buy product, sell product, etc.)
-2. What is the exact goal of each business task?
-3. How to use each business task as a Superpy-user? 
+[goto Table of Contents at start of markdown file: ](#USAGE)
+This chapter explains how to use Superpy's command-line interface.  
+Three questions are answered:
+1. Which functions (fns) does Superpy fulfill? (e.g. buy product, sell product, etc.)
+2. What is the exact goal of each Superpy fn?
+3. How to use each Superpy fn as a Superpy-user? 
 
-List of superpy business tasks with their goals:
+List of superpy functionality with goals:
 
-
-
-|Nr | Business task         | Goal                                                              |
+|Nr | Superpy functionality | Goal                                                              |
 |---|-----------------------|-------------------------------------------------------------------|
 |1  | buy                   | buy 1 product and add this product to bought.csv                  |
 |2  | create_mock_data      | fill bought.csv and sold.csv with mockdata.                       |
@@ -185,7 +165,7 @@ List of superpy business tasks with their goals:
 |13 | show_sold_csv         | show contents of bought.csv as a table                            |
 |14 | time_travel           | change the system_date by adding or subtracing a nr of days       |
 
-- click link to goto business task:
+## click link to goto superpy functionality: (press CTRL-key)
 ### buy
 ### create_mock_data
 ### delete
@@ -206,11 +186,12 @@ List of superpy business tasks with their goals:
 
 
 
+
 - ----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
 <br />
-1. BUSINESS TASK: BUY PRODUCTS 
+1. SUPERPY FUNCTIONALITY: BUY PRODUCTS 
 
 [goto chapter Usage --> overview with business tasks ](#buy) <br />
 - goal: buy product and add to file bought.csv 
@@ -221,23 +202,23 @@ List of superpy business tasks with their goals:
     py super.py buy apple 1.75 -bd 23-09-15 -sd 23-09-27 
 ```
 
-- buy_date is 23-09-15,   expiry_date is 23-09-27   
+-   product: apple,  price: &euro; 1.75, buy_date: 23-09-15, expiry_date: 23-09-27   
 
 - ex2: 
 ```
-    py super.py buy apple 3.00 -exd 23-09-28 
+    py super.py buy linseed 3.00 -exd 23-09-28 
 ```
-- system_date is default buy_date. expiry_date is 23-09-28   
+-   product: linseed, price: &euro; 3.00, buy_date: system_date as default, expiry_date: 23-09-28   
 
 - ex3: 
 ```
     py super.py buy cabbage 0.73 
 ```
-- system_date is default sell_date. 'does not expire' is default expiry_date
+-   product: cabbage, price: &euro; 0.73, buy_date: system_date as default, expiry_date:  'does not expire' as default 
 
 - arg1: positional argument product: e.g. apple, potato, milk
 - arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35   
-- arg3: optional argument -buy_date, -bd (ex: 2023-09-15) with system_date as default value. 
+- arg3: optional argument -buy_date, -bd (ex: 2023-09-15) with default value system_date 
 - arg4: optional argument -expiry_date, -exd (ex: 2023-10-03) with default value 'does not expire' 
 
 
@@ -246,10 +227,215 @@ List of superpy business tasks with their goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-2. BUSINESS TASK: CREATE_MOCK_DATA
+2. SUPERPY FUNCTIONALITY: CREATE_MOCK_DATA
 
 [goto chapter Usage --> overview with business tasks ](#create_mock_data) <br />
+- goal: create mock data for bought.csv and sold.csv
+- All 11 arguments have default values that can be changed in (...\superpy\super.py --> goto CONSTANTS at start of main.py())
+- Quick summary: 
+- All 11 arguments are optional, so you can do this:
+```
+    py super.py create_mock_data
+```
+-   result: bought.csv and sold.csv are filled with mockdata that has been created with default values. 
+<br/>
+<br/>
 
+- arg1: product_range
+    - flags: -pr, -product_range
+    - product_range == product_assortment == the amount of different products in Superpy.
+    - ex1:
+    ```
+    py super.py create_mock_data -pr 3
+    ```
+    - product_range: 3 random products: e.g. 'apple', 'cabbage' and 'beetroot' as input to create mock data
+    <br />
+    - ex2:
+    ```
+    py super.py create_mock_data -pr 2
+    ```
+    - product_range: 2 random products: e.g. 'coffee' and 'potato' as input to create mock data.
+<br/>
+-----------------------------------------------------------------------------------------------------
+<br/>
+
+- arg2: delete_every_nth_row
+    - delete_every_nth_row == delete every nth row in sold.csv
+    - Purpose: deleting rows makes them expire while time travelling:
+    - after creating mock data for bought.csv, a copy is made to create sold.csv.
+    - Then rows are deleted from sold.csv (e.g. every 3rd row).
+    - By time travelling to the future these bought_products (e.g. every 3rd row) will expire.
+    - flags: -del_row, -delete_every_nth_row
+
+    - ex1:
+    ```
+    py super.py create_mock_data -del_row 3
+    ```
+    - delete_every_nth_row: 3 
+    
+<br />
+-----------------------------------------------------------------------------------------------------
+<br/>
+
+- arg3: delete_every_nth_row
+    - shelf_life == shelf_time == number of days between buying a product and its expiry_date
+    - flags: -sl, -shelf_life
+
+    - ex1:
+    ```
+    py super.py create_mock_data -del_row 3
+    ```
+    - shelf_life: 10 days
+    - result: a bought product will expire after 10 days.
+<br />
+-----------------------------------------------------------------------------------------------------
+<br/>
+
+- arg4: turnover_time
+    - turnover_time == inventory turnover == the number of days between buying a product in bought.csv  
+        and selling a product in sold.csv.
+    - flags: -turnover_time, -tt
+
+    - ex1:
+    ```
+    py super.py create_mock_data -tt 4
+    ```
+    - turnover_time: 4 days
+    - result: a bought product will expire after 10 days.
+<br />
+-----------------------------------------------------------------------------------------------------
+<br/>
+
+- arg5: markup
+    - markup = the amount of money a business adds to the cost of a product or service in order to make a profit.
+    - In super.py markup is calculated as a factor: ex: if buy_price is 3 euro and sell_price is 4 euro,  
+        then markup is 4/3 = 1.33 . 
+    - flags: -mu, -markup
+
+    - ex1:
+    ```
+    py super.py create_mock_data -mu 3
+    ```
+    - markup: factor 3
+    - result: if buy_price in bought.csv is 3 euro, then sell_price will be 9 euro in sold.csv.
+<br />
+-----------------------------------------------------------------------------------------------------
+<br/>
+
+- arg6: lower_boundary_year
+    - lower_boundary_year == lower_boundary_year_of_time_interval_in_which_to_create_random_testdata.
+    - flags: -lby, -lower_boundary_year 
+
+    - ex1:
+    ```
+    py super.py create_mock_data -lby 2024
+    ```
+    - lower_boundary_year: 2024
+
+<br />
+-----------------------------------------------------------------------------------------------------
+<br/>
+
+- arg7: lower_boundary_month
+    - lower_boundary_month == lower_boundary_month_of_time_interval_in_which_to_create_random_testdata.
+    - flags: -lbm, -lower_boundary_month 
+
+    - ex1:
+    ```
+    py super.py create_mock_data -lbm 10
+    ```
+    - lower_boundary_month: October
+
+<br />
+-----------------------------------------------------------------------------------------------------
+<br/>
+
+- arg8: lower_boundary_day
+    - lower_boundary_day == lower_boundary_day_of_time_interval_in_which_to_create_random_testdata.
+    - flags: -lbd, -lower_boundary_day 
+
+    - ex1:
+    ```
+    py super.py create_mock_data -lbd 15
+    ```
+    - lower_boundary_day: 15th day of  the  month
+
+<br />
+-----------------------------------------------------------------------------------------------------
+<br/>
+
+- arg9: nr_of_months_to_calculate_upper_boundary_month
+    - flags: -ubmnr, -upper_boundary_month_nr
+
+    - ex1:
+    ```
+    py super.py create_mock_data -ubmnr 3
+    ```
+    - nr_of_months_to_calculate_upper_boundary_month: 3 months
+    - result: upper boundary month of time interval in which to create data is 3 months in the future
+
+<br />
+-----------------------------------------------------------------------------------------------------
+<br/>
+
+- arg10: nr_of_weeks_to_calculate_upper_boundary_week
+    - flags: -ubwnr, -upper_boundary_weeknr
+
+    - ex1:
+    ```
+    py super.py create_mock_data -ubwnr 8
+    ```
+    - nr_of_weeks_to_calculate_upper_boundary_month: 3 weeks
+    - result: upper boundary week of time interval in which to create data is 8 weeks in the future
+
+<br />
+-----------------------------------------------------------------------------------------------------
+<br/>
+
+- arg11: nr_of_days_to_calculate_upper_boundary_day
+    - flags: -ubwnr, -upper_boundary_weeknr
+
+    - ex1:
+    ```
+    py super.py create_mock_data -ubdnr 3
+    ```
+    - nr_of_days_to_calculate_upper_boundary_day: 3 weeks
+    - upper boundary day of time interval in which to create data is 3 days in the future
+
+<br />
+-----------------------------------------------------------------------------------------------------
+<br/>
+
+
+---------------------------------------------------
+------------------------------------------------
+----------------------------------------------
+
+```
+    py super.py show_profit -ed 2023-10-05
+```
+-   start_date: start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01
+-   end_date: 2023-10-05
+-   result in terminal:  
+    'profit from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'
+
+
+- ex3: 
+```
+    py super.py show_profit -sd 2023-07-01
+```
+-   start_date: 2023-07-01
+-   end_date: end_date is by default system_date (here, e.g. 2023-09-17) 
+-   result in terminal:  
+    'Profit from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9'  
+
+
+- arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01  
+    default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01.  
+    reason: often you want to know the cost of the current financial year until today inclusive.  
+
+- arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15  
+    default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.
 
 
 
@@ -259,7 +445,7 @@ List of superpy business tasks with their goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-3. BUSINESS TASK: DELETE
+3. SUPERPY FUNCTIONALITY: DELETE
 
 [goto chapter Usage --> overview with business tasks ](#delete) <br />
 - goal: delete all data in bought.csv and sold.csv
@@ -270,7 +456,7 @@ List of superpy business tasks with their goals:
     py super.py delete 
 ```
 
-- result: all transaction records in bought.csv and sold.csv have been deleted.
+- result: all transaction records in bought.csv and sold.csv have been deleted
 
 
 
@@ -280,7 +466,7 @@ List of superpy business tasks with their goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-4. BUSINESS TASK: SELL
+4. SUPERPY FUNCTIONALITY: SELL
 
 [goto chapter Usage --> overview with business tasks ](#sell) <br />
 
@@ -292,33 +478,33 @@ List of superpy business tasks with their goals:
     py super.py b_15 3.75 -sd 2023-11-15 
 ```
 
-- sell_date is 2023-11-15
+-   product: row with id b_15 in bought.csv is sold, price: &euro; 3.75, sell_date: 23-11-15
 
 - ex2: 
 ```
     py super.py b_16 5.15
 ```
-- system_date is default sell_date   
+-   product: row with id b_15 in bought.csv is sold, price: &euro; 5.15, sell_date: system_date as default     
 
 - ex3: 
 ```
     py super.py b_128 2.42 
 ```
-- ssystem_date is default sell_date
+-   product: row with id b_128 in bought.csv is sold, price: &euro; 2.42, sell_date: system_date as default
 
 - arg1: positional argument buy_id: e.g. b_7, b_18, etc. See bought.csv for buy_ids
 - arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35  
-- arg3: optional argument -sell_date, -sd (ex: -sd 2023-09-15) with system_date as default value 
+- arg3: optional argument -sell_date, -sd (ex: -sd 2023-09-15) with default value system_date 
 
 <br /> 
 <br /> 
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-5. BUSINESS TASK: SET_DATE
+5. SUPERPY FUNCTIONALITY: SET_DATE
 
 [goto chapter Usage --> overview with business tasks ](#set_date) <br />
-- goal: set_system_date_to a specific date in the file system__date.txt 
+- goal: set_system_date_to a specific date in the file system_date.txt 
 
 - ex1: 
 
@@ -326,7 +512,7 @@ List of superpy business tasks with their goals:
     py super.py set_date 2025-01-01
 ```
 
-- result: system_date is set to 2025-01-01 in file system_date.txt   
+- system_date: 2025-01-01   
 
 - ex2: 
 
@@ -334,7 +520,7 @@ List of superpy business tasks with their goals:
     py super.py set_date 2023-09-20 
 ```
 
-- result: system_date is set to 2023-09-20 in file system_date.txt  
+- system_date: 2023-09-20
 
 - arg1: positional argument system_date, e.g. 2023-10-11 --> string representation in format 'yyy-mm-dd'<br/>
 
@@ -345,7 +531,7 @@ List of superpy business tasks with their goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-6. BUSINESS TASK: SHOW_BOUGHT_CSV
+6. SUPERPY FUNCTIONALITY: SHOW_BOUGHT_CSV
 
 [goto chapter Usage --> overview with business tasks ](#show_bought_csv) <br />
 
@@ -367,22 +553,80 @@ List of superpy business tasks with their goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-7. BUSINESS TASK: SHOW_COST
+7. SUPERPY FUNCTIONALITY: SHOW_COST
 
 [goto chapter Usage --> overview with business tasks ](#show_cost) <br />
+- goal: show cost in time range between start_date and end_date inclusive
+
+- ex1: 
+
+```
+    py super.py show_cost -sd 2023-09-01 -ed 2023-10-10 
+```
+-   start_date: 2023-09-01, 
+-   end_date: 2023-10-10
+-   result in terminal:  
+    'Cost from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'   
+
+- ex2: 
+```
+    py super.py show_cost -ed 2023-10-05
+```
+-   start_date is by default start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.  
+-   end_date: 2023-10-05
+-   result in terminal:  
+    'Cost from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'  
 
 
+- ex3: 
+```
+    py super.py show_cost -sd 2023-07-01
+```
+-   start_date: 2023-07-01 
+-   end_date is by default system_date (here, e.g. 2023-09-17) 
+-   result in terminal:  
+    'Cost from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9'  
 
+
+- arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01  
+    default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01.  
+    reason: often you want to know the cost of the current financial year until today inclusive.  
+
+- arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15  
+    default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.
+    
+ 
 <br /> 
 <br /> 
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-8. BUSINESS TASK: SHOW_EXPIRED_PRODUCTS
+8. SUPERPY FUNCTIONALITY: SHOW_EXPIRED_PRODUCTS
 
 [goto chapter Usage --> overview with business tasks ](#show_expired_products) <br />
+- goal: calculate expired products on a day in format 'YYYY-MM-DD' (e.g. 2023-09-18)
+
+- ex1: 
+
+```
+    py super.py show_expired_products -d 23-09-28
+```
+-   date: 2023-09-28, 
+-   result is displayed in table in the terminal:  
+ 
+
+- ex2: 
+```
+    py super.py show_expired_products -ed 2023-10-05
+```
+-   date: by default system_date
+-   end_date: 2023-10-05
+-   result is displayed in table in the terminal:    
 
 
+- arg1: optional argument date in following format: 'YYYY-MM-DD'. ex: -d 2026-10-21, or: -date 2026-10-21 
+    default value is system_date
+    reason: often you want to know which products expire today. 
 
 
 <br /> 
@@ -390,10 +634,32 @@ List of superpy business tasks with their goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-9. BUSINESS TASK: SHOW_INVENTORY
+9. SUPERPY FUNCTIONALITY: SHOW_INVENTORY
 
 [goto chapter Usage --> overview with business tasks ](#show_inventory) <br />
+- goal: calculate inventory on a day in format 'YYYY-MM-DD' (e.g. 2023-09-18)
 
+- ex1: 
+
+```
+    py super.py show_inventory -d 23-09-28
+```
+-   date: 2023-09-28, 
+-   result is displayed in table in the terminal:  
+ 
+
+- ex2: 
+```
+    py super.py show_inventory -ed 2023-10-05
+```
+-   date: by default system_date
+-   end_date: 2023-10-05
+-   result is displayed in table in the terminal:    
+
+
+- arg1: optional argument date in following format: 'YYYY-MM-DD'. ex: -d 2026-10-21, or: -date 2026-10-21 
+    default value is system_date
+    reason: often you want to know which products expire today. 
 
 
 <br /> 
@@ -401,10 +667,47 @@ List of superpy business tasks with their goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-10. BUSINESS TASK: SHOW_PROFIT
+10. SUPERPY FUNCTIONALITY: SHOW_PROFIT
 
 [goto chapter Usage --> overview with business tasks ](#show_profit) <br />
+- goal: show profit in time range between start_date and end_date inclusive
 
+- ex1: 
+
+```
+    py super.py show_profit -sd 2023-09-01 -ed 2023-10-10
+```
+-   start_date: 2023-09-01, 
+-   end_date: 2023-10-10
+-   result in terminal:  
+    'Profit from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'   
+
+- ex2: 
+```
+    py super.py show_profit -ed 2023-10-05
+```
+-   start_date: start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01
+-   end_date: 2023-10-05
+-   result in terminal:  
+    'profit from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'
+
+
+- ex3: 
+```
+    py super.py show_profit -sd 2023-07-01
+```
+-   start_date: 2023-07-01
+-   end_date: end_date is by default system_date (here, e.g. 2023-09-17) 
+-   result in terminal:  
+    'Profit from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9'  
+
+
+- arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01  
+    default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01.  
+    reason: often you want to know the cost of the current financial year until today inclusive.  
+
+- arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15  
+    default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.
 
 
 <br /> 
@@ -412,10 +715,47 @@ List of superpy business tasks with their goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-11. BUSINESS TASK: SHOW_REVENUE
+11. SUPERPY FUNCTIONALITY: SHOW_REVENUE
 
 [goto chapter Usage --> overview with business tasks ](#show_revenue) <br />
+- goal: show revenue in time range between start_date and end_date inclusive
 
+- ex1: 
+
+```
+    py super.py show_revenue -sd 2023-09-01 -ed 2023-10-10
+```
+-   start_date: 2023-09-01, 
+-   end_date: 2023-10-10
+-   result in terminal:  
+    'Cost from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'   
+
+- ex2: 
+```
+    py super.py show_revenue -ed 2023-10-05
+```
+-   start_date: start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01
+-   end_date: 2023-10-05
+-   result in terminal:  
+    'Revenue from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'
+
+
+- ex3: 
+```
+    py super.py show_revenue -sd 2023-07-01
+```
+-   start_date: 2023-07-01
+-   end_date: end_date is by default system_date (here, e.g. 2023-09-17) 
+-   result in terminal:  
+    'Cost from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9'  
+
+
+- arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01  
+    default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01.  
+    reason: often you want to know the cost of the current financial year until today inclusive.  
+
+- arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15  
+    default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.
 
 
 <br /> 
@@ -423,10 +763,47 @@ List of superpy business tasks with their goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-12. BUSINESS TASK: SHOW_SALES_VOLUME
+12. SUPERPY FUNCTIONALITY: SHOW_SALES_VOLUME
 
 [goto chapter Usage --> overview with business tasks ](#show_sales_volume) <br />
+- goal: show sales_volume in time range between start_date and end_date inclusive
 
+- ex1: 
+
+```
+    py super.py show_sales_volume -sd 2023-09-01 -ed 2023-10-10
+```
+-   start_date: 2023-09-01, 
+-   end_date: 2023-10-10
+-   result in terminal:  
+    'Profit from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'   
+
+- ex2: 
+```
+    py super.py show_sales_volume -ed 2023-10-05
+```
+-   start_date: start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01
+-   end_date: 2023-10-05
+-   result in terminal:  
+    'Sales volume from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'
+
+
+- ex3: 
+```
+    py super.py show_sales_volume -sd 2023-07-01
+```
+-   start_date: 2023-07-01
+-   end_date: end_date is by default system_date (here, e.g. 2023-09-17) 
+-   result in terminal:  
+    'Profit from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9'  
+
+
+- arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01  
+    default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01.  
+    reason: often you want to know the cost of the current financial year until today inclusive.  
+
+- arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15  
+    default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.
 
 
 <br /> 
@@ -434,7 +811,7 @@ List of superpy business tasks with their goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-13. BUSINESS TASK: SHOW_SOLD_CSV
+13. SUPERPY FUNCTIONALITY: SHOW_SOLD_CSV
 
 [goto chapter Usage --> overview with business tasks ](#show_sold_csv) <br />
 
@@ -455,18 +832,18 @@ List of superpy business tasks with their goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-14. BUSINESS TASK: TIME_TRAVEL
+14. SUPERPY FUNCTIONALITY: TIME_TRAVEL
 
 [goto chapter Usage --> overview with business tasks ](#time_travel) <br />
 
-- goal: goal: change system_date by adding or subtracting nr of day(s)
+- goal: change system_date by adding or subtracting nr of day(s)
 
 - ex1: 
 
 ```
     py super.py time_travel 3
 ```
-
+-  nr_of_days: 3
 - result: you travel with 3 days to the future. So if system_date is 2020-03-10, then  
   new date becomes 2020-03-13 in the future.
 
@@ -474,6 +851,7 @@ List of superpy business tasks with their goals:
 ```
     py super.py time_travel -3
 ```
+-  nr_of_days: -3
 - result: you travel with 3 days to the past. So if system_date is 2020-03-10, then  
   new date becomes 2020-03-07 in the past.  
 

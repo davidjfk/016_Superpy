@@ -1,7 +1,19 @@
 
-
+## TABLE OF CONTENTS: click link to goto chapter: (press CTRL-key)
+### INTRO
+### ANALYSIS:
+###   DEFINITIONS
+### DESIGN:
+###   1_CREATE-DATAMODEL-ERD   
+###   2_CREATE-FN-create_data_for_csv_files_bought_and_sold.py 
+###   3_USE-CASES
+###   4_MVC-MODEL-VIEW-CONTROLLER
+###   5_TASKS-NOT-UCS
+###   6_TDD-CODING-STEPS-TO-IMPLEMENT-EACH-UC
+###   7_IMPLEMENTATION-ORDER-OF-UCS-AND-TASKS
 
 # INTRO
+[table of contents at the start of markdown file](#INTRO)
     To create application super.py I do the following:
     1. create ERD
     2. create fn to quickly create testdata for  bought.csv and sold.csv
@@ -14,72 +26,10 @@
        etc.
 
 
-
-# TABLE OF CONTENTS:
-
 # ANALYSIS
-1. # DEFINITIONS
-
-# DESIGN
-1. # CREATE datamodel / ERD (entity relationship diagram)  
-2. # CREATE FUNCTION create_testdata_for_csv_files_bought_and_sold.py 
-3. # USE CASES (UCS): 
-
-        Develop all use cases (ucs) with TDD ( == non-trivial feature 1). See chapter 6 about TDD-metholodogy. The testcode for each use case (uc) can be found in (...)\superpy\test_utils\"name of uc" . -->"name of uc" can be e.g. "fn_buy_product_testcases". 
-        uc_01: set the system_date in time range
-        uc_02: timetravel in time range.
-        uc_03: buy product (and add to bought.csv) 
-        uc_04: sell product (and add to sold.csv)
-        uc_05: cancel_buy_transaction (cruD: Delete part 1)
-        uc_06: cancel_sell_transaction (cruD: Delete part 2)
-        uc_07: update_buy_transaction
-        uc_08: update_sell_transaction
-
-        uc_09 fill bought.csv and sold.csv with mock data via argparse cli ( == non-trivial feature 2).
-
-
-        uc_10: calculate inventory on date
-        uc_11: calculate expired products on date
-        uc_12: calculate sales volume in time range between start_date and end_date inclusive
-        uc_13: calculate costs in time range between start_date and end_date inclusive
-        uc_14: calculate revenue in time range between start_date and end_date inclusive
-        uc_15: calculate profit in time range between start_date and end_date inclusive
-
-        Display output in Rich ( == non-trivial feature 3):
-        uc_16: display_in_rich_inventory on date
-        uc_17: display_in_rich_expired products in time range between start_date and end_date inclusive
-        uc_18: display_in_rich_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
-        uc_19: display_in_rich_costs in time range between start_date and end_date inclusive
-        uc_20: display_in_rich_revenue in time range between start_date and end_date inclusive
-        uc_21: display_in_rich_profit in time range between start_date and end_date inclusive
-
-        Display output in Matplotlib ( == non-trivial feature 4):
-        uc_22: display_in_matplotlib_inventory on date
-        uc_23: display_in_rich_expired products in time range between start_date and end_date inclusive
-        uc_24: display_in_matplotlib_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
-        uc_25: display_in_matplotlib_costs in time range between start_date and end_date inclusive
-        uc_26: display_in_matplotlib_revenue in time range between start_date and end_date inclusive
-        uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
-
-
-        more features along the way: (I do not want to keep renumbering ucs, so any new functionality that pops up, gets a uc-nr, starting in the 40-range.)
-        uc_40: delete all data from bought.csv and  sold.csv via argparse cli (== feature 5) 
-        uc_41: show bought.csv in console with module rich (== feature 6)
-        uc_42: show sold.csv in console with module rich (== feature 7)
-
-4. # MVC: model, view, controller  
-5. # TASKS (not UCS )
-6. # TDD: CODING STEPS TO IMPLEMENT EACH EACH UC
-7. # IMPLEMENTATION ORDER OF UCS and TASKS (mandatory and optional)
-
-
-
-
-
-# ANALYSIS
-
+[table of contents at the start of markdown file](#ANALYSIS)
 1. # DEFINITIONS:
-
+[table of contents at the start of markdown file](#DEFINITIONS)
     date == calendar day == date object with string representation in format: '%Y-%m-%d', e.g. '2025-10-15'. --> 
         system_date is a date with a special purpose. See system_date below. 
 
@@ -153,8 +103,9 @@
 
 
 # DESIGN
-
-1. # CREATE datamodel / ERD (entity relationship diagram)
+[table of contents at the start of markdown file](#DESIGN)
+1. # CREATE DATAMODEL-ERD 
+[table of contents at the start of markdown file](#1_CREATE-DATAMODEL-ERD) 
     Goal: decide about how to connect csv-tables bought.csv and sold.csv.
     -- design idea 1: all data in 1 big csv-file
       (tldr; bad idea: readability, performance, security).
@@ -339,7 +290,8 @@
 
 
 
-2.  # CREATE FUNCTION create_testdata_for_csv_files_bought_and_sold() 
+2.  # CREATE-FN-create_data_for_csv_files_bought_and_sold.py
+[table of contents at the start of markdown file](#2_CREATE-FN-create_data_for_csv_files_bought_and_sold.py) 
     precondition: ERD (see prev par) must be ready before creating script.
 
     Fn create_data_for_csv_files_bought_and_sold() has 2 purposes:
@@ -431,6 +383,7 @@
 
 
 3.  # USE CASES
+[table of contents at the start of markdown file](#3_USE-CASES) 
    - intro
         If a uc is about implementing a fn, then in the uc the following 2 signatures are provided:
         1. fn-signature (e.g. buy_product(product, price, buy_date, expiry_date))
@@ -445,6 +398,12 @@
         so the superpy-app will become easy and  intuitive to use.
 
         While creating the fn- and arparse-signatures, I check if they are compatible with the created ERD.
+
+
+
+
+
+
 
 
     - uc_01: set the system_date in time range
@@ -1065,8 +1024,8 @@
         So right before you sell a product, you need to have an overview in the console with all sold products.
 
 
-4. # MVC: model, view, controller 
-
+4. # MVC-MODEL-VIEW-CONTROLLER 
+[table of contents at the start of markdown file](#4_MVC-MODEL-VIEW-CONTROLLER) 
     Looking at the ucs from previous chapter 3 from a bird's-eye view:
 
     MODEL LAYER (MVC-model):
@@ -1130,7 +1089,8 @@
     CONTROLLER LAYER (MVC-model):   
         The argparse cli in super.py ( (...)\superpy\super.py) acts as the controller between MODEL and VIEW. 
 
-5. # TASKS (not UCS )
+5. # TASKS-NOT-UCS
+[table of contents at the start of markdown file](#5_TASKS-NOT-UCS) 
     - task 01: connect id-range of script 'create_testdata_for_csv_files_bought_and_sold' with id-range of 
         buy-transactions that are manually added.
         Currently id-range id_1 to id_299 are served for this script and range id_300 and beyond are 
@@ -1162,7 +1122,8 @@
 
 
 
-6. # TDD: CODING STEPS TO IMPLEMENT EACH EACH UC
+6. # TDD-CODING-STEPS-TO-IMPLEMENT-EACH-UC
+[table of contents at the start of markdown file](#6_TDD-CODING-STEPS-TO-IMPLEMENT-EACH-UC) 
     coding methodology for each uc: implement each use case in its own TDD-iteration
     Perform the following steps iteratively for each use case from chapter 'List with fn signatures and argparse-command signatures' above. 
     Workflow: 
@@ -1248,7 +1209,8 @@
                 this test is supposed to pass). 
 
 
-7. # IMPLEMENTATION ORDER OF UCS and TASKS (mandatory and optional)
+7. # IMPLEMENTATION-ORDER-OF-UCS-AND-TASKS
+[table of contents at the start of markdown file](#7_IMPLEMENTATION-ORDER-OF-UCS-AND-TASKS) 
     First implement the mandatory requirements about super.py from Winc Academy. 
 
     Develop all use cases (ucs) with TDD ( == non-trivial feature 1). See previous chapter 6 for explanation 
@@ -1256,32 +1218,30 @@
     "name of uc" can be e.g. "fn_buy_product_testcases". 
 
     - MANDATORY Winc Academy Requirements: 2 implement first:
-    uc_01: set the system_date in time range
-    uc_02: timetravel in time range.
-    uc_03: buy product (and add to bought.csv) 
-    uc_04: sell product (and add to sold.csv)
+    uc_01: set the system_date in time range (done)
+    uc_02: timetravel in time range. (done)
+    uc_03: buy product (and add to bought.csv)  (done)
+    uc_04: sell product (and add to sold.csv) (done)
 
-    uc_09 fill bought.csv and sold.csv with mock data via argparse cli. ( == non-trivial feature 2)
+    uc_09 fill bought.csv and sold.csv with mock data via argparse cli. ( == non-trivial feature 2) (done)
 
-    uc_14: calculate revenue in time range between start_date and end_date inclusive
+    uc_14: calculate revenue in time range between start_date and end_date inclusive (done)
     uc_13: calculate costs in time range between start_date and end_date inclusive
             profit == revenue minus costs. So  to calculate profit in uc_15 next, I must calculate
-            cost first.
-    
-    uc_15: calculate profit in time range between start_date and end_date inclusive        
+            cost first. (done)
+    uc_15: calculate profit in time range between start_date and end_date inclusive     (done)   
 
 
     
-
     - EXTRA OPTIONAL features: 
-    uc_05: cancel_buy_transaction (cruD: Delete part 1)
-    uc_06: cancel_sell_transaction (cruD: Delete part 2)
-    uc_07: update_buy_transaction
-    uc_08: update_sell_transaction
+    uc_05: cancel_buy_transaction (cruD: Delete part 1) (on backlog)
+    uc_06: cancel_sell_transaction (cruD: Delete part 2) (on backlog)
+    uc_07: update_buy_transaction (on backlog)
+    uc_08: update_sell_transaction (on backlog)
     
-    uc_10: calculate inventory on date
-    uc_11: calculate expired products on date
-    uc_12: calculate sales volume in time range between start_date and end_date inclusive
+    uc_10: calculate inventory on date (done)
+    uc_11: calculate expired products on date (done)
+    uc_12: calculate sales volume in time range between start_date and end_date inclusive (done)
     
 
     Display output in Rich ( == non-trivial feature 3):
@@ -1292,7 +1252,7 @@
     uc_20: display_in_rich_revenue in time range between start_date and end_date inclusive
     uc_21: display_in_rich_profit in time range between start_date and end_date inclusive
 
-    Display output in Matplotlib ( == non-trivial feature 4):
+    Display output in Matplotlib ( == non-trivial feature 4): (on backlog)
     uc_22: display_in_matplotlib_inventory on date
     uc_23: display_in_rich_expired products in time range between start_date and end_date inclusive
     uc_24: display_in_matplotlib_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
@@ -1300,8 +1260,9 @@
     uc_26: display_in_matplotlib_revenue in time range between start_date and end_date inclusive
     uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
 
-    uc_40: delete all data from bought.csv and  sold.csv via argparse cli (== feature 5)
-    uc_41: show bought.csv in console with module rich (== feature 6)
-    uc_42: show sold.csv in console with module rich (== feature 7)
-
+    more features along the way: (I do not want to keep renumbering ucs, so any new functionality  
+    that pops up, gets a uc-nr, starting in the 40-range.)
+    uc_40: delete all data from bought.csv and  sold.csv via argparse cli (== feature 5) (done)
+    uc_41: show bought.csv in console with module rich (== feature 6) (done)
+    uc_42: show sold.csv in console with module rich (== feature 7) (done)
 

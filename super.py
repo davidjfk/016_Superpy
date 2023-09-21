@@ -38,7 +38,59 @@ from utils_superpy.utils import calculate_inventory_on_day
 
 def main():
 
-    # CONSTANTS:
+    # CONFIGURATION:
+    '''
+    Scope: only subparser create_mock_data uses the following variables as default values for its optional arguments. 
+    Change them at your liking.
+    ex: if you want to create mock data for 5 products very often, then change PRODUCT_RANGE to 5 below, so you can do:
+    
+    py super.py create_mock_data
+    
+    instead of using the optional flag -pr 5 in the command line:
+    e.g.:
+    py super.py create_mock_data -pr 5
+    or: 
+    py super.py create_mock_data -pr 5 -del_row 3 -sl 10 -tt 3 -mu 3 -lby 2024 -lbm 10 -lbd 15 -ubmnr 3 -ubwnr 8 -ubdnr 3
+
+    '''
+    PRODUCT_RANGE = 3
+    # see 'produt_range' definition in README_SOFTWARE_DESIGN.md --> ch definitions. 
+
+    DELETE_EVERY_NTH_ROW_IN_SOLDCSV_SO_EVERY_NTH_ROW_IN_BOUGHTCSV_CAN_EXPIRE_WHEN_TIME_TRAVELLING = 2
+    '''
+    explanation:
+    In subparser create_mock_data, fn create_data_for_csv_files_bought_and_sold() first creates mockdata for bought.csv, 
+    based on the supplied arguments. Then it creates a copy of bought.csv and calls it sold.csv.
+    Then it deletes every nth row in sold.csv, so that when time travelling, every nth row in bought.csv will expire.
+    '''
+    SHELF_LIFE = 10 # days
+    # see shelf_life definition in README_SOFTWARE_DESIGN.md --> ch definitions.
+
+    TURNOVER_TIME = 3 # days
+    # see turnover_time definition in README_SOFTWARE_DESIGN.md --> ch definitions.
+    
+    MARKUP = 3
+    # see markup definition in README_SOFTWARE_DESIGN.md --> ch definitions.
+
+    # see time_interval definition in README_SOFTWARE_DESIGN.md --> ch definitions:
+
+    '''
+    pitfall / for future reference: do not (try to) assign a default value here in this section to  the following variables:
+        lower_boundary_year_of_time_interval_in_which_to_create_random_testdata = 2023
+        lower_boundary_month_of_time_interval_in_which_to_create_random_testdata = 10
+        lower_boundary_week_of_time_interval_in_which_to_create_random_testdata = 1
+
+        Reason: variable system_date sets / assigns the default values of these variables in the subparser create_mock_data below! 
+    '''
+
+
+    UPPER_BOUNDARY_NR_OF_MONTHS_TO_ADD_TO_CALCULATE = 2
+    UPPER_BOUNDARY_NR_OF_WEEKS_TO_ADD_TO_CALCULATE = 0
+    UPPER_BOUNDARY_NR_OF_DAYS_TO_ADD_TO_CALCULATE = 0
+
+
+
+    # CONSTANTS: (do not change these lines!!)
     DATA_DIRECTORY = "data_used_in_superpy"
     FILE_WITH_SYSTEM_DATE = "system_date.txt"
     PATH_TO_SYSTEM_DATE = get_path_to_file(DATA_DIRECTORY , FILE_WITH_SYSTEM_DATE)
@@ -71,8 +123,8 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help='Commands: \n buy\n create_mock_data\n delete\n sell\n set_date\n show_bought_csv\n show_cost\n show_expired_products\n show_inventory\n show_profit\n show_revenue\n show_sales_volume\n show_sold_csv\n time_travel\n\n')
 
 
-    # BUY: create subparser "buy" with help text and add it to the container "command":
-    subparser_buy_product = subparsers.add_parser("buy", help="goal: buy product and add to file bought.csv \n   ex1: py super.py buy apple 1.75 -bd 23-09-15 -sd 23-09-27 --> buy_date is 23-09-15 .\n   expiry_date is 23-09-27\n   ex2: py super.py buy apple 3.00 -exd 23-09-28 --> taking system_date as default buy_date. \n   expiry_date is 23-09-28\n   ex3: py super.py buy cabbage 0.73 --> taking system_date as default sell_date, and \n   'does not expire' as default expiry_date\n   arg1: s positional argument product: e.g. apple, potato, milk\n   arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35\n   arg3: optional argument -buy_date, -bd (ex: 2023-09-15) with system_date as default value. \n   arg4: optional argument -expiry_date, -exd (ex: 2023-10-03) with default value 'does not expire' \n\n") 
+    # 1_BUY: create subparser "buy" with help text and add it to the container "command":
+    subparser_buy_product = subparsers.add_parser("buy", help="goal: buy product and add to file bought.csv \n   ex1: py super.py buy apple 1.75 -bd 23-09-15 -sd 23-09-27 \n   product: apple,  price: E 1.75, buy_date: 23-09-15, expiry_date: 23-09-27\n\n   ex2: py super.py buy linseed 3.00 -exd 23-09-28 \n   product: linseed, price: &euro; 3.00, buy_date: system_date as default, expiry_date: 23-09-28\n\n   ex3: py super.py buy cabbage 0.73 \n   product: cabbage, price: E 0.73, buy_date: system_date as default, expiry_date:  'does not expire' as default \n\n   arg1: positional argument product: e.g. apple, potato, milk\n   arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35\n   arg3: optional argument -buy_date, -bd (ex: 2023-09-15) with system_date as default value. \n   arg4: optional argument -expiry_date, -exd (ex: 2023-10-03) with default value 'does not expire' \n\n") 
     #step: add the positional and optional arguments to  'subparser_buy_product': 
     subparser_buy_product.add_argument("product_name", type=str, help="e.g. apple, carrot, oats, etc.") 
     subparser_buy_product.add_argument("price", type=float, help="e.g. 1.20 means 1 euro and 20 cents. 0.2 or 0.20 means 20 cents.") 
@@ -83,14 +135,14 @@ def main():
 
 
 
-    # CREATE_MOCK_DATE: Create subparser "create_mock_data" with help text and add it to the container "command":
-    subparser_create_mock_data = subparsers.add_parser("create_mock_data", help="goal: create mock data for bought.csv and sold.csv. \n   All 11 arguments are optional.  \n   ex1: py super.py create_mock_data \n   result: bought.csv and sold.csv are filled with mockdata that has \n   been created with default values.   \n\n   arg1 = optional argument product_range. \n   flags: -pr, -product_range.\n   product_range == product_assortment == the amount of different products in a shop . \n   ex1: py super.py -pr 3 \n   result: ['apple', 'cabbage', 'beetroot'] \n  ex2: py super.py -pr 2 \n   result: ['coffee', 'potato']. \n   More products in product_range lead to more rows in bought.csv and sold.csv. \n   flags: -pr, -product_range \n   ex2: py super.py -pr 3 \n   result: 3 random products are selected from a pre-filled list to \n   create the testdata.  \n\n   arg2 = optional argument delete_every_nth_row == 'deleting each nth list in list': this sets nr of rows \n   to delete from sold.csv: \n   flags: -del_row, -delete_every_nth_row  \n   ex1: py super.py -del_row 3 \n   result: delete every 3rd row in sold.csv\n   The idea behind this fn-argument is the following \n   fn creates data for bought.csv. Then to create sold.csv a deepcopy is made from \n   bought.csv . Then rows are deleted from sold.csv (e.g. every 3rd row). \n   By time travelling to the future these bought_products (e.g. every 3rd row) will expire.  \n\n   arg3 = optional argument shelf_life. shelf_life == shelf_time == number of days between buying a product and \n   its expiry_date. ex: 3 is three days. \n   flags: -sl, -shelf_life  \n   ex: py super.py -sl 10 \n   result: a bought product will expire after 10 days.\n\n   arg4 = optional argument turnover_time == inventory turnover == the number of days \n   between buying and selling a product. \n   flags: -turnover_time, -tt  \n   ex: py super.py -tt 4  \n   result: there are 4 days between buying a product in bought.csv and  \n   selling this same product in sold.csv  \n\n   arg5 = optional argument markup = the amount of money a business adds to the cost of a product or service in order to make a profit. \n   In super.py markup is calculated as a factor: ex: if buy_price is 3 euro and sell_price is 4 euro, then markup is 4/3 = 1.33 \n   flags: -mu, -markup  \n   ex: py super.py -mu 3  \n   result: if price_bought is 3 euro, then price_sell will be 9 euro.  \n\n   arg6 = optional argument lower_boundary_year_of_time_interval_in_which_to_create_random_testdata. \n   flags: -lby, -lower_boundary_year  \n   ex: py super.py -lby 2024  \n   result: lower boundary year of time interval in which to create data is 2024. \n   system_date provides default value. \n\n   arg7 = optional argument lower_boundary_month_of_time_interval_in_which_to_create_random_testdata. \n   flags: -lbm, -lower_boundary_month  \n   ex: py super.py -lbm 10  \n   result: lower boundary month of time interval in which to create data is October.  \n   system_date provides default value.\n\n   arg8 = optional argument lower_boundary_day_of_time_interval_in_which_to_create_random_testdata.  \n   flags: -lbd, -lower_boundary_day  \n   ex: py super.py -lbd 15  \n   result: lower boundary day of time interval in which to create data is day 15 \n   system_date provides default value.\n\n   arg9 = optional argument upper_boundary_nr_of_months_to_add_to_calculate.  \n   flags: -ubm, -upper_boundary_month   \n   ex: py super.py -ubm 3  \n   result: upper boundary month of time interval in which to create data is 3 months in the future. \n   default value: 0 months.  \n\n   arg10 = optional argument upper_boundary_nr_of_weeks_to_add_to_calculate. \n   flags: -ubw, -upper_boundary_week  \n   ex: py super.py -ubm 8  \n   result: upper boundary week of time interval in which to create data is 8 weeks in the future.  \n   default value: 4 weeks. So by default time interval is from system_date as lower \n   boundary to 4 weeks in the future as its upper boundary.\n\n   arg11 = optional argument upper_boundary_nr_of_days_to_add_to_calculate. \n   flags: -ubd, -upper_boundary_day  \n   ex: py super.py  -ubd 3  \n   result: upper boundary day of time interval in which to create data is 3 days in the future.  \n   default value: 0 days.\n\n")
+    # 2_CREATE_MOCK_DATE: Create subparser "create_mock_data" with help text and add it to the container "command":
+    subparser_create_mock_data = subparsers.add_parser("create_mock_data", help="goal: create mock data for bought.csv and sold.csv\n   All 11 arguments have default values that can be changed in (...\superpy\super.py --> goto CONSTANTS at start of main.py()) \n   All 11 arguments are optional, so you can do this:  \n\n   ex1: py super.py create_mock_data \n   result: bought.csv and sold.csv are filled with mockdata that has \n   been created with default values.   \n\n   arg1 = product_range \n   flags: -pr, -product_range.\n   product_range == product_assortment == the amount of different products in Superpy. \n   ex1: py super.py create_mock_data -pr 3 \n   product_range: 3 random products: e.g. 'apple', 'cabbage' and 'beetroot' as input to create mock data \n   ex2: py super.py create_mock_data -pr 2 \n   product_range: 2 random products: e.g. 'coffee' and 'potato' as input to create mock data. \n   More products in product_range lead to more rows in bought.csv and sold.csv. \n   flags: -pr, -product_range \n   ex2: py super.py create_mock_data -pr 3 \n   result: 3 random products are selected from a pre-filled list to \n   create the testdata.  \n\n   arg2 =  delete every nth row in sold.csv \n   purpose: deleting rows makes them expire while time travelling: \n   After creating mock data for bought.csv, a copy is made to create sold.csv. \n   Then rows are deleted from sold.csv (e.g. every 3rd row). \n   By time travelling to the future these bought_products (e.g. every 3rd row) will expire. \n   flags: -del_row, -delete_every_nth_row  \n   ex1: py super.py create_mock_data -del_row 3 \n   delete_every_nth_row: 3  \n\n   arg3 = shelf_life == shelf_time == number of days between buying a product and \n   its expiry_date. \n   flags: -sl, -shelf_life  \n   ex1: py super.py create_mock_data -sl 10\n   shelf_life: 10 days \n   result: a bought product will expire after 10 days.\n\n   arg4 = turnover_time == inventory turnover == the number of days \n   between buying and selling a product. \n   flags: -turnover_time, -tt  \n   ex1: py super.py create_mock_data -tt 4\n   turnover_time: 4 days  \n\n   arg5 = markup = the amount of money a business adds to the cost of a product or service in order to make a profit. \n   In super.py markup is calculated as a factor: ex: if buy_price is 3 euro and sell_price is 4 euro, then markup is 4/3 = 1.33 \n   flags: -mu, -markup  \n   ex: py super.py create_mock_data -mu 3 \n    markup: factor 3  \n   result: if buy_price in bought.csv is 3 euro, then sell_price will be 9 euro in sold.csv.  \n\n   arg6 = lower_boundary_year == lower_boundary_year_of_time_interval_in_which_to_create_random_testdata. \n   flags: -lby, -lower_boundary_year  \n   ex1: py super.py create_mock_data -lby 2024\n   lower_boundary_year: 2024  \n\n   arg7 = lower_boundary_month == lower_boundary_month_of_time_interval_in_which_to_create_random_testdata. \n   flags: -lbm, -lower_boundary_month  \n   ex1: py super.py create_mock_data -lbm 10\n   lower_boundary_month: October  \n\n   arg8 = lower_boundary_day == lower_boundary_day_of_time_interval_in_which_to_create_random_testdata.  \n   flags: -lbd, -lower_boundary_day  \n   ex1: py super.py create_mock_data -lbd 15  \n   lower_boundary_day: 15th day of  the  month \n\n   arg9 =  nr_of_months_to_calculate_upper_boundary_month    \n   flags: -ubmnr, -upper_boundary_month_nr   \n   ex1: py super.py create_mock_data -ubmnr 3\n   nr_of_months_to_calculate_upper_boundary_month: 3 months  \n   result: upper boundary month of time interval in which to create data is 3 months in the future. \n   default value: 0 months.  \n\n   arg10 = nr_of_weeks_to_calculate_upper_boundary_week. \n   flags: -ubwnr, -upper_boundary_weeknr  \n   ex1: py super.py create_mock_data -ubwnr 8\n   nr_of_weeks_to_calculate_upper_boundary_week: 8 months  \n   result: upper boundary week of time interval in which to create data is 8 weeks in the future.  \n\n   arg11 = nr_of_days_to_calculate_upper_boundary_day. \n   flags: -ubdnr, -upper_boundary_day_nr  \n   ex: py super.py create_mock_data -ubdnr 3\n   nr_of_days_to_calculate_upper_boundary_day: 3 days  \n   result: upper boundary day of time interval in which to create data is 3 days in the future.  \n   default value: 0 days.\n\n")
     #step: add the optional arguments to 'subparser_create_mock_data':
-    subparser_create_mock_data.add_argument("-product_range", "-pr", default=2, type=int, help=" ") 
-    subparser_create_mock_data.add_argument("-delete_every_nth_row", "-del_nth_row", default=3, type=int, help=" ") 
-    subparser_create_mock_data.add_argument("-shelf_life", "-sl", default=10, type=int, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
-    subparser_create_mock_data.add_argument("-turnover_time", "-tt", default=3, type=int, help=" ")
-    subparser_create_mock_data.add_argument("-markup", "-mu", default=3, type=int, help=" ")
+    subparser_create_mock_data.add_argument("-product_range", "-pr", default=PRODUCT_RANGE, type=int, help=" ") 
+    subparser_create_mock_data.add_argument("-delete_every_nth_row", "-del_nth_row", default=DELETE_EVERY_NTH_ROW_IN_SOLDCSV_SO_EVERY_NTH_ROW_IN_BOUGHTCSV_CAN_EXPIRE_WHEN_TIME_TRAVELLING, type=int, help=" ") 
+    subparser_create_mock_data.add_argument("-shelf_life", "-sl", default=SHELF_LIFE, type=int, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
+    subparser_create_mock_data.add_argument("-turnover_time", "-tt", default=TURNOVER_TIME, type=int, help=" ")
+    subparser_create_mock_data.add_argument("-markup", "-mu", default=MARKUP, type=int, help=" ")
     # ex of system_date: 2023-10-11
     default_year = int(SYSTEM_DATE[:4])
     default_month = int(SYSTEM_DATE[5:7])
@@ -99,19 +151,19 @@ def main():
     subparser_create_mock_data.add_argument("-lower_boundary_month_of_time_interval_in_which_to_create_random_testdata","-lower_boundary_month", "-lbm", default=default_month, type=int, help="lower_boundary_month_of_time_interval_in_which_to_create_random_testdata")
     subparser_create_mock_data.add_argument("-lower_boundary_day_of_time_interval_in_which_to_create_random_testdata","-lower_boundary_day", "-lbd", default=default_day, type=int, help="lower_boundary_day_of_time_interval_in_which_to_create_random_testdata")
 
-    subparser_create_mock_data.add_argument("-upper_boundary_nr_of_months_to_add_to_calculate","-upper_boundary_month", "-ubm", "-ubm", default=2, type=int, help="upper_boundary_nr_of_months_to_add_to_calculate")
-    subparser_create_mock_data.add_argument("-upper_boundary_nr_of_weeks_to_add_to_calculate","-upper_boundary_week", "-ubw", "-upper_boundary_nr_of_weeks_to_add_to_calculate", default=0, type=int, help="upper_boundary_nr_of_weeks_to_add_to_calculate")
-    subparser_create_mock_data.add_argument("-upper_boundary_nr_of_days_to_add_to_calculate","-upper_boundary_day", "-ubd", "-upper_boundary_nr_of_days_to_add_to_calculate", default=0, type=int, help="upper_boundary_nr_of_days_to_add_to_calculate")
+    subparser_create_mock_data.add_argument("-upper_boundary_nr_of_months_to_add_to_calculate","-upper_boundary_month", "-ubm", "-ubm", default=UPPER_BOUNDARY_NR_OF_MONTHS_TO_ADD_TO_CALCULATE, type=int, help="upper_boundary_nr_of_months_to_add_to_calculate")
+    subparser_create_mock_data.add_argument("-upper_boundary_nr_of_weeks_to_add_to_calculate","-upper_boundary_week", "-ubw", "-upper_boundary_nr_of_weeks_to_add_to_calculate", default=UPPER_BOUNDARY_NR_OF_WEEKS_TO_ADD_TO_CALCULATE, type=int, help="upper_boundary_nr_of_weeks_to_add_to_calculate")
+    subparser_create_mock_data.add_argument("-upper_boundary_nr_of_days_to_add_to_calculate","-upper_boundary_day", "-ubd", "-upper_boundary_nr_of_days_to_add_to_calculate", default=UPPER_BOUNDARY_NR_OF_DAYS_TO_ADD_TO_CALCULATE, type=int, help="upper_boundary_nr_of_days_to_add_to_calculate")
     # The remaining fn-arguments are NOT supposed to be changed via argparse-cli
 
 
-    # DELETE: Create subparser "delete" with help text and add it to the container "command":
-    subparser_delete_data = subparsers.add_parser("delete", help="goal: delete all data in bought.csv and sold.csv. \n   ex: py super.py delete \n   result: bought.csv and sold.csv are empty.   \n\n")
+    # 3_DELETE: Create subparser "delete" with help text and add it to the container "command":
+    subparser_delete_data = subparsers.add_parser("delete", help="goal: delete all data in bought.csv and sold.csv. \n   ex: py super.py delete \n   result: all transaction records in bought.csv and sold.csv have been deleted   \n\n")
     # subparser does not need any arguments.
 
 
-    # SELL: create subparser "sell" with help text and add it to the container "command":
-    subparser_sell_product = subparsers.add_parser("sell", help="goal: sell product and add to file sold.csv \n   ex1: py super.py b_15 3.75 -sd 2023-11-15 -->  sell_date is 2023-11-15 \n   ex2: py super.py b_16 5.15 --> system_date is default sell_date. \n   ex3: py super.py b_128 2.42 --> system_date is default sell_date.\n   arg1: positional argument buy_id: e.g. b_7, b_18, etc. See bought.csv for buy_ids\n   arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35\n   arg3: optional argument -sell_date, -sd (ex: -sd 2023-09-15) with system_date as default value. \n \n\n")
+    # 4_SELL: create subparser "sell" with help text and add it to the container "command":
+    subparser_sell_product = subparsers.add_parser("sell", help="goal: sell product and add to file sold.csv \n   ex1: py super.py b_15 3.75 -sd 2023-11-15 \n   product: row with id b_15 in bought.csv is sold, price: E 3.75, sell_date: 23-11-15\n\n   ex2: py super.py b_16 5.15 \n   product: row with id b_15 in bought.csv is sold, price: E 5.15, sell_date: system_date as default\n\n   ex3: py super.py b_128 2.42 \n   product: row with id b_128 in bought.csv is sold, price: E 2.42, sell_date: system_date as default\n\n   arg1: positional argument buy_id: e.g. b_7, b_18, etc. See bought.csv for buy_ids\n   arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35\n   arg3: optional argument -sell_date, -sd (ex: -sd 2023-09-15) with system_date as default value. \n \n\n")
     #step: add the positional and optional arguments to 'subparser_set_date': 
     subparser_sell_product.add_argument("buy_id", type=str, help="e.g. apple, carrot, oats, etc.") 
     subparser_sell_product.add_argument("price", type=float, help="e.g. 1.20 means 1 euro and 20 cents. 0.2 or 0.20 means 20 cents.") 
@@ -120,57 +172,57 @@ def main():
     # subparser_sell_product.add_argument("-expiry_date", "-ed", default="does not expire", type=str, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21") 
 
 
-    # SET_DATE: create subparser "set_date" with help text and add it to the container "command":
-    subparser_set_date = subparsers.add_parser("set_date", help="goal: set_system_date_to a specific date in the file system__date.txt\n   ex1: py super.py set_date 2020-03-10 \n   result: system_date is set to 2020-03-10 in file system_date.txt\n\n   arg1: positional argument system_date, e.g. 2023-10-11. \n   --> string representation in format 'yyy-mm-dd'\n\n")
+    # 5_SET_DATE: create subparser "set_date" with help text and add it to the container "command":
+    subparser_set_date = subparsers.add_parser("set_date", help="goal: set_system_date_to a specific date in the file system_date.txt\n   ex1: py super.py set_date 2025-01-01 \n   system_date: 2025-01-01 \n\n   arg1: positional argument system_date, e.g. 2023-10-11. \n   --> string representation in format 'yyy-mm-dd'\n\n")
     #step: add the positional and optional arguments to 'subparser_set_date': 
     subparser_set_date.add_argument("-new_system_date", type=str, help="specify the new system date in format YYYY-MM-DD") 
 
 
-    # SHOW_BOUGHT_CSV: Create subparser "show_bought_csv" with help text and add it to the container "command":
-    subparser_show_bought_csv = subparsers.add_parser("show_bought_csv", help="goal: show all data in bought.csv in a table. \n   ex: py super.py show_bought_csv \n   result: bought.csv is shown in the terminal as a table.   \n\n")   
+    # 6_SHOW_BOUGHT_CSV: Create subparser "show_bought_csv" with help text and add it to the container "command":
+    subparser_show_bought_csv = subparsers.add_parser("show_bought_csv", help="goal: show all data from bought.csv in a table in the terminal \n   ex: py super.py show_bought_csv \n   result: bought.csv is shown in the terminal as a table.   \n\n")   
 
 
-    # SHOW_COST: Create subparser "show_cost" with help text and add it to the container "command":
-    subparser_show_cost = subparsers.add_parser("show_cost", help="goal: show cost in time range between start_date and end_date inclusive. \n   ex1: py super.py show_cost -sd 2023-09-01 -ed 2023-10-10 \n   result in terminal: \n   'Cost from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_cost -ed 2023-10-05 \n   result in terminal: \n   'Cost from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6' \n   start_date is start of financial  year of system_date. e.g. system_date 23-06-08 --> 23-01-01.  \n\n   ex3: py super.py show_profit -sd 2023-07-01 \n   result in terminal: \n   'Cost from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date is system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the cost of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
+    # 7_SHOW_COST: Create subparser "show_cost" with help text and add it to the container "command":
+    subparser_show_cost = subparsers.add_parser("show_cost", help="goal: show cost in time range between start_date and end_date inclusive. \n   ex1: py super.py show_cost -sd 2023-09-01 -ed 2023-10-10 \n   start_date: 2023-09-01 \n   end_date: 2023-10-10 \n   result in terminal: \n   'Cost from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_cost -ed 2023-10-05 \n   start_date is start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.\n   end_date: 2023-10-05 \n   result in terminal: \n   'Cost from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'   \n\n   ex3: py super.py show_profit -sd 2023-07-01 \n   start_date: 2023-07-01 \n   end_date is by default system_date \n   result in terminal: \n   'Cost from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date has by default system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the cost of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_cost':
     subparser_show_cost.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, help="specify the start date in format YYYY-MM-DD")
     subparser_show_cost.add_argument("-end_date","-ed",default=SYSTEM_DATE, type=str, help="specify the end date in format YYYY-MM-DD")
 
-    # SHOW_EXPIRED_PRODUCTS: create subparser "show_expired_products" with help text and add it to the container "command":
-    subparser_buy_product = subparsers.add_parser("show_expired_products", help="goal: calculate expired products on a day in format 'YYYY-MM-DD' (e.g. 2023-09-18) \n   ex: py super.py expired_products -d 23-09-28  \n   result is displayed in a table in the console. \n   ex: py super.py expired_products.\n   results is displayed in a table in the console. \n\n   arg1: optional argument date in following format: 'YYYY-MM-DD'. ex: -d 2026-10-21 \n   default value is system_date.  \n\n") 
+    # 8_SHOW_EXPIRED_PRODUCTS: create subparser "show_expired_products" with help text and add it to the container "command":
+    subparser_buy_product = subparsers.add_parser("show_expired_products", help="goal: calculate expired products on a day in format 'YYYY-MM-DD' (e.g. 2023-09-28) \n   ex1: py super.py show_expired_products -d 2023-09-28\n   date: 2023-09-28   \n   result is displayed in a table in the terminal. \n\n   ex2: py super.py show_expired_products\n   date: by default system_date\n   results is displayed in a table in the terminal. \n\n   arg1: optional argument date in following format: 'YYYY-MM-DD'. ex: -d 2026-10-21 \n   default value is system_date.\n   reason: often you want to know which products expire today.  \n\n") 
     subparser_buy_product.add_argument("-date", "-d", default=SYSTEM_DATE, type=str, help="date in following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
-    # SHOW_INVENTORY: create subparser "show_inventory" with help text and add it to the container "command":
-    subparser_buy_product = subparsers.add_parser("show_inventory", help="goal: calculate inventory on a day in format 'YYYY-MM-DD' (e.g. 2023-09-18) \n   ex: py super.py inventory -d 23-09-28  \n   result is displayed in a table in the console. \n   ex: py super.py inventory.\n   results is displayed in a table in the console. \n\n   arg1: optional argument date in following format: 'YYYY-MM-DD'. ex: -d 2026-10-21 \n   default value is system_date.  \n\n") 
+    # 9_SHOW_INVENTORY: create subparser "show_inventory" with help text and add it to the container "command":
+    subparser_buy_product = subparsers.add_parser("show_inventory", help="goal: calculate inventory on a day in format 'YYYY-MM-DD' (e.g. 2023-09-28) \n   ex1: py super.py show_inventory -d 2023-09-28\n   date: 2023-09-28   \n   result is displayed in a table in the terminal. \n\n   ex2: py super.py show_inventory\n   date: by default system_date\n   results is displayed in a table in the terminal. \n\n   arg1: optional argument date in following format: 'YYYY-MM-DD'. ex: -d 2026-10-21 \n   default value is system_date.\n   reason: often you want to know which products expire today.  \n\n")  
     subparser_buy_product.add_argument("-date", "-d", default=SYSTEM_DATE, type=str, help="date in following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
-    # SHOW_PROFIT: Create subparser "show_profit" with help text and add it to the container "command":
-    subparser_show_cost = subparsers.add_parser("show_profit", help="goal: show profit in time range between start_date and end_date inclusive. \n   ex1: py super.py show_profit -sd 2023-09-01 -ed 2023-10-10 \n   result in terminal: \n   'Profit from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_profit -ed 2023-10-05 \n   result in terminal: \n   'Profit from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6' \n   start_date is start of financial  year of system_date. e.g. system_date 23-06-08 --> 23-01-01.  \n\n   ex3: py super.py show_profit -sd 2023-07-01 \n   result in terminal: \n   'Profit from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date is system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the profit of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the profit of the current financial year until today  inclusive.  \n\n")
+    # 10_SHOW_PROFIT: Create subparser "show_profit" with help text and add it to the container "command":
+    subparser_show_cost = subparsers.add_parser("show_profit", help="goal: show profit in time range between start_date and end_date inclusive. \n   ex1: py super.py show_profit -sd 2023-09-01 -ed 2023-10-10 \n   start_date: 2023-09-01 \n   end_date: 2023-10-10 \n   result in terminal: \n   'Profit from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_profit -ed 2023-10-05 \n   start_date is start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.\n   end_date: 2023-10-05 \n   result in terminal: \n   'Profit from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'   \n\n   ex3: py super.py show_profit -sd 2023-07-01 \n   start_date: 2023-07-01 \n   end_date is by default system_date \n   result in terminal: \n   'Profit from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date has by default system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the profit of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_profit':
     subparser_show_cost.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, help="specify the start date in format YYYY-MM-DD")
     subparser_show_cost.add_argument("-end_date","-ed",default= SYSTEM_DATE, type=str, help="specify the end date in format YYYY-MM-DD")
 
 
-    # SHOW_REVENUE: Create subparser "show_revenue" with help text and add it to the container "command":
-    subparser_show_revenue = subparsers.add_parser("show_revenue", help="goal: show revenue in time range between start_date and end_date inclusive. \n   ex1: py super.py show_revenue -sd 2023-09-01 -ed 2023-10-10 \n   result in terminal: \n   'Revenue from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_revenue -ed 2023-10-05 \n   result in terminal: \n   'Revenue from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6' \n   start_date is start of financial  year of system_date. e.g. system_date 23-06-08 --> 23-01-01.  \n\n   ex3: py super.py show_revenue -sd 2023-07-01 \n   result in terminal: \n   'Revenue from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date is system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01\n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the revenue of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the revenue of the current financial year until today  inclusive.  \n\n")
+    # 11_SHOW_REVENUE: Create subparser "show_revenue" with help text and add it to the container "command":
+    subparser_show_revenue = subparsers.add_parser("show_revenue", help="goal: show revenue in time range between start_date and end_date inclusive. \n   ex1: py super.py show_revenue -sd 2023-09-01 -ed 2023-10-10 \n   start_date: 2023-09-01 \n   end_date: 2023-10-10 \n   result in terminal: \n   'Revenue from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_revenue -ed 2023-10-05 \n   start_date is start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.\n   end_date: 2023-10-05 \n   result in terminal: \n   'Revenue from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'   \n\n   ex3: py super.py show_revenue -sd 2023-07-01 \n   start_date: 2023-07-01 \n   end_date is by default system_date \n   result in terminal: \n   'Revenue from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date has by default system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the revenue of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_revenue':
     subparser_show_revenue.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, help="specify the start date in format YYYY-MM-DD")
     subparser_show_revenue.add_argument("-end_date","-ed",default=SYSTEM_DATE, type=str, help="specify the end date in format YYYY-MM-DD")
 
 
-    # SHOW_SALES_VOLUME: Create subparser "show_sales_volume" with help text and add it to the container "command":
-    subparser_show_revenue = subparsers.add_parser("show_sales_volume", help="goal: show sales volume in time range between start_date and end_date inclusive. \n   ex1: py super.py show_sales_volume -sd 2023-09-01 -ed 2023-10-10 \n   result in terminal: \n   'Sales volume from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: 18 products'  \n\n   ex2: py super.py show_sales_volume -ed 2023-10-05 \n   result in terminal: \n   'Sales volume from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: 117 products' \n   start_date is start of financial  year of system_date. e.g. system_date 23-06-08 --> 23-01-01.  \n\n   ex3: py super.py show_sales_volume -sd 2023-07-01 \n   result in terminal: \n   'Sales volume from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: 2241 products' \n   end_date is system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the sales volume of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the sales volume of the current financial year until today  inclusive.  \n\n")
+    # 12_SHOW_SALES_VOLUME: Create subparser "show_sales_volume" with help text and add it to the container "command":
+    subparser_show_revenue = subparsers.add_parser("show_sales_volume", help="goal: show sales volume in time range between start_date and end_date inclusive. \n   ex1: py super.py show_sales_volume -sd 2023-09-01 -ed 2023-10-10 \n   start_date: 2023-09-01 \n   end_date: 2023-10-10 \n   result in terminal: \n   'Sales Volume from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_sales_volume -ed 2023-10-05 \n   start_date is start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.\n   end_date: 2023-10-05 \n   result in terminal: \n   'Sales volume from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'   \n\n   ex3: py super.py show_sales_volume -sd 2023-07-01 \n   start_date: 2023-07-01 \n   end_date is by default system_date \n   result in terminal: \n   'Sales volume from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date has by default system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the sales volume of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_revenue':
     subparser_show_revenue.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, help="specify the start date in format YYYY-MM-DD")
     subparser_show_revenue.add_argument("-end_date","-ed",default=SYSTEM_DATE, type=str, help="specify the end date in format YYYY-MM-DD")
 
 
-    # SHOW_SOLD_CSV: Create subparser "show_sold_csv" with help text and add it to the container "command":
+    # 13_SHOW_SOLD_CSV: Create subparser "show_sold_csv" with help text and add it to the container "command":
     subparser_show_sold_csv = subparsers.add_parser("show_sold_csv", help="goal: show all data from sold.csv in a table in the terminal. \n   ex: py super.py show_sold_csv \n   result: sold.csv is shown in the terminal as a table   \n\n") 
 
 
-    # TIME_TRAVEL: create subparser "time_travel" with help text and add it to the container "command":
-    subparser_time_travel = subparsers.add_parser("time_travel", help="goal: change system_date by adding or subtracting nr of day(s) \n   ex1: py super.py time_travel 3.  \n   result: you travel with 3 days to the future. So if system_date is 2024-03-10, then \n   new date becomes 2024-03-13 in the future.\n   ex2: py super.py time_travel -3 \n   result: you travel with 3 days to the past. So if system date is 2024-03-10, then new date becomes 2024-03-07 in the past.\n   arg1: positional argument days to add or subtract from system_date: e.g. 9, -8, etc.\n ") 
+    # 14_TIME_TRAVEL: create subparser "time_travel" with help text and add it to the container "command":
+    subparser_time_travel = subparsers.add_parser("time_travel", help="goal: change system_date by adding or subtracting nr of day(s) \n   ex1: py super.py time_travel 3.\n   nr_of_days: 3 \n   result: you travel with 3 days to the future. So if system_date is 2024-03-10, then \n   new date becomes 2024-03-13 in the future.\n\n   ex2: py super.py time_travel -3\n   nr_of_days: -3 \n   result: you travel with 3 days to the past. So if system date is 2024-03-10, \n   then new date becomes 2024-03-07 in the past.\n\n   arg1: positional argument days to add or subtract from system_date: e.g. 9, -8, etc.\n ") 
     #step: add the positional and optional arguments to  'subparser_time_travel': 
     subparser_time_travel.add_argument("nr_of_days", type=int, help="specify the new system date in format YYYY-MM-DD") 
 
@@ -266,15 +318,22 @@ def main():
         path_to_csv_sold_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'sold.csv')
         # step: delete all data in bought.csv and sold.csv:
 
+        '''
+        Goal: delete all transaction records in bought.csv and sold.csv.
+        How2: assign 0 to variable 'product_range_to_delete_all_records_in_bought_csv_and_sold_csv'.
+        It does not matter what the values of the other fn-arguments are, as long as
+        the datatypes of the other fn-arguments remain correct. So do not do e.g. this:
+        shelf_life = 'foo'.
+        '''
+        product_range_to_delete_all_records_in_bought_csv_and_sold_csv = 0
+        # see 'product_range' definition in README_SOFTWARE_DESIGN.md --> ch definitions. 
 
-        # to delete all data in bought.csv and sold.csv, all you need to do is set product_range to 0.
-        # it does not matter what the values of the other fn-arguments are.
-        product_range = 0
-        # see produt_range definition in README_SOFTWARE_DESIGN.md --> ch definitions. 
+        '''
+        The following 10 variables never change. So to avoid bugs, I do not use the CONSTANTS at the beginning of 
+        main.py to define them: 
+        '''
 
-         # variable 'every_nth_row' makes sense inside the assignment statement below it
-        every_nth_row = 2
-        delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling = every_nth_row
+        delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling = 2
 
         shelf_life = 9
         # see shelf_life definition in README_SOFTWARE_DESIGN.md --> ch definitions.
@@ -302,7 +361,7 @@ def main():
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv')
 
         create_data_for_csv_files_bought_and_sold(
-            product_range,
+            product_range_to_delete_all_records_in_bought_csv_and_sold_csv,
             delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling,
             shelf_life,
             turnover_time,
