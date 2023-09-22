@@ -153,22 +153,24 @@ List of superpy functionality with goals:
 |1  | buy                   | buy 1 product and add this product to bought.csv                  |
 |2  | create_mock_data      | fill bought.csv and sold.csv with mockdata.                       |
 |3  | delete                | delete all transaction records in bought.csv and sold.csv         |
-|4  | sell                  | buy 1 product and add this product to bought.csv                  |
-|5  | set_date              | set system_date                                                   |
-|6  | show_bought_csv       | show contents of bought.csv as a table                            |
-|7  | show_cost             | calculate and display cost of a time interval                     |
-|8  | show_expired_products | calculate and display expired products on a date                  | 
-|9  | show_inventory        | calculate and display inventory on a date                         |
-|10 | show_profit           | calculate and display profit of a time interval                   |
-|11 | show_revenue          | calculate and display revenue of a time interval                  |
-|12 | show_sales_volume     | calculate and display sales volume of a time interval             |
-|13 | show_sold_csv         | show contents of bought.csv as a table                            |
-|14 | time_travel           | change the system_date by adding or subtracing a nr of days       |
+|4  | reset_system_date     | reset to current date on device Superpy is running on
+|5  | sell                  | buy 1 product and add this product to bought.csv                  |
+|6  | set_date              | set system_date                                                   |
+|7  | show_bought_csv       | show contents of bought.csv as a table                            |
+|8  | show_cost             | calculate and display cost of a time interval                     |
+|9  | show_expired_products | calculate and display expired products on a date                  | 
+|10 | show_inventory        | calculate and display inventory on a date                         |
+|11 | show_profit           | calculate and display profit of a time interval                   |
+|12 | show_revenue          | calculate and display revenue of a time interval                  |
+|13 | show_sales_volume     | calculate and display sales volume of a time interval             |
+|14 | show_sold_csv         | show contents of bought.csv as a table                            |
+|15 | time_travel           | change the system_date by adding or subtracing a nr of days       |
 
 ## click link to goto superpy functionality: (press CTRL-key)
 ### buy
 ### create_mock_data
 ### delete
+### reset_system_date
 ### sell
 ### set_date
 ### show_bought_csv
@@ -459,6 +461,24 @@ List of superpy functionality with goals:
 - result: all transaction records in bought.csv and sold.csv have been deleted
 
 
+<br /> 
+<br /> 
+- -----------------------------------------------------------------------------------------------
+<br /> 
+<br /> 
+4. SUPERPY FUNCTIONALITY: RESET_SYSTEM_DATE
+
+[goto chapter Usage --> overview with business tasks ](#reset_system_date) <br />
+- goal: reset system_date in system_date.txt (...\superpy\data_used_in_superpy\system_date.txt) to   
+    current date on the device Superpy is running on.
+
+- ex1: 
+
+```
+    py super.py reset_system_date 
+```
+
+- result: system_date.txt now contains current system_date from the  device Superpy is running on.
 
 
 <br /> 
@@ -466,7 +486,7 @@ List of superpy functionality with goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-4. SUPERPY FUNCTIONALITY: SELL
+5. SUPERPY FUNCTIONALITY: SELL
 
 [goto chapter Usage --> overview with business tasks ](#sell) <br />
 
@@ -501,7 +521,7 @@ List of superpy functionality with goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-5. SUPERPY FUNCTIONALITY: SET_DATE
+6. SUPERPY FUNCTIONALITY: SET_DATE
 
 [goto chapter Usage --> overview with business tasks ](#set_date) <br />
 - goal: set_system_date_to a specific date in the file system_date.txt 
@@ -531,7 +551,8 @@ List of superpy functionality with goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-6. SUPERPY FUNCTIONALITY: SHOW_BOUGHT_CSV
+
+7. SUPERPY FUNCTIONALITY: SHOW_BOUGHT_CSV
 
 [goto chapter Usage --> overview with business tasks ](#show_bought_csv) <br />
 
@@ -546,14 +567,13 @@ List of superpy functionality with goals:
 - result: bought.csv is shown in the terminal as a table 
 
 
-
-
 <br /> 
 <br /> 
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-7. SUPERPY FUNCTIONALITY: SHOW_COST
+
+8. SUPERPY FUNCTIONALITY: SHOW_COST
 
 [goto chapter Usage --> overview with business tasks ](#show_cost) <br />
 - goal: show cost in time range between start_date and end_date inclusive
@@ -601,7 +621,7 @@ List of superpy functionality with goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-8. SUPERPY FUNCTIONALITY: SHOW_EXPIRED_PRODUCTS
+9. SUPERPY FUNCTIONALITY: SHOW_EXPIRED_PRODUCTS
 
 [goto chapter Usage --> overview with business tasks ](#show_expired_products) <br />
 - goal: calculate expired products on a day in format 'YYYY-MM-DD' (e.g. 2023-09-18)
@@ -634,7 +654,7 @@ List of superpy functionality with goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-9. SUPERPY FUNCTIONALITY: SHOW_INVENTORY
+10. SUPERPY FUNCTIONALITY: SHOW_INVENTORY
 
 [goto chapter Usage --> overview with business tasks ](#show_inventory) <br />
 - goal: calculate inventory on a day in format 'YYYY-MM-DD' (e.g. 2023-09-18)
@@ -667,7 +687,7 @@ List of superpy functionality with goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-10. SUPERPY FUNCTIONALITY: SHOW_PROFIT
+11. SUPERPY FUNCTIONALITY: SHOW_PROFIT
 
 [goto chapter Usage --> overview with business tasks ](#show_profit) <br />
 - goal: show profit in time range between start_date and end_date inclusive
@@ -715,7 +735,7 @@ List of superpy functionality with goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-11. SUPERPY FUNCTIONALITY: SHOW_REVENUE
+12. SUPERPY FUNCTIONALITY: SHOW_REVENUE
 
 [goto chapter Usage --> overview with business tasks ](#show_revenue) <br />
 - goal: show revenue in time range between start_date and end_date inclusive
@@ -763,7 +783,8 @@ List of superpy functionality with goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-12. SUPERPY FUNCTIONALITY: SHOW_SALES_VOLUME
+
+13. SUPERPY FUNCTIONALITY: SHOW_SALES_VOLUME
 
 [goto chapter Usage --> overview with business tasks ](#show_sales_volume) <br />
 - goal: show sales_volume in time range between start_date and end_date inclusive
@@ -811,7 +832,7 @@ List of superpy functionality with goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-13. SUPERPY FUNCTIONALITY: SHOW_SOLD_CSV
+14. SUPERPY FUNCTIONALITY: SHOW_SOLD_CSV
 
 [goto chapter Usage --> overview with business tasks ](#show_sold_csv) <br />
 
@@ -832,7 +853,7 @@ List of superpy functionality with goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-14. SUPERPY FUNCTIONALITY: TIME_TRAVEL
+15. SUPERPY FUNCTIONALITY: TIME_TRAVEL
 
 [goto chapter Usage --> overview with business tasks ](#time_travel) <br />
 

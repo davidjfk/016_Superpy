@@ -6,7 +6,8 @@ __human_name__ = "superpy"
 # Imports
 import argparse, os, sys
 import csv
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from rich.table import Table
 from rich.console import Console
@@ -33,7 +34,7 @@ from utils_superpy.utils import calculate_profit_in_time_range_between_start_dat
 from utils_superpy.utils import calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive
 from utils_superpy.utils import calculate_expired_products_on_day
 from utils_superpy.utils import show_list_with_nested_lists_in_console_with_module_rich
-from utils_superpy.utils import calculate_inventory_on_day
+from utils_superpy.utils import calculate_inventory_on_day, calculate_middle_of_time_interval
 
 
 def main():
@@ -73,7 +74,9 @@ def main():
     # see markup definition in README_SOFTWARE_DESIGN.md --> ch definitions.
 
     # see time_interval definition in README_SOFTWARE_DESIGN.md --> ch definitions:
-
+    UPPER_BOUNDARY_NR_OF_MONTHS_TO_ADD_TO_CALCULATE = 0
+    UPPER_BOUNDARY_NR_OF_WEEKS_TO_ADD_TO_CALCULATE = 4
+    UPPER_BOUNDARY_NR_OF_DAYS_TO_ADD_TO_CALCULATE = 0
     '''
     pitfall / for future reference: do not (try to) assign a default value here in this section to  the following variables:
         lower_boundary_year_of_time_interval_in_which_to_create_random_testdata = 2023
@@ -84,9 +87,6 @@ def main():
     '''
 
 
-    UPPER_BOUNDARY_NR_OF_MONTHS_TO_ADD_TO_CALCULATE = 2
-    UPPER_BOUNDARY_NR_OF_WEEKS_TO_ADD_TO_CALCULATE = 0
-    UPPER_BOUNDARY_NR_OF_DAYS_TO_ADD_TO_CALCULATE = 0
 
 
 
@@ -107,6 +107,7 @@ def main():
     If system_date is 2024-06-24, then start date of current financial year is 2024-01-01.
     If system_date is 2025-09-06, then start date of current financial year is 2025-01-01.
     '''
+
     year = int(SYSTEM_DATE[:4]) 
     start_date_of_current_financial_year_unformatted = date(year, 1, 1) 
     # a date object does not have a format. It is just a date object.
@@ -162,7 +163,13 @@ def main():
     # subparser does not need any arguments.
 
 
-    # 4_SELL: create subparser "sell" with help text and add it to the container "command":
+    # 4_RESET_SYSTEM_DATE: Create subparser "reset_system_date" with help text and add it to the container "command":
+    subparser_reset_system_date = subparsers.add_parser("reset_system_date", help="goal: reset system_date in system_date.txt (...\superpy\data_used_in_superpy\system_date.txt) to \n  current date on the device Superpy is running on.\n   ex: py super.py reset_system_date \n   result: system_date.txt now contains current system_date from the  device Superpy is running on.  \n\n")
+    # subparser does not need any arguments.
+
+
+
+    # 5_SELL: create subparser "sell" with help text and add it to the container "command":
     subparser_sell_product = subparsers.add_parser("sell", help="goal: sell product and add to file sold.csv \n   ex1: py super.py b_15 3.75 -sd 2023-11-15 \n   product: row with id b_15 in bought.csv is sold, price: E 3.75, sell_date: 23-11-15\n\n   ex2: py super.py b_16 5.15 \n   product: row with id b_15 in bought.csv is sold, price: E 5.15, sell_date: system_date as default\n\n   ex3: py super.py b_128 2.42 \n   product: row with id b_128 in bought.csv is sold, price: E 2.42, sell_date: system_date as default\n\n   arg1: positional argument buy_id: e.g. b_7, b_18, etc. See bought.csv for buy_ids\n   arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35\n   arg3: optional argument -sell_date, -sd (ex: -sd 2023-09-15) with system_date as default value. \n \n\n")
     #step: add the positional and optional arguments to 'subparser_set_date': 
     subparser_sell_product.add_argument("buy_id", type=str, help="e.g. apple, carrot, oats, etc.") 
@@ -172,56 +179,56 @@ def main():
     # subparser_sell_product.add_argument("-expiry_date", "-ed", default="does not expire", type=str, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21") 
 
 
-    # 5_SET_DATE: create subparser "set_date" with help text and add it to the container "command":
+    # 6_SET_DATE: create subparser "set_date" with help text and add it to the container "command":
     subparser_set_date = subparsers.add_parser("set_date", help="goal: set_system_date_to a specific date in the file system_date.txt\n   ex1: py super.py set_date 2025-01-01 \n   system_date: 2025-01-01 \n\n   arg1: positional argument system_date, e.g. 2023-10-11. \n   --> string representation in format 'yyy-mm-dd'\n\n")
     #step: add the positional and optional arguments to 'subparser_set_date': 
     subparser_set_date.add_argument("-new_system_date", type=str, help="specify the new system date in format YYYY-MM-DD") 
 
 
-    # 6_SHOW_BOUGHT_CSV: Create subparser "show_bought_csv" with help text and add it to the container "command":
+    # 7_SHOW_BOUGHT_CSV: Create subparser "show_bought_csv" with help text and add it to the container "command":
     subparser_show_bought_csv = subparsers.add_parser("show_bought_csv", help="goal: show all data from bought.csv in a table in the terminal \n   ex: py super.py show_bought_csv \n   result: bought.csv is shown in the terminal as a table.   \n\n")   
 
 
-    # 7_SHOW_COST: Create subparser "show_cost" with help text and add it to the container "command":
+    # 8_SHOW_COST: Create subparser "show_cost" with help text and add it to the container "command":
     subparser_show_cost = subparsers.add_parser("show_cost", help="goal: show cost in time range between start_date and end_date inclusive. \n   ex1: py super.py show_cost -sd 2023-09-01 -ed 2023-10-10 \n   start_date: 2023-09-01 \n   end_date: 2023-10-10 \n   result in terminal: \n   'Cost from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_cost -ed 2023-10-05 \n   start_date is start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.\n   end_date: 2023-10-05 \n   result in terminal: \n   'Cost from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'   \n\n   ex3: py super.py show_profit -sd 2023-07-01 \n   start_date: 2023-07-01 \n   end_date is by default system_date \n   result in terminal: \n   'Cost from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date has by default system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the cost of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_cost':
     subparser_show_cost.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, help="specify the start date in format YYYY-MM-DD")
     subparser_show_cost.add_argument("-end_date","-ed",default=SYSTEM_DATE, type=str, help="specify the end date in format YYYY-MM-DD")
 
-    # 8_SHOW_EXPIRED_PRODUCTS: create subparser "show_expired_products" with help text and add it to the container "command":
+    # 9_SHOW_EXPIRED_PRODUCTS: create subparser "show_expired_products" with help text and add it to the container "command":
     subparser_buy_product = subparsers.add_parser("show_expired_products", help="goal: calculate expired products on a day in format 'YYYY-MM-DD' (e.g. 2023-09-28) \n   ex1: py super.py show_expired_products -d 2023-09-28\n   date: 2023-09-28   \n   result is displayed in a table in the terminal. \n\n   ex2: py super.py show_expired_products\n   date: by default system_date\n   results is displayed in a table in the terminal. \n\n   arg1: optional argument date in following format: 'YYYY-MM-DD'. ex: -d 2026-10-21 \n   default value is system_date.\n   reason: often you want to know which products expire today.  \n\n") 
     subparser_buy_product.add_argument("-date", "-d", default=SYSTEM_DATE, type=str, help="date in following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
-    # 9_SHOW_INVENTORY: create subparser "show_inventory" with help text and add it to the container "command":
+    # 10_SHOW_INVENTORY: create subparser "show_inventory" with help text and add it to the container "command":
     subparser_buy_product = subparsers.add_parser("show_inventory", help="goal: calculate inventory on a day in format 'YYYY-MM-DD' (e.g. 2023-09-28) \n   ex1: py super.py show_inventory -d 2023-09-28\n   date: 2023-09-28   \n   result is displayed in a table in the terminal. \n\n   ex2: py super.py show_inventory\n   date: by default system_date\n   results is displayed in a table in the terminal. \n\n   arg1: optional argument date in following format: 'YYYY-MM-DD'. ex: -d 2026-10-21 \n   default value is system_date.\n   reason: often you want to know which products expire today.  \n\n")  
     subparser_buy_product.add_argument("-date", "-d", default=SYSTEM_DATE, type=str, help="date in following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
-    # 10_SHOW_PROFIT: Create subparser "show_profit" with help text and add it to the container "command":
+    # 11_SHOW_PROFIT: Create subparser "show_profit" with help text and add it to the container "command":
     subparser_show_cost = subparsers.add_parser("show_profit", help="goal: show profit in time range between start_date and end_date inclusive. \n   ex1: py super.py show_profit -sd 2023-09-01 -ed 2023-10-10 \n   start_date: 2023-09-01 \n   end_date: 2023-10-10 \n   result in terminal: \n   'Profit from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_profit -ed 2023-10-05 \n   start_date is start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.\n   end_date: 2023-10-05 \n   result in terminal: \n   'Profit from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'   \n\n   ex3: py super.py show_profit -sd 2023-07-01 \n   start_date: 2023-07-01 \n   end_date is by default system_date \n   result in terminal: \n   'Profit from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date has by default system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the profit of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_profit':
     subparser_show_cost.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, help="specify the start date in format YYYY-MM-DD")
     subparser_show_cost.add_argument("-end_date","-ed",default= SYSTEM_DATE, type=str, help="specify the end date in format YYYY-MM-DD")
 
 
-    # 11_SHOW_REVENUE: Create subparser "show_revenue" with help text and add it to the container "command":
+    # 12_SHOW_REVENUE: Create subparser "show_revenue" with help text and add it to the container "command":
     subparser_show_revenue = subparsers.add_parser("show_revenue", help="goal: show revenue in time range between start_date and end_date inclusive. \n   ex1: py super.py show_revenue -sd 2023-09-01 -ed 2023-10-10 \n   start_date: 2023-09-01 \n   end_date: 2023-10-10 \n   result in terminal: \n   'Revenue from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_revenue -ed 2023-10-05 \n   start_date is start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.\n   end_date: 2023-10-05 \n   result in terminal: \n   'Revenue from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'   \n\n   ex3: py super.py show_revenue -sd 2023-07-01 \n   start_date: 2023-07-01 \n   end_date is by default system_date \n   result in terminal: \n   'Revenue from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date has by default system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the revenue of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_revenue':
     subparser_show_revenue.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, help="specify the start date in format YYYY-MM-DD")
     subparser_show_revenue.add_argument("-end_date","-ed",default=SYSTEM_DATE, type=str, help="specify the end date in format YYYY-MM-DD")
 
 
-    # 12_SHOW_SALES_VOLUME: Create subparser "show_sales_volume" with help text and add it to the container "command":
+    # 13_SHOW_SALES_VOLUME: Create subparser "show_sales_volume" with help text and add it to the container "command":
     subparser_show_revenue = subparsers.add_parser("show_sales_volume", help="goal: show sales volume in time range between start_date and end_date inclusive. \n   ex1: py super.py show_sales_volume -sd 2023-09-01 -ed 2023-10-10 \n   start_date: 2023-09-01 \n   end_date: 2023-10-10 \n   result in terminal: \n   'Sales Volume from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_sales_volume -ed 2023-10-05 \n   start_date is start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.\n   end_date: 2023-10-05 \n   result in terminal: \n   'Sales volume from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'   \n\n   ex3: py super.py show_sales_volume -sd 2023-07-01 \n   start_date: 2023-07-01 \n   end_date is by default system_date \n   result in terminal: \n   'Sales volume from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date has by default system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the sales volume of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_revenue':
     subparser_show_revenue.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, help="specify the start date in format YYYY-MM-DD")
     subparser_show_revenue.add_argument("-end_date","-ed",default=SYSTEM_DATE, type=str, help="specify the end date in format YYYY-MM-DD")
 
 
-    # 13_SHOW_SOLD_CSV: Create subparser "show_sold_csv" with help text and add it to the container "command":
+    # 14_SHOW_SOLD_CSV: Create subparser "show_sold_csv" with help text and add it to the container "command":
     subparser_show_sold_csv = subparsers.add_parser("show_sold_csv", help="goal: show all data from sold.csv in a table in the terminal. \n   ex: py super.py show_sold_csv \n   result: sold.csv is shown in the terminal as a table   \n\n") 
 
 
-    # 14_TIME_TRAVEL: create subparser "time_travel" with help text and add it to the container "command":
+    # 15_TIME_TRAVEL: create subparser "time_travel" with help text and add it to the container "command":
     subparser_time_travel = subparsers.add_parser("time_travel", help="goal: change system_date by adding or subtracting nr of day(s) \n   ex1: py super.py time_travel 3.\n   nr_of_days: 3 \n   result: you travel with 3 days to the future. So if system_date is 2024-03-10, then \n   new date becomes 2024-03-13 in the future.\n\n   ex2: py super.py time_travel -3\n   nr_of_days: -3 \n   result: you travel with 3 days to the past. So if system date is 2024-03-10, \n   then new date becomes 2024-03-07 in the past.\n\n   arg1: positional argument days to add or subtract from system_date: e.g. 9, -8, etc.\n ") 
     #step: add the positional and optional arguments to  'subparser_time_travel': 
     subparser_time_travel.add_argument("nr_of_days", type=int, help="specify the new system date in format YYYY-MM-DD") 
@@ -247,6 +254,43 @@ def main():
         print("create_mock_data:")
         path_to_csv_bought_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'bought.csv')
         path_to_csv_sold_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'sold.csv')
+        
+        '''
+        GOAL: set system_date to the middle of the time interval in which to create random mock data for bought.csv
+        and sold.csv.
+        ex of expected / desired result: if lower boundary is 2023-09-01 and upper boundary is 2023-10-10, then system_date is set to 2023-09-15.
+        reason: as a superpy-user after just having created mock data via argparse cli interface with just default values (== py super.py create_mock_data), 
+        I want to be able to create a(ny) report using JUST the default arguments. This makes it easier to learn superpy-app.
+        
+        ex1: how NOT to do it: create_mock_data does not control the value of system_date. As a result system_date can have any value, based on
+        what the superpy-user has set it to (can be any date for any possible reason ) before invoking create_mock_data.  
+        Suppose mock data is created in interval 2023-09-01 to 2023-10-10, but system_date happens to be set to 2023-07-01 (which is outside the interval)),
+        then ALL the subparsers that "show stuff" (show_sales_volume, show_cost, show inventory, show_profit, etc.). show an empty  table
+        in the terminal ! Work-around: 
+        a. check system date
+        b. check lower boundary of time interval in which to create random mock data for bought.csv and sold.csv
+        c. check upper boundary of time interval in which to create random mock data for bought.csv and sold.csv
+        d. if system_date is not in the interval, then set system_date to the middle of the interval.
+        e. ...very cumbersome and tedious for a prospect superpy-user having to do this...
+
+        ex2: how to do it: mock data is created in interval 2023-09-01 to 2023-10-10, and system_date is automatically set to 2023-09-15.
+        As a superpy-user after creating mock data via argparse cli interface with just default values (== py super.py create_mock_data), I
+        can immediately create a(ny) report using JUST the default arguments. This makes it easier to learn and play around with the superpy-app.
+        The following code makes that happen:
+        ''' 
+        system_date_in_the_middle_of_time_interval = calculate_middle_of_time_interval(
+            SYSTEM_DATE, 
+            args.upper_boundary_nr_of_months_to_add_to_calculate, 
+            args.upper_boundary_nr_of_weeks_to_add_to_calculate, 
+            args.upper_boundary_nr_of_days_to_add_to_calculate)
+        path_to_file_system_datetxt = get_path_to_file('data_used_in_superpy', 'system_date.txt')
+        set_system_date_to(system_date_in_the_middle_of_time_interval, path_to_file_system_datetxt)
+
+
+
+
+
+
         create_data_for_csv_files_bought_and_sold(
             args.product_range,
             args.delete_every_nth_row,
@@ -266,8 +310,11 @@ def main():
             generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
         )
         '''
+        Now 1 more thing needs to be done:
 
-        subject: synchronize buy_ids that can be created and deleted by user in following ways: 
+        GOAL:  make sure primary and foreign keys to connect bought.csv and sold.csv have the correct value.
+        remark: this topic is explained in more detail in README_REPORT.md --> 'Technical element 2: create 
+        primary and foreign keys to connect bought.csv and sold.csv'.
 
         There are 2 ways in the superpy-app to create buy_ids:
 
@@ -295,7 +342,7 @@ def main():
         path_to_csv_bought_file = get_path_to_file("data_used_in_superpy", "bought.csv")
 
         highest_buy_id_in_boughtcsv = get_highest_buy_id_from_boughtcsv_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(path_to_csv_bought_file)
-        print(f"highest_buy_id_from_boughtcsv: {highest_buy_id_in_boughtcsv}")
+        print(f"highest_buy_id_in_boughtcsv: {highest_buy_id_in_boughtcsv}")
         # pitfall: do not increment buy_id with 1 for the next buy-transaction: e.g. b_1 --> b_2. This will be done at other point in the code. 
 
         path_to_file_with_name_id_to_use_in_fn_buy_product = get_path_to_file("data_used_in_superpy", "id_to_use_in_fn_buy_product.txt")
@@ -310,7 +357,9 @@ def main():
         
         When creating this next buy_transaction, fn 'create_buy_id_that_increments_highest_buy_id_in_boughtcsv 
         will increment 'b_132' with 1, so this next transaction will show up in bought.csv as 'b_133'.
-        '''    
+        '''   
+
+
 
     if args.command == "delete":
         print("delete:")
@@ -321,18 +370,19 @@ def main():
         '''
         Goal: delete all transaction records in bought.csv and sold.csv.
         How2: assign 0 to variable 'product_range_to_delete_all_records_in_bought_csv_and_sold_csv'.
-        It does not matter what the values of the other fn-arguments are, as long as
-        the datatypes of the other fn-arguments remain correct. So do not do e.g. this:
-        shelf_life = 'foo'.
+        The other fn-parameters are not relevant for this goal, so they are assigned a dummy value
+
+        The following 11 variables never change. So to avoid bugs, I isolate them from  the 
+        configurable constants at the start of main(), by using lower case fn arguments with 
+        values that never break the code.
+        E.g. if constant MARKUP = 'foo' by accident, then below 
+        markup = 3 still works as argument to delete all transactions
+        from bought.csv and sold.csv still works.  
         '''
+        
         product_range_to_delete_all_records_in_bought_csv_and_sold_csv = 0
-        # see 'product_range' definition in README_SOFTWARE_DESIGN.md --> ch definitions. 
-
-        '''
-        The following 10 variables never change. So to avoid bugs, I do not use the CONSTANTS at the beginning of 
-        main.py to define them: 
-        '''
-
+        # see 'product_range' definition in README_SOFTWARE_DESIGN.md --> ch definitions.        
+        
         delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling = 2
 
         shelf_life = 9
@@ -379,11 +429,23 @@ def main():
             generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
         )
 
+    if args.command == "reset_system_date":
+        
+        system_date_on_device_outside_of_Superpy = set_system_date_to(datetime.today().strftime('%Y-%m-%d'), PATH_TO_FILE_WITH_SYSTEM_DATE)
+        print("reset system_date in Superpy to current date on your device outside of Superpy:")
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')
+        print(f"Superpy system_date reset to current date of laptop: {system_date_on_device_outside_of_Superpy}"   )
+        print('                                                                                                   ')
+        print('---------------------------------------------------------------------------------------------------')
+
+
     if args.command == "sell":
         print("sell:")
         path_to_csv_sold_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'sold.csv')
         path_to_csv_sold_output_file = path_to_csv_sold_input_file # but not the same in pytest.
         sell_product(args.buy_id, args.price, args.sell_date, path_to_csv_sold_input_file, path_to_csv_sold_output_file)
+
 
     if args.command == "set_date":
         print("set_date")
@@ -428,6 +490,7 @@ def main():
         
         show_list_with_nested_lists_in_console_with_module_rich(expired_products)
 
+
     if args.command == "show_inventory":
         path_to_directory_testdata = ''
         path_to_file_bought_csv = ''
@@ -459,7 +522,7 @@ def main():
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
         revenue = calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_sold_csv)
-        show_csv_file_in_console_with_module_rich
+        # show_csv_file_in_console_with_module_rich
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')
         print(f"Revenue from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {revenue}")

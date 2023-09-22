@@ -24,6 +24,8 @@ from copy import deepcopy
 
 # calculate_inventory_on_day(date_on_which_to_calculate_products_in_inventory, path_to_csv_sold_file, path_to_csv_bought_file):
 
+# calculate_middle_of_time_interval(SYSTEM_DATE: str, upper_boundary_nr_of_months_to_add_to_calculate: int, upper_boundary_nr_of_weeks_to_add_to_calculate: int,upper_boundary_nr_of_days_to_add_to_calculate: int  ) -> str:
+
 # calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive):
 
 # calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
@@ -225,6 +227,31 @@ def calculate_inventory_on_day(date_on_which_to_calculate_products_in_inventory,
             default value for expiry_date is 'does not expire' (supermarket also sells e.g. magazines, light bulbs, etc. that do not expire)
             '''
     return products_in_inventory
+
+
+def calculate_middle_of_time_interval(
+        SYSTEM_DATE: str, 
+        upper_boundary_nr_of_months_to_add_to_calculate: int, 
+        upper_boundary_nr_of_weeks_to_add_to_calculate: int,
+        upper_boundary_nr_of_days_to_add_to_calculate: int  ) -> str:
+
+    system_date_as_object = datetime.strptime(SYSTEM_DATE, '%Y-%m-%d')
+    lower_boundary_date_object = system_date_as_object # default value
+    print('lower_boundary_date_object: ', lower_boundary_date_object)
+
+    upper_boundary_date_object = system_date_as_object + timedelta( weeks= upper_boundary_nr_of_weeks_to_add_to_calculate, days=upper_boundary_nr_of_days_to_add_to_calculate)
+    print('upper_boundary_date_object: ', upper_boundary_date_object)
+    upper_boundary_date_object = upper_boundary_date_object + relativedelta(months=upper_boundary_nr_of_months_to_add_to_calculate)
+    print('upper_boundary_date_object: ', upper_boundary_date_object)
+
+    time_interval_middle = lower_boundary_date_object + (upper_boundary_date_object - lower_boundary_date_object) / 2
+    print('time_interval_middle: ', time_interval_middle)
+    SYSTEM_DATE = datetime.strftime(time_interval_middle, '%Y-%m-%d')
+    print('SYSTEM_DATE: ', SYSTEM_DATE)
+    print(type(SYSTEM_DATE))
+
+    return SYSTEM_DATE
+
 
 def calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive):
     cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_bought_file)
