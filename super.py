@@ -35,6 +35,7 @@ from utils_superpy.utils import calculate_sales_volume_in_time_range_between_sta
 from utils_superpy.utils import calculate_expired_products_on_day
 from utils_superpy.utils import show_list_with_nested_lists_in_console_with_module_rich
 from utils_superpy.utils import calculate_inventory_on_day, calculate_middle_of_time_interval
+from utils_superpy.utils import get_system_date
 
 
 def main():
@@ -180,9 +181,9 @@ def main():
 
 
     # 6_SET_DATE: create subparser "set_date" with help text and add it to the container "command":
-    subparser_set_date = subparsers.add_parser("set_date", help="goal: set_system_date_to a specific date in the file system_date.txt\n   ex1: py super.py set_date 2025-01-01 \n   system_date: 2025-01-01 \n\n   arg1: positional argument system_date, e.g. 2023-10-11. \n   --> string representation in format 'yyy-mm-dd'\n\n")
+    subparser_set_date = subparsers.add_parser("set_system_date", help="goal: set_system_date_to a specific date in the file system_date.txt\n   ex1: py super.py set_date 2025-01-01 \n   system_date: 2025-01-01\n result: 'Superpy system_date is set to date (e.g.) 2028-03-10' \n\n   arg1: positional argument system_date, e.g. 2023-10-11. \n   --> string representation in format 'yyy-mm-dd'\n\n")
     #step: add the positional and optional arguments to 'subparser_set_date': 
-    subparser_set_date.add_argument("-new_system_date", type=str, help="specify the new system date in format YYYY-MM-DD") 
+    subparser_set_date.add_argument("new_system_date", type=str, help="specify the new system date in format YYYY-MM-DD") 
 
 
     # 7_SHOW_BOUGHT_CSV: Create subparser "show_bought_csv" with help text and add it to the container "command":
@@ -227,8 +228,10 @@ def main():
     # 14_SHOW_SOLD_CSV: Create subparser "show_sold_csv" with help text and add it to the container "command":
     subparser_show_sold_csv = subparsers.add_parser("show_sold_csv", help="goal: show all data from sold.csv in a table in the terminal. \n   ex: py super.py show_sold_csv \n   result: sold.csv is shown in the terminal as a table   \n\n") 
 
+    # 15_SHOW_SYSTEM_DATE: Create subparser "show_system_date" with help text and add it to the container "command":
+    subparser_show_system_date = subparsers.add_parser("show_system_date", help="goal: show SYSTEM_DATE (e.g. '2027-06-13') from system_date.txt in the terminal \n (...\superpy\data_used_in_superpy\system_date.txt). \n   ex: py super.py show_system_date \n   result: 'Superpy SYSTEM_DATE has value 2023-08-20'  \n\n") 
 
-    # 15_TIME_TRAVEL: create subparser "time_travel" with help text and add it to the container "command":
+    # 16_TIME_TRAVEL: create subparser "time_travel" with help text and add it to the container "command":
     subparser_time_travel = subparsers.add_parser("time_travel", help="goal: change system_date by adding or subtracting nr of day(s) \n   ex1: py super.py time_travel 3.\n   nr_of_days: 3 \n   result: you travel with 3 days to the future. So if system_date is 2024-03-10, then \n   new date becomes 2024-03-13 in the future.\n\n   ex2: py super.py time_travel -3\n   nr_of_days: -3 \n   result: you travel with 3 days to the past. So if system date is 2024-03-10, \n   then new date becomes 2024-03-07 in the past.\n\n   arg1: positional argument days to add or subtract from system_date: e.g. 9, -8, etc.\n ") 
     #step: add the positional and optional arguments to  'subparser_time_travel': 
     subparser_time_travel.add_argument("nr_of_days", type=int, help="specify the new system date in format YYYY-MM-DD") 
@@ -432,11 +435,10 @@ def main():
     if args.command == "reset_system_date":
         
         system_date_on_device_outside_of_Superpy = set_system_date_to(datetime.today().strftime('%Y-%m-%d'), PATH_TO_FILE_WITH_SYSTEM_DATE)
-        print("reset system_date in Superpy to current date on your device outside of Superpy:")
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')
-        print(f"Superpy system_date reset to current date of laptop: {system_date_on_device_outside_of_Superpy}"   )
-        print('                                                                                                   ')
+        print(f"Superpy system_date is reset to the current date of the device (e.g. your laptop) that Superpy    ")
+        print(f'is running on: {system_date_on_device_outside_of_Superpy}                                                                                                   ')
         print('---------------------------------------------------------------------------------------------------')
 
 
@@ -450,8 +452,11 @@ def main():
     if args.command == "set_date":
         print("set_date")
         # step: call fn set_system_date_to to update file system__date.txt with following date:
-        system_date = set_system_date_to(args.new_system_date, PATH_TO_FILE_WITH_SYSTEM_DATE)
-        print(system_date) 
+        new_system_date = set_system_date_to(args.new_system_date, PATH_TO_FILE_WITH_SYSTEM_DATE)
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')
+        print(f"Superpy system_date is set to date: {new_system_date}                    ")
+        print('---------------------------------------------------------------------------------------------------')
 
 
     if args.command == "show_bought_csv":
@@ -550,7 +555,15 @@ def main():
         path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
         show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
 
-
+    if args.command == "show_system_date":
+        
+        system_date_of_superpy = get_system_date( PATH_TO_FILE_WITH_SYSTEM_DATE)
+        print("reset system_date in Superpy to current date on your device outside of Superpy:")
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')
+        print(f"Superpy SYSTEM_DATE has value: {system_date_of_superpy}"                                           )
+        print('                                                                                                   ')
+        print('---------------------------------------------------------------------------------------------------')
 
     if args.command == "time_travel":
         print("time_travel")

@@ -127,6 +127,18 @@ and running applications via argparse cli.
         23-09-12     23-09-15         3
         (used in fn create_data_for_csv_files_bought_and_sold() )
 
+# LOCATION OF IMPORTANT DIRECTORIES AND FILES
+bought.csv      :  ...\superpy\date_used_in_superpy\bought.csv
+create_testdata_for_csv_files_bought_and_sold   :  ...\superpy\data_pytest_create_boughtcsv_and_soldcsv_for_pytestcases_here\
+                                                   create_testdata_for_csv_files_bought_and_sold
+erd             :  ...\superpy\erd  (entity relationship diagram)
+readme_files    :  ...\superpy\readme_files
+sold.csv        :  ...\superpy\date_used_in_superpy\sold.csv
+super.py        :  ...\superpy\super.py 
+system_date     :  ...\superpy\date_used_in_superpy\system_date.txt
+test_utils      :  ...\superpy\test_utils   (regression testcases, run in pytest)
+utils.py        :  ...\superpy\test_utils   (functions)
+
 
 # DATA-MODEL
 [goto Table of Contents at start of markdown file: ](#data-model)
@@ -134,7 +146,7 @@ Before moving on, please have a look at the data model. This provides some conte
 better understand the business tasks of Superpy in next chapter Usage.
 
 
-<img src="../entity_relationship_diagram/erd_superpy.png" alt="Image Name" width="400" height="600">
+<img src="../erd/erd_superpy.png" alt="Image Name" width="400" height="600">
 
 
 
@@ -148,23 +160,24 @@ Three questions are answered:
 
 List of superpy functionality with goals:
 
-|Nr | Superpy functionality | Goal                                                              |
-|---|-----------------------|-------------------------------------------------------------------|
-|1  | buy                   | buy 1 product and add this product to bought.csv                  |
-|2  | create_mock_data      | fill bought.csv and sold.csv with mockdata.                       |
-|3  | delete                | delete all transaction records in bought.csv and sold.csv         |
-|4  | reset_system_date     | reset to current date on device Superpy is running on
-|5  | sell                  | buy 1 product and add this product to bought.csv                  |
-|6  | set_date              | set system_date                                                   |
-|7  | show_bought_csv       | show contents of bought.csv as a table                            |
-|8  | show_cost             | calculate and display cost of a time interval                     |
-|9  | show_expired_products | calculate and display expired products on a date                  | 
-|10 | show_inventory        | calculate and display inventory on a date                         |
-|11 | show_profit           | calculate and display profit of a time interval                   |
-|12 | show_revenue          | calculate and display revenue of a time interval                  |
-|13 | show_sales_volume     | calculate and display sales volume of a time interval             |
-|14 | show_sold_csv         | show contents of bought.csv as a table                            |
-|15 | time_travel           | change the system_date by adding or subtracing a nr of days       |
+|Nr | Superpy functionality | Goal                                                                                  |
+|---|-----------------------|---------------------------------------------------------------------------------------|
+|1  | buy                   | buy 1 product and add this product to bought.csv                                      |
+|2  | create_mock_data      | fill bought.csv and sold.csv with mockdata.                                           |
+|3  | delete                | delete all transaction records in bought.csv and sold.csv                             |
+|4  | reset_system_date     | reset to current date on device Superpy is running on                                 |
+|5  | sell                  | buy 1 product and add this product to bought.csv                                      |
+|6  | set_system_date       | set system_date  in system_date.txt                                                   |
+|7  | show_bought_csv       | show contents of bought.csv as a table                                                |
+|8  | show_cost             | calculate and display cost of a time interval                                         |
+|9  | show_expired_products | calculate and display expired products on a date                                      | 
+|10 | show_inventory        | calculate and display inventory on a date                                             |
+|11 | show_profit           | calculate and display profit of a time interval                                       |
+|12 | show_revenue          | calculate and display revenue of a time interval                                      |
+|13 | show_sales_volume     | calculate and display sales volume of a time interval                                 |
+|14 | show_sold_csv         | show contents of bought.csv as a table                                                |
+|15 | show_system_date      | show system date from system_date.txt                                                 |
+|15 | time_travel           | change the system_date by adding or subtracing a nr of days                           |
 
 ## click link to goto superpy functionality: (press CTRL-key)
 ### buy
@@ -172,7 +185,7 @@ List of superpy functionality with goals:
 ### delete
 ### reset_system_date
 ### sell
-### set_date
+### set_system_date
 ### show_bought_csv
 ### show_cost
 ### show_expired_products
@@ -182,9 +195,6 @@ List of superpy functionality with goals:
 ### show_sales_volume
 ### show_sold_csv
 ### time_travel
-
-
-
 
 
 
@@ -521,26 +531,28 @@ List of superpy functionality with goals:
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-6. SUPERPY FUNCTIONALITY: SET_DATE
+6. SUPERPY FUNCTIONALITY: SET_SYSTEM_DATE
 
-[goto chapter Usage --> overview with business tasks ](#set_date) <br />
+[goto chapter Usage --> overview with business tasks ](#set_system_date) <br />
 - goal: set_system_date_to a specific date in the file system_date.txt 
 
 - ex1: 
 
 ```
-    py super.py set_date 2025-01-01
+    py super.py set_system_date 2025-01-01
 ```
 
 - system_date: 2025-01-01   
+- result: 'Superpy system_date is set to date: 2025-01-01'
 
 - ex2: 
 
 ```
-    py super.py set_date 2023-09-20 
+    py super.py set_system_date 2023-09-20 
 ```
 
 - system_date: 2023-09-20
+- result: 'Superpy system_date is set to date: 2023-09-20'
 
 - arg1: positional argument system_date, e.g. 2023-10-11 --> string representation in format 'yyy-mm-dd'<br/>
 
