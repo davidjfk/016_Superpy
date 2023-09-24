@@ -939,36 +939,29 @@ List of superpy functionality with goals:
     - step 3: show_sold_csv
     - step 4: show_system_date 
     - step 5: reset_system_date
-    - step 6: show_system_date   --> notice that system_date is now equal to that on the device  
-                                     you are running superpy on. 
+    - step 6: show_system_date   --> notice that Superpy system_date is now equal to that  
+                                     of the  host machine. 
 
     - 2do: add copy-pastable code snippet for each step, e.g. py super.py create_mock_data
 
 2. buy and sell a product
     - step 1: create_mock_data
     - step 2: buy_product
-    - step 3: sell_product
-
+    - step 3: show_bought_csv
+    - step 4: sell_product
+    - step 5: show_sold_csv
 
 3. show all management reports
     - step 1: create_mock_data
     - step 2: show_cost
-    - 2do: add all the other reports
+    - step 3: show_expired_products
+    - step 4: show_inventory
+    - step 5: show_profit
+    - step 6: show_revenue
+    - step 7: show_cost
+    - step 8: show_sales_volume
+    - step 9: time_travel to the past and future and  check the differences in the reports. 
 
-4. time_travel and see how the data (inventory, expired products, profit, etc.) on  
-    the management reports changes
-    - step 1: create_mock_data    
-
-5. create a lot of profit
-
-
-6. create a loss 
-
-
-7. create a lot of inventory
-
-
-8. create a lot of expired products 
 
 
 
