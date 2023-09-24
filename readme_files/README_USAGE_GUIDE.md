@@ -4,13 +4,15 @@
 ### DEFINITIONS
 ### DATA-MODEL
 ### USAGE
-### EXAMPLES
+### EXAMPLES-SCENARIOS-WORKFLOWS
+### TESTING-THE-APPLICATION-IN-PYTEST
 ### TROUBLE-SHOOTING
 ### FAQ
 ### SUPPORT 
 
 # INTRO
-[goto Table of Contents at start of markdown file: ](#introduction) 
+[goto Table of Contents at start of this markdown file: ](#INTRO) 
+
 Application Superpy can be used to buy and sell products. In addition to that
 all kinds of reports can be created: revenue, cost,  profit, inventory, expired_products, etc.
 
@@ -21,8 +23,16 @@ To learn superpy faster, the following 2 features can be used via the cli:
 The target group of this usage guide are Winc students. Winc students are familiar with python, vsCode 
 and running applications via argparse cli.
 
+
+Comprehensive info about all argparse (subparser) arguments from this manual is also available via:
+
+```python
+py super.py -h
+```
+
 # INSTALLATION
-[goto Table of Contents at start of markdown file: ](#installation)
+[goto Table of Contents at start of this markdown file: ](#INSTALLATION)
+
 1. The latest version of Superpy is in Github: https://github.com/davidjfk/David_Sneek_Superpy . Check if there is a newer version.
 2. In Powershell navigate into folder Superpy 
 3. create a virtual environment:
@@ -30,13 +40,18 @@ and running applications via argparse cli.
     py -m venv env
 ``` 
 4. activate virtual environment: 
+
+
+    in Powersell:
 ```python
-    \env\Scripts\activate
+    .\env\Scripts\activate
 ``` 
-    or in e.g. git bash:
+    or in Git Bash:
 ```python
-    /env/Scripts/activate
+    source ./env/Scripts/activate
 ``` 
+    To verify that the virtual environment is active, you should see  the name of the   
+    virtual environment in parentheses at the beginning of your command prompt.
 
 5. install all dependencies:
 ```python
@@ -45,11 +60,12 @@ and running applications via argparse cli.
 
 6. Ready to use Superpy. See next chapter Usage
 
-7. (To deactivate virtual environment, enter 'deactivate' in cli and press enter. )
+7. To deactivate virtual environment (in Powershell or Git Bash), enter 'deactivate'  
+    in cli and press enter.
 
 
 # DEFINITIONS
-[goto Table of Contents at start of markdown file: ](#DEFINITIONS) <br />
+[goto Table of Contents at start of this markdown file: ](#DEFINITIONS) <br />
 
     business task = activity that is carried out in Superpy, e.g. buy a product, show 
        an overview of profit in a certain time interval.
@@ -141,7 +157,7 @@ utils.py        :  ...\superpy\test_utils   (functions)
 
 
 # DATA-MODEL
-[goto Table of Contents at start of markdown file: ](#data-model)
+[goto Table of Contents at start of this markdown file: ](#data-model)
 Before moving on, please have a look at the data model. This provides some context to  
 better understand the business tasks of Superpy in next chapter Usage.
 
@@ -151,7 +167,7 @@ better understand the business tasks of Superpy in next chapter Usage.
 
 
 # Usage 
-[goto Table of Contents at start of markdown file: ](#USAGE)
+[goto Table of Contents at start of this markdown file: ](#USAGE)
 This chapter explains how to use Superpy's command-line interface.  
 Three questions are answered:
 1. Which functions (fns) does Superpy fulfill? (e.g. buy product, sell product, etc.)
@@ -160,26 +176,26 @@ Three questions are answered:
 
 List of superpy functionality with goals:
 
-|Nr | Superpy functionality | Goal                                                                                  |
-|---|-----------------------|---------------------------------------------------------------------------------------|
-|1  | buy                   | buy 1 product and add this product to bought.csv                                      |
-|2  | create_mock_data      | fill bought.csv and sold.csv with mockdata.                                           |
-|3  | delete                | delete all transaction records in bought.csv and sold.csv                             |
-|4  | reset_system_date     | reset to current date on device Superpy is running on                                 |
-|5  | sell                  | buy 1 product and add this product to bought.csv                                      |
-|6  | set_system_date       | set system_date  in system_date.txt                                                   |
-|7  | show_bought_csv       | show contents of bought.csv as a table                                                |
-|8  | show_cost             | calculate and display cost of a time interval                                         |
-|9  | show_expired_products | calculate and display expired products on a date                                      | 
-|10 | show_inventory        | calculate and display inventory on a date                                             |
-|11 | show_profit           | calculate and display profit of a time interval                                       |
-|12 | show_revenue          | calculate and display revenue of a time interval                                      |
-|13 | show_sales_volume     | calculate and display sales volume of a time interval                                 |
-|14 | show_sold_csv         | show contents of bought.csv as a table                                                |
-|15 | show_system_date      | show system date from system_date.txt                                                 |
-|15 | time_travel           | change the system_date by adding or subtracing a nr of days                           |
+|Nr | Superpy functionality | Goal                                                            |
+|---|-----------------------|-----------------------------------------------------------------|
+|1  | buy                   | buy 1 product and add this product to bought.csv                |
+|2  | create_mock_data      | fill bought.csv and sold.csv with mockdata.                     |
+|3  | delete                | delete all transaction records in bought.csv and sold.csv       |
+|4  | reset_system_date     | reset to current date on device Superpy is running on           |
+|5  | sell                  | buy 1 product and add this product to bought.csv                |
+|6  | set_system_date       | set system_date  in system_date.txt                             |
+|7  | show_bought_csv       | show contents of bought.csv as a table                          |
+|8  | show_cost             | calculate and display cost of a time interval                   |
+|9  | show_expired_products | calculate and display expired products on a date                | 
+|10 | show_inventory        | calculate and display inventory on a date                       |
+|11 | show_profit           | calculate and display profit of a time interval                 |
+|12 | show_revenue          | calculate and display revenue of a time interval                |
+|13 | show_sales_volume     | calculate and display sales volume of a time interval           |
+|14 | show_sold_csv         | show contents of bought.csv as a table                          |
+|15 | show_system_date      | show system date from system_date.txt                           |
+|16 | time_travel           | change the system_date by adding or subtracing a nr of days     |
 
-## click link to goto superpy functionality: (press CTRL-key)
+## click link to goto respective paragraph with superpy functionality: (press CTRL-key)
 ### buy
 ### create_mock_data
 ### delete
@@ -243,7 +259,7 @@ List of superpy functionality with goals:
 
 [goto chapter Usage --> overview with business tasks ](#create_mock_data) <br />
 - goal: create mock data for bought.csv and sold.csv
-- All 11 arguments have default values that can be changed in (...\superpy\super.py --> goto CONSTANTS at start of main.py())
+- Of 8 arguments the default values can be changed in (...\superpy\super.py --> goto section 'CONFIGURATION' at start of main.py())
 - Quick summary: 
 - All 11 arguments are optional, so you can do this:
 ```
@@ -256,6 +272,8 @@ List of superpy functionality with goals:
 - arg1: product_range
     - flags: -pr, -product_range
     - product_range == product_assortment == the amount of different products in Superpy.
+    - minimum value: 1 (generates 8 transactions in bought.csv) 
+    - maximum value: 40 (generates 280 transactions in bought.csv)
     - ex1:
     ```
     py super.py create_mock_data -pr 3
@@ -860,12 +878,15 @@ List of superpy functionality with goals:
 
 
 
+
+
+
 <br /> 
 <br /> 
 - -----------------------------------------------------------------------------------------------
 <br /> 
 <br /> 
-15. SUPERPY FUNCTIONALITY: TIME_TRAVEL
+16. SUPERPY FUNCTIONALITY: TIME_TRAVEL
 
 [goto chapter Usage --> overview with business tasks ](#time_travel) <br />
 
@@ -896,26 +917,144 @@ List of superpy functionality with goals:
 
 <br /> 
 <br /> 
-# Examples
+# EXAMPLES-SCENARIOS-WORKFLOWS
 
-[goto Table of Contents at start of markdown file: ](#examples)
-This chapter provides some examples of common Superpy usage scenarios, demonstrating how to  
-combine different business tasks, command-line options and arguments.
+[goto Table of Contents at start of this markdown file: ](#EXAMPLES-SCENARIOS-WORKFLOWS)
+- This chapter provides some examples of common Superpy usage scenarios, demonstrating how to  
+    combine different business tasks, command-line options and arguments.
+
+    The examples start easy with subparsers (i.e. create_mock_data, buy_product, etc.) only
+    using their default values. Gradually the scenarios get more complex and more and more
+    default values are replaced by using custom values.
+
+- Examples-scenarios-workflows: 
+1. get familiar with the data
+    
+    - step 1: create_mock_data
+    - step 2: show_bought_csv
+    - step 3: show_sold_csv
+    - step 4: show_system_date 
+    - step 5: reset_system_date
+    - step 6: show_system_date   --> notice that system_date is now equal to that on the device  
+                                     you are running superpy on. 
+
+    - 2do: add copy-pastable code snippet for each step, e.g. py super.py create_mock_data
+
+2. buy and sell a product
+    - step 1: create_mock_data
+    - step 2: buy_product
+    - step 3: sell_product
+
+
+3. show all management reports
+    - step 1: create_mock_data
+    - step 2: show_cost
+    - 2do: add all the other reports
+
+4. time_travel and see how the data (inventory, expired products, profit, etc.) on  
+    the management reports changes
+    - step 1: create_mock_data    
+
+5. create a lot of profit
+
+
+6. create a loss 
+
+
+7. create a lot of inventory
+
+
+8. create a lot of expired products 
+
+
+
+# TESTING-THE-APPLICATION-IN-PYTEST
+[goto Table of Contents at start of this markdown file: ](#TESTING-THE-APPLICATION-IN-PYTEST)
+
+## 1of2: run regression testcases:
+
+There are 2 options to run the regression testcases in pytest:
+
+Option 1of2: run them all (this is usually what you want):
+1. navigate into (...\superpy) or (...\superpy\test_utils)
+2. enter following command:
+```python
+    pytest
+```
+3. all 23 testcases should pass. If not then investigate the failing testcase(s).
+<br/>
+<br/>
+
+Option 2of2: run only the testcase(s) that test a specific function:
+1. navigate into (...\superpy) or (...\superpy\test_utils)
+2. navigate into the folder that contains the testcases of the fn that you want to test.
+    - ex: to test fn buy_product, navigate into directory 'fn_buy_product_testcases'.
+    - or: 
+    - ex: to test fn calculate_profit_in_time_range_between_start_date_and_end_date_inclusive,  
+        navigate into directory 'fn_calculate_profit_in_time_range_between_start_date_and_end_date_inclusive'  
+    etc.
+3. now enter following command:
+```python
+    pytest
+```
+4. all testcases of this fn (e.g. fn buy_product) should pass.  
+    If not then investigate the failing testcase(s).
+<br/>
+<br/>
+
+## 2of2: create testdata for additional testcases:
+Creating testdata involves creating testdata for bought.csv and sold.csv.
+
+1. navigate into (...\superpy\data_pytest_create_boughtcsv_and_soldcsv_for_pytestcases_here)
+2. run the following script:
+```python
+    py create_testdata_for_csv_files_bought_and_sold.py
+```
+3. bought.csv and sold.csv have now been created. You can find them in the same location
+    as the script: (...\superpy\data_pytest_create_boughtcsv_and_soldcsv_for_pytestcases_here)
+
+- Inside this script at the beginning of main() in section 'CONFIGURATION', the following variables  
+    (actually fn-arguments) can be assigned another value to your liking:
+    - product_range
+    - delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling
+    - shelf_life
+    - turnover_time
+    - markup
+    - lower_boundary_year_of_time_interval_in_which_to_create_random_testdata
+    - lower_boundary_month_of_time_interval_in_which_to_create_random_testdata
+    - lower_boundary_week_of_time_interval_in_which_to_create_random_testdata
+    - upper_boundary_nr_of_months_to_add_to_calculate
+    - upper_boundary_nr_of_weeks_to_add_to_calculate
+    - upper_boundary_nr_of_days_to_add_to_calculate 
+
+     - Chapter USAGE --> paragraph create_mock_data explains exactly what these variables mean and  
+        how they can be used to create testdata.
+     - Chapter EXAMPLES shows them "in action".  
+        ex: if you create 10 rows in bought.csv (these are automatically copied into 10 rows in sold.csv) and then  
+        delete every 2nd row in sold.csv AND THEN time travel to the future, then more products will expire, compared  
+        to when you only let every tenth row in sold.csv expire.  
+        Setting the shelf_life (e.g. 4 days or 25 days) also make a difference in how many products will expire, or
+        or still  be part of the inventory, etc.
+
+
+<br/>
+<br/>
+
 
 
 # Troubleshooting
-[goto Table of Contents at start of markdown file: ](#trouble-shooting)
+[goto Table of Contents at start of this markdown file: ](#trouble-shooting)
 If you encounter a problem, first run the pytest regression testcases.
 1. navigate into (...\superpy) or (...\superpy\test_utils)
 2. enter following command:
 ```python
     pytest
 ```
-3. all 21 testcases should pass. If not then investigate the failing testcase(s).
+3. all 23 testcases should pass. If not then investigate the failing testcase(s).
 
 
 # FAQ
-[goto Table of Contents at start of markdown file: ](#faq)
+[goto Table of Contents at start of this markdown file: ](#faq)
 1. Can I export data from bought.csv or sold.csv as a pdf?
     - no
 
@@ -925,7 +1064,7 @@ If you encounter a problem, first run the pytest regression testcases.
 
 
 # Support
-[goto Table of Contents at start of markdown file: ](#support)
+[goto Table of Contents at start of this markdown file: ](#support)
 For support please send an email to noreply@really.com or call  
 0011-2233-4455 during business hours GMT+2. 
 

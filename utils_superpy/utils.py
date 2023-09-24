@@ -11,12 +11,12 @@ from rich.console import Console
 # only used in fn create_data_for_csv_files_bought_and_sold():
 from itertools import product
 from copy import deepcopy
-
+from typing import Callable
 
 # LIST OF FUNCTIONS:
 # add_days_to_date(date_string, days_to_add)
 
-# buy_product(product, price, buy_date, expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file,       path_to_csv_bought_output_file):
+# buy_product(product, price, buy_date, expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file, path_to_csv_bought_output_file):
 
 # calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_bought_file):
 
@@ -32,15 +32,17 @@ from copy import deepcopy
 
 # calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
 
-# create_data_for_csv_files_bought_and_sold(product_range, delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling, shelf_life, turnover_time, markup, lower_boundary_year_of_time_interval_in_which_to_create_random_testdata, lower_boundary_month_of_time_interval_in_which_to_create_random_testdata, lower_boundary_week_of_time_interval_in_which_to_create_random_testdata, upper_boundary_nr_of_months_to_add_to_calculate, upper_boundary_nr_of_weeks_to_add_to_calculate, upper_boundary_nr_of_days_to_add_to_calculate, path_to_file_bought_csv, path_to_file_sold_csv, add_days_to_date, create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv, generate_random_buy_date_for_buy_transaction_in_future_in_time_interval):
-
 # create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created(csv_file_name_first_letter, first_nr_in_range):
 
 # create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number):
 
+# create_data_for_csv_files_bought_and_sold(product_range, delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling, shelf_life, turnover_time, markup, lower_boundary_year_of_time_interval_in_which_to_create_random_testdata, lower_boundary_month_of_time_interval_in_which_to_create_random_testdata, lower_boundary_week_of_time_interval_in_which_to_create_random_testdata, upper_boundary_nr_of_months_to_add_to_calculate, upper_boundary_nr_of_weeks_to_add_to_calculate, upper_boundary_nr_of_days_to_add_to_calculate, path_to_file_bought_csv, path_to_file_sold_csv, add_days_to_date, create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv, generate_random_buy_date_for_buy_transaction_in_future_in_time_interval):
+
 # generate_random_buy_date_for_buy_transaction_in_future_in_time_interval(interval_lower_boundary_year,            interval_lower_boundary_month, interval_lower_boundary_day, nr_of_months_added_to_calculate_upper_boundary,            nr_of_weeks_added_to_calculate_upper_boundary, nr_of_days_added_to_calculate_upper_boundary):
 
-# get_highest_buy_id_from_boughtcsv_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(path_to_csv_bought_file):
+# get_dates_of_next_7_days(today: str) -> list:
+
+# get_highest_buy_id_from_boughtcsv(path_to_csv_bought_file):
 
 # get_path_to_directory_of_file(directory_of_file):
 
@@ -62,7 +64,7 @@ from copy import deepcopy
 
 
 
-def add_days_to_date(date_string, days_to_add):
+def add_days_to_date(date_string: str, days_to_add: int) -> str:
     date = datetime.strptime(date_string, '%Y-%m-%d')
     new_date = date + timedelta(days= days_to_add)
     '''
@@ -74,14 +76,15 @@ def add_days_to_date(date_string, days_to_add):
     return new_date.strftime('%Y-%m-%d')
 
 
-def buy_product(product,
-                price,
-                buy_date,
-                expiry_date, 
-                id_of_row_in_csv_file_bought,
-                path_to_csv_bought_input_file,  
-                path_to_csv_bought_output_file
-                ):
+def buy_product(
+        product: str, 
+        price: float, 
+        buy_date: str, 
+        expiry_date: str, 
+        id_of_row_in_csv_file_bought: str, 
+        path_to_csv_bought_input_file: str, 
+        path_to_csv_bought_output_file: str
+) -> None:
     '''
     About the input_file and output_file:
     when using superpy as user, input and output csv file are the same.
@@ -102,7 +105,11 @@ def buy_product(product,
         writer.writerows(rows)
 
 
-def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_bought_file):
+def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(
+        start_date: str, 
+        end_date: str, 
+        path_to_csv_bought_file: str
+) -> float:
     '''
     Goal of fn: calculate cost in time range between start_date and end_date inclusive.
     hardcoded variables in fn: buy_date, buy_price.
@@ -124,13 +131,16 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start
             sell_date = row['buy_date']
             sell_date = datetime.strptime(sell_date, '%Y-%m-%d')
             if start_date <= sell_date <= end_date:
-                # print(revenue)
                 cost += float(row['buy_price'])
                 cost_rounded = round(cost, 2)
     return cost_rounded
 
 
-def calculate_expired_products_on_day(date_on_which_to_calculate_expired_products, path_to_csv_sold_file, path_to_csv_bought_file):
+def calculate_expired_products_on_day(
+        date_on_which_to_calculate_expired_products: str, 
+        path_to_csv_sold_file: str, 
+        path_to_csv_bought_file: str
+) -> list:
     # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' has datatype <class 'str'>
     date_on_which_to_calculate_expired_products = datetime.strptime(date_on_which_to_calculate_expired_products, '%Y-%m-%d').date()
     # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' now has datatype <class 'datetime.date'> and that is what I neeed. 
@@ -180,7 +190,11 @@ def calculate_expired_products_on_day(date_on_which_to_calculate_expired_product
     return expired_products
 
 
-def calculate_inventory_on_day(date_on_which_to_calculate_products_in_inventory, path_to_csv_sold_file, path_to_csv_bought_file):
+def calculate_inventory_on_day(
+        date_on_which_to_calculate_products_in_inventory: str, 
+        path_to_csv_sold_file: str, 
+        path_to_csv_bought_file: str
+) -> list:
     # print(type(date_on_which_to_calculate_products_in_inventory)) # e.g. '2023-10-01' has datatype <class 'str'>
     date_on_which_to_calculate_products_in_inventory = datetime.strptime(date_on_which_to_calculate_products_in_inventory, '%Y-%m-%d').date()
     # print(type(date_on_which_to_calculate_products_in_inventory)) # e.g. '2023-10-01' now has datatype <class 'datetime.date'> and that is what I neeed. 
@@ -233,7 +247,8 @@ def calculate_middle_of_time_interval(
         SYSTEM_DATE: str, 
         upper_boundary_nr_of_months_to_add_to_calculate: int, 
         upper_boundary_nr_of_weeks_to_add_to_calculate: int,
-        upper_boundary_nr_of_days_to_add_to_calculate: int  ) -> str:
+        upper_boundary_nr_of_days_to_add_to_calculate: int  
+) -> str:
 
     system_date_as_object = datetime.strptime(SYSTEM_DATE, '%Y-%m-%d')
     lower_boundary_date_object = system_date_as_object # default value
@@ -253,14 +268,25 @@ def calculate_middle_of_time_interval(
     return SYSTEM_DATE
 
 
-def calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive):
+def calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(
+        start_date: str, 
+        end_date: str, 
+        path_to_csv_sold_file: str, 
+        path_to_csv_bought_file: str, 
+        calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive: Callable[[str, str, str], float], 
+        calculate_cost_in_time_range_between_start_date_and_end_date_inclusive: Callable[[str, str, str], float]
+) -> float:
     cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_bought_file)
     revenue = calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file)
     profit = round(revenue - cost,2)
     return profit
 
 
-def calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
+def calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive(
+        start_date: str, 
+        end_date: str, 
+        path_to_csv_sold_file: str
+    ) -> int:
     '''
     Goal of fn: calculate sales volume in time range between start_date and end_date inclusive.
     hardcoded variables in fn: sell_date, sell_price .
@@ -283,7 +309,11 @@ def calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusi
 
     return sales_volume
 
-def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
+def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(
+        start_date: str, 
+        end_date: str, 
+        path_to_csv_sold_file: str
+) -> float:
     '''
     Goal of fn: calculate revenue in time range between start_date and end_date inclusive.
     hardcoded variables in fn: sell_date, sell_price .
@@ -293,47 +323,101 @@ def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(st
     ex of start_date: '2023-09-01'
     ex of end_date: '2023-12-21'
     '''
-    # print('start_date:')
     start_date = datetime.strptime(str(start_date), '%Y-%m-%d')
-    # print(start_date)
-    # print('end_date:')
     end_date = datetime.strptime(str(end_date), '%Y-%m-%d')
-    # print(end_date)
 
     revenue = 0
     revenue_rounded = 0
     with open(path_to_csv_sold_file, 'r', newline='') as file: 
         reader = csv.DictReader(file)
         for row in reader:
-            # print('row:')
-            # print(row)
             sell_date = row['sell_date']
             sell_date = datetime.strptime(sell_date, '%Y-%m-%d')
             if start_date <= sell_date <= end_date:
-                # print(revenue)
                 revenue += float(row['sell_price'])
                 revenue_rounded = round(revenue, 2)
     return revenue_rounded
 
 
+def create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created(
+        csv_file_name_first_letter: str, 
+        first_nr_in_range: int
+) -> Callable[[], int]:
+    ''' 
+    scope: only used by script create_testdata_for_csv_files_bought_and_sold.py.
+    e.g. "b" is abbreviation of 'bought.csv'. This 'b' will be part of 
+    argparse argument, so needs to be concise for pleasant user 
+    experience.    
+    '''
+    count = first_nr_in_range
+    count -= 1 # to start with 1, not 0
+    def counter():
+        nonlocal count
+        count += 1
+        return f"{csv_file_name_first_letter}_{count}"
+    return counter
+
+def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number: str) -> str:
+    '''
+    Goal: use output of this fn to create a buy_id as input for fn buy_product, so fn buy_product can create a next buy-transaction.
+    Context: this fn is  only used in super.py.
+    More info about how this fn fits into  the bigger picture, see: README_REPORT.md --> '# Technical element 2: create primary 
+    and foreign keys to connect bought.csv and sold.csv 
+
+    I run superpy via the command line in argparse.
+    So state of last id that was used in fn buy_product() is unknown (e.g. b_323), given
+    that I buy products and delete products (records) from bought.csv. 
+    I do not want to reuse an id that was used before (e.g. that belonged to a product
+    that was deleted).
+    So I save the state of the id (e.g. b_351) that was used last in fn buy_product() in a txt-file.
+
+    The products that are bought by superpy-user and/or pytest-"testengine" user  start
+    at id b_300 and count up from there.
+    The range id_1 to id_299 is reserved for script 'create_testdata_for_csv_files_bought_and_sold'
+    in directory create_new_testdata_for_csv_files.
+
+    '''
+    print('path_to_id_with_highest_sequence_number')
+    print(path_to_id_with_highest_sequence_number)
+    # new_id_to_use_in_fn_buy_product = ''
+    try:
+        with open(path_to_id_with_highest_sequence_number, 'r', newline='') as file:
+            last_id_used_in_fn_buy_product =file.read()
+
+            id_parts = last_id_used_in_fn_buy_product.split("_")
+            new_id_to_use_in_fn_buy_product = int(id_parts[1]) + 1
+            new_id_to_use_in_fn_buy_product = "b_" + str(new_id_to_use_in_fn_buy_product)
+            file.seek(0)
+        with open(path_to_id_with_highest_sequence_number, 'w', newline='') as file: 
+            print(new_id_to_use_in_fn_buy_product)  
+            file.write(new_id_to_use_in_fn_buy_product)
+    except IOError:
+        print("Error in fn create_id_with_unused_highest_sequence_nr()")
+    return new_id_to_use_in_fn_buy_product
+
+
+
 def create_data_for_csv_files_bought_and_sold(
-    product_range, 
-    delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling,
-    shelf_life,
-    turnover_time,
-    markup,
-    lower_boundary_year_of_time_interval_in_which_to_create_random_testdata,
-    lower_boundary_month_of_time_interval_in_which_to_create_random_testdata,
-    lower_boundary_week_of_time_interval_in_which_to_create_random_testdata,
-    upper_boundary_nr_of_months_to_add_to_calculate,
-    upper_boundary_nr_of_weeks_to_add_to_calculate,
-    upper_boundary_nr_of_days_to_add_to_calculate,
-    path_to_file_bought_csv,
-    path_to_file_sold_csv,
-    add_days_to_date,
-    create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv,
-    generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
-):
+        product_range: int, 
+        delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling: int,
+        shelf_life: int,
+        turnover_time: int,
+        markup: int,
+        lower_boundary_year_of_time_interval_in_which_to_create_random_testdata: int,
+        lower_boundary_month_of_time_interval_in_which_to_create_random_testdata: int,
+        lower_boundary_week_of_time_interval_in_which_to_create_random_testdata: int,
+        upper_boundary_nr_of_months_to_add_to_calculate: int,
+        upper_boundary_nr_of_weeks_to_add_to_calculate: int,
+        upper_boundary_nr_of_days_to_add_to_calculate: int,
+        superpy_product_prices: list,
+        superpy_product_range: list,
+        path_to_file_bought_csv: str,
+        path_to_file_sold_csv: str,
+        add_days_to_date: int,
+        create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created: Callable[[str, int], Callable[[], int]], 
+        # reason: fn A is fn-argument in fn B == fn B(fn A). And B(fn A) is argument in fn C == fn C(B(fn A))
+        generate_random_buy_date_for_buy_transaction_in_future_in_time_interval: Callable[[int, int, int, int, int, int], str]
+) -> None:
     '''
         Goal: create testdata for bought.csv and sold.csv. 
         # part 1 of 2: create testdata for bought.csv
@@ -346,23 +430,26 @@ def create_data_for_csv_files_bought_and_sold(
     
     '''
     # PART 1 OF 2: create testdata for bought.csv: 
-    # step 1: create id for each bought product: (e.g. b_1, b_2, b_3, etc):
-    csv_file_bought_id = ''
-    csv_file_bought_id = create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv('b', 1) 
 
-    # step 2: create list with products that are sold in supermarket:
-    # rule: each product can only appear once in supermarket_products:    
-    supermarket_products = list(set(['fish', 'rice', 'potato', 'quinoa', 'bread', 'carrot', 'chicken', 'beef', 'bulgur','tomato', 'lettuce', 'beans', 'cheese', 'apple', 'beetroot', 'kiwi', 'onion', 'eggs', 'banana', 'oats', 'milk', 'pasta']))
-   
+    # step 1: check if product_range does not exceed nr of products in supermarket (i.e. imported superpy_product_range):
+
+    if product_range > len(superpy_product_range):
+        raise ValueError('''product_range cannot exceed nr of products in supermarket. 
+                         Plz specify a lower value for product_range. 
+                         See README_USAGE_GUIDE.md ffor more information.''')
+
+
+    # step 2: create id for each bought product: (e.g. b_1, b_2, b_3, etc):
+    csv_file_bought_id = ''
+    csv_file_bought_id = create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created('b', 1) 
+
+    superpy_product_range = list(set(superpy_product_range))
     # step 3: create random list with products that are sold in supermarket:
     # product = '' # prevent UnboundLocalError: local variable 'product' referenced before assignment
-    products = random.sample(supermarket_products, product_range)
+    products = random.sample(superpy_product_range, product_range)
     
-
-    price_per_unit = [0.50, 1.10, 1.40, 2.50, 3.10, 4.00, 5.20]
-
     # step 4: generate all possible combinations of products and price_per_unit:
-    bought_products = (list(product(products, price_per_unit)))
+    bought_products = (list(product(products, superpy_product_prices)))
     '''
         math highschool analogy: (5+2)*(3+4) == 5*3 + 5*4 + 2*3 + 2*4:
         (5+2)*(3+4) == 5*3 + 5*4 + 2*3 + 2*4 == (5,2)*(3,4) == (5,3) + (5,4) + (2,3) + (2,4)
@@ -463,70 +550,16 @@ def create_data_for_csv_files_bought_and_sold(
         writer.writerow(['sell_id', 'buy_id', 'sell_price', 'sell_date'])
         writer.writerows(products_with_sold_date) # note to self: writerows() expects a list of lists.
 
-def create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created(csv_file_name_first_letter, first_nr_in_range):
-    ''' 
-    scope: only used by script create_testdata_for_csv_files_bought_and_sold.py.
-    e.g. "b" is abbreviation of 'bought.csv'. This 'b' will be part of 
-    argparse argument, so needs to be concise for pleasant user 
-    experience.    
-    '''
-    count = first_nr_in_range
-    count -= 1 # to start with 1, not 0
-    def counter():
-        nonlocal count
-        count += 1
-        return f"{csv_file_name_first_letter}_{count}"
-    return counter
-
-def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number):
-    '''
-    Goal: use output of this fn to create a buy_id as input for fn buy_product, so fn buy_product can create a next buy-transaction.
-    Context: this fn is  only used in super.py.
-    More info about how this fn fits into  the bigger picture, see: README_REPORT.md --> '# Technical element 2: create primary 
-    and foreign keys to connect bought.csv and sold.csv 
-
-    I run superpy via the command line in argparse.
-    So state of last id that was used in fn buy_product() is unknown (e.g. b_323), given
-    that I buy products and delete products (records) from bought.csv. 
-    I do not want to reuse an id that was used before (e.g. that belonged to a product
-    that was deleted).
-    So I save the state of the id (e.g. b_351) that was used last in fn buy_product() in a txt-file.
-
-    The products that are bought by superpy-user and/or pytest-"testengine" user  start
-    at id b_300 and count up from there.
-    The range id_1 to id_299 is reserved for script 'create_testdata_for_csv_files_bought_and_sold'
-    in directory create_new_testdata_for_csv_files.
-
-    '''
-    print('path_to_id_with_highest_sequence_number')
-    print(path_to_id_with_highest_sequence_number)
-    # new_id_to_use_in_fn_buy_product = ''
-    try:
-        with open(path_to_id_with_highest_sequence_number, 'r', newline='') as file:
-            last_id_used_in_fn_buy_product =file.read()
-
-            id_parts = last_id_used_in_fn_buy_product.split("_")
-            new_id_to_use_in_fn_buy_product = int(id_parts[1]) + 1
-            new_id_to_use_in_fn_buy_product = "b_" + str(new_id_to_use_in_fn_buy_product)
-            file.seek(0)
-        with open(path_to_id_with_highest_sequence_number, 'w', newline='') as file: 
-            print(new_id_to_use_in_fn_buy_product)  
-            file.write(new_id_to_use_in_fn_buy_product)
-    except IOError:
-        print("Error in fn create_id_with_unused_highest_sequence_nr()")
-    return new_id_to_use_in_fn_buy_product
 
 
-
-
-
-def generate_random_buy_date_for_buy_transaction_in_future_in_time_interval(interval_lower_boundary_year, 
-                                                    interval_lower_boundary_month, 
-                                                    interval_lower_boundary_day, 
-                                                    nr_of_months_added_to_calculate_upper_boundary,
-                                                    nr_of_weeks_added_to_calculate_upper_boundary,
-                                                    nr_of_days_added_to_calculate_upper_boundary
-                                                    ):
+def generate_random_buy_date_for_buy_transaction_in_future_in_time_interval(
+        interval_lower_boundary_year: int, 
+        interval_lower_boundary_month: int, 
+        interval_lower_boundary_day: int, 
+        nr_of_months_added_to_calculate_upper_boundary: int, 
+        nr_of_weeks_added_to_calculate_upper_boundary: int, 
+        nr_of_days_added_to_calculate_upper_boundary: int
+) -> str:     
     '''
     alternative setup for fn-arguments: system_date in format '%Y-%m-%d' for lower boundary and another one for upper boundary.
     '''
@@ -540,11 +573,105 @@ def generate_random_buy_date_for_buy_transaction_in_future_in_time_interval(inte
     random_date = start_date + timedelta(days=random_number_of_days)
     return random_date.strftime('%Y-%m-%d')
 
+def get_dates_of_next_7_days(today: str) -> list:
+    '''
+    uc: as a Superpy user I want to have intuitive 
+    UI: e.g.
+    'py super.py buy apple 1.10 next_monday 
+    instead of e.g.:
+    'py super.py buy apple 1.10 2021-09-25'
+    '''
+    
+    today_as_date_object = datetime.strptime(today, '%Y-%m-%d').date()
+    print(f'today_as_date_object: {today_as_date_object}')
+    
+    day_of_week = (today_as_date_object.weekday() + 1 ) 
+    # Monday is 0, Sunday is 6, so add 1 for easier reading.
+    print(f'day_of_week: {day_of_week}')
+    '''
+    My code below is bit of a long stretch, but I do not
+    know how to make it shorter. 
+    '''
+    if day_of_week == 1:  # Monday
+        monday = today_as_date_object + timedelta(days= 7)
+        tuesday = today_as_date_object + timedelta(days= 1)
+        wednesday = today_as_date_object + timedelta(days= 2)
+        thursday = today_as_date_object + timedelta(days= 3)
+        friday = today_as_date_object + timedelta(days= 4)
+        saturday = today_as_date_object + timedelta(days= 5)
+        sunday = today_as_date_object + timedelta(days= 6)
+        # print(f'monday: {monday}')
+        # print(f'tuesday: {tuesday}')
+        # print(f'wednesday: {wednesday}')
+        # print(f'thursday: {thursday}')
+        # print(f'friday: {friday}')
+        # print(f'saturday: {saturday}')
+        # print(f'sunday: {sunday}')
+    if day_of_week == 2: # Tuesday
+        monday = today_as_date_object + timedelta(days= 6)
+        tuesday = today_as_date_object + timedelta(days= 7)
+        wednesday = today_as_date_object + timedelta(days= 1)
+        thursday = today_as_date_object + timedelta(days= 2)
+        friday = today_as_date_object + timedelta(days= 3)
+        saturday = today_as_date_object + timedelta(days= 4)
+        sunday = today_as_date_object + timedelta(days= 5)
+    if day_of_week == 3: # Wednesday
+        monday = today_as_date_object + timedelta(days= 5)
+        tuesday = today_as_date_object + timedelta(days= 6)
+        wednesday = today_as_date_object + timedelta(days= 7)
+        thursday = today_as_date_object + timedelta(days= 1)
+        friday = today_as_date_object + timedelta(days= 2)
+        saturday = today_as_date_object + timedelta(days= 3)
+        sunday = today_as_date_object + timedelta(days= 4)
+    if day_of_week == 4: # Thursday
+        monday = today_as_date_object + timedelta(days= 4)
+        tuesday = today_as_date_object + timedelta(days= 5)
+        wednesday = today_as_date_object + timedelta(days= 6)
+        thursday = today_as_date_object + timedelta(days= 7)
+        friday = today_as_date_object + timedelta(days= 1)
+        saturday = today_as_date_object + timedelta(days= 2)
+        sunday = today_as_date_object + timedelta(days= 3)
+    if day_of_week == 5: # Friday
+        monday = today_as_date_object + timedelta(days= 3)
+        tuesday = today_as_date_object + timedelta(days= 4)
+        wednesday = today_as_date_object + timedelta(days= 5)
+        thursday = today_as_date_object + timedelta(days= 6)
+        friday = today_as_date_object + timedelta(days= 7)
+        saturday = today_as_date_object + timedelta(days= 1)
+        sunday = today_as_date_object + timedelta(days= 2)
+    if day_of_week == 6: # Saturday
+        monday = today_as_date_object + timedelta(days= 2)
+        tuesday = today_as_date_object + timedelta(days= 3)
+        wednesday = today_as_date_object + timedelta(days= 4)
+        thursday = today_as_date_object + timedelta(days= 5)
+        friday = today_as_date_object + timedelta(days= 6)
+        saturday = today_as_date_object + timedelta(days= 7)
+        sunday = today_as_date_object + timedelta(days= 1)
+    if day_of_week == 7: # Sunday
+        monday = today_as_date_object + timedelta(days= 1)
+        tuesday = today_as_date_object + timedelta(days= 2)
+        wednesday = today_as_date_object + timedelta(days= 3)
+        thursday = today_as_date_object + timedelta(days= 4)
+        friday = today_as_date_object + timedelta(days= 5)
+        saturday = today_as_date_object + timedelta(days= 6)
+        sunday = today_as_date_object + timedelta(days= 7)
 
-def get_highest_buy_id_from_boughtcsv_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(path_to_csv_bought_file):
+    dates_of_next_7_days = [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+
+    dates_of_next_7_days_as_strings = []
+    for day in dates_of_next_7_days:
+        day = day.strftime('%Y-%m-%d')
+        dates_of_next_7_days_as_strings.append(day)
+        print(day)
+
+
+    return dates_of_next_7_days_as_strings
+
+def get_highest_buy_id_from_boughtcsv(path_to_csv_bought_file: str) -> str:
     '''
     Goal: use output of this fn to create a buy_id for the next buy-transaction.
-    Context: this fn is  only used in super.py.
+    Context: this fn is  only used in super.py: after the mockdata has been created for bought.csv and sold.csv, but before you
+    start using super.py via the command line in argparse to e.g.  buy a product,  you call this fn.
     More info about how this fn fits into  the bigger picture, see: README_REPORT.md --> '# Technical element 2: create primary 
     and foreign keys to connect bought.csv and sold.csv 
  
@@ -562,7 +689,7 @@ def get_highest_buy_id_from_boughtcsv_after_running_fn_to_create_mock_data_for_b
     return highest_buy_id
 
 
-def get_path_to_directory_of_file(directory_of_file):
+def get_path_to_directory_of_file(directory_of_file: str) -> str:
     # rule1: directory_of_file must be unique inside project superpy.
     whereabouts_of_directory_of_file  = str(os.getcwd()) 
     path_to_directory_of_this_file = '' # prevent UnboundLocalError
@@ -574,7 +701,7 @@ def get_path_to_directory_of_file(directory_of_file):
     return path_to_directory_of_this_file
 
 
-def get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_path):
+def get_path_to_file(directory_of_file: str, file_name_of_which_you_want_to_know_the_path: str) -> str:
     # rule1: directory_of_file must be unique inside project superpy.
     whereabouts_of_directory_of_file  = str(os.getcwd()) 
     path_to_directory_of_this_file = '' # prevent UnboundLocalError
@@ -586,7 +713,7 @@ def get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_
     path_to_file = os.path.join(path_to_directory_of_this_file, file_name_of_which_you_want_to_know_the_path ) # path to file 
     return path_to_file
 
-def get_system_date(path_to_system_date):
+def get_system_date(path_to_system_date: str) -> str:
     # fn-output: system_date is datetime object, ex: '2020-01-01'
     try:
         with open(path_to_system_date, 'r', newline='') as file:
@@ -596,11 +723,12 @@ def get_system_date(path_to_system_date):
     return system_date
 
 
-def sell_product(bought_product_id, 
-                 price, 
-                 sell_date, 
-                 path_to_csv_bought_input_file, 
-                 path_to_csv_bought_output_file):
+def sell_product(bought_product_id: str, 
+                 price: float, 
+                 sell_date: str, 
+                 path_to_csv_bought_input_file: str, 
+                 path_to_csv_bought_output_file: str
+) -> None:
     '''
     About the input_file and output_file:
     when using superpy as user, input and output csv file are the same.
@@ -619,7 +747,7 @@ def sell_product(bought_product_id,
         writer.writerows(rows)
 
 
-def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id, path_to_buy_id_file):
+def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id: str, path_to_buy_id_file: str) -> str:
     '''
     # pitfall: read first part of fn-name 'file_id_to_use_in_fn_to_buy_product_txt' as a reference to a file. 
     # arg1: ex of buy_id: b_1, or: b_2, or: b_3, etc
@@ -638,7 +766,7 @@ def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_cr
         print("Inside fn set_system_date_to() --> Plz investigate IOError.  ")
     return buy_id
 
-def set_system_date_to(system_date, path_to_system_date):
+def set_system_date_to(system_date: str, path_to_system_date: str) -> str:
     # system_date is datetime object, ex: '2020-01-01'
     try:
         with open(path_to_system_date, 'w', newline='') as file:
@@ -648,7 +776,7 @@ def set_system_date_to(system_date, path_to_system_date):
     return system_date
 
 
-def show_list_with_nested_lists_in_console_with_module_rich(list):
+def show_list_with_nested_lists_in_console_with_module_rich(list: list) -> Table: # more precise: input is list with lists.
     rich_table = Table(show_header=True, header_style="bold magenta")
     # (future reference: column names hardcoded. Currently no need
     # to make dynamic).
@@ -663,7 +791,7 @@ def show_list_with_nested_lists_in_console_with_module_rich(list):
     console.print(rich_table)
     return rich_table
 
-def show_csv_file_in_console_with_module_rich(path_to_csv_file):
+def show_csv_file_in_console_with_module_rich(path_to_csv_file: str) -> None:
     console = Console()
     table = Table(show_header=True, header_style="bold magenta")
     with open(path_to_csv_file, 'r') as file:
@@ -676,10 +804,10 @@ def show_csv_file_in_console_with_module_rich(path_to_csv_file):
     console.print(table)
 
 def time_travel_system_date_with_nr_of_days(
-        nr_of_days_to_travel, 
-        path_to_input_file, 
-        path_to_output_file
-    ):
+        nr_of_days_to_travel: int, 
+        path_to_input_file: str, 
+        path_to_output_file: str
+    ) -> str:
     try:
         with open(path_to_input_file, 'r', newline='') as file:
             # read current system date from file in format YYYY-MM-DD (e.g. '2025-03-14). This

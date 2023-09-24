@@ -8,28 +8,28 @@
 ###   2_CREATE-FN-create_data_for_csv_files_bought_and_sold.py 
 ###   3_USE-CASES
 ###   4_MVC-MODEL-VIEW-CONTROLLER
-###   5_TASKS-NOT-UCS
-###   6_TDD-CODING-STEPS-TO-IMPLEMENT-EACH-UC
-###   7_IMPLEMENTATION-ORDER-OF-UCS-AND-TASKS
+###   5_TDD-CODING-STEPS-TO-IMPLEMENT-EACH-UC
+###   6_IMPLEMENTATION-ORDER-OF-UCS
 
 # INTRO
 [table of contents at the start of markdown file](#INTRO)
-    To create application super.py I do the following:
-    1. create ERD
-    2. create fn to quickly create testdata for  bought.csv and sold.csv
-    3. define the ucs to implement (e.g. buy_product, sell_product, etc.)
-    4. define a workflow to implement each uc with Test Driven Development (TDD): in
-       iteration first create testcases for a uc and then make testcases pass
-       by developing the functionality. 
-       Then the next iteration: create testcases for next uc and then make
-       testcases pass by developing the functionality. 
-       etc.
+To create application super.py I do the following:
+1. create ERD
+2. create fn to quickly create testdata for  bought.csv and sold.csv
+3. define the ucs to implement (e.g. buy_product, sell_product, etc.)
+4. define a workflow to implement each uc with Test Driven Development (TDD): in
+    iteration first create testcases for a uc and then make testcases pass
+    by developing the functionality. 
+    Then the next iteration: create testcases for next uc and then make
+    testcases pass by developing the functionality. 
+    etc.
 
 
 # ANALYSIS
 [table of contents at the start of markdown file](#ANALYSIS)
 1. # DEFINITIONS:
 [table of contents at the start of markdown file](#DEFINITIONS)
+    
     date == calendar day == date object with string representation in format: '%Y-%m-%d', e.g. '2025-10-15'. --> 
         system_date is a date with a special purpose. See system_date below. 
 
@@ -292,6 +292,7 @@
 
 2.  # CREATE-FN-create_data_for_csv_files_bought_and_sold.py
 [table of contents at the start of markdown file](#2_CREATE-FN-create_data_for_csv_files_bought_and_sold.py) 
+    
     precondition: ERD (see prev par) must be ready before creating script.
 
     Fn create_data_for_csv_files_bought_and_sold() has 2 purposes:
@@ -1026,6 +1027,7 @@
 
 4. # MVC-MODEL-VIEW-CONTROLLER 
 [table of contents at the start of markdown file](#4_MVC-MODEL-VIEW-CONTROLLER) 
+    
     Looking at the ucs from previous chapter 3 from a bird's-eye view:
 
     MODEL LAYER (MVC-model):
@@ -1089,128 +1091,48 @@
     CONTROLLER LAYER (MVC-model):   
         The argparse cli in super.py ( (...)\superpy\super.py) acts as the controller between MODEL and VIEW. 
 
-5. # TASKS-NOT-UCS
-[table of contents at the start of markdown file](#5_TASKS-NOT-UCS) 
-    - task 01: connect id-range of script 'create_testdata_for_csv_files_bought_and_sold' with id-range of 
-        buy-transactions that are manually added.
-        Currently id-range id_1 to id_299 are served for this script and range id_300 and beyond are 
-        reserved for buy_transactions that are added by super.py-user.
-        If script creates e.g. 167 buy_transactions (b_1 - b_167), and super.py-user then creates a few 
-        buy_transactions (starting at b_300), then currently there is a gap between the 2 ranges.
-
-        Goal of this task: connect the 2 ranges, nomatter how many buy_transactions the script creates.
-        So in ex above, the super.py-user manually creates a buy_transaction that gets assigned b_168 (intead
-        of b_300).
-        If script creates 17 buy_transactions (b_1 - b_17), then user creates its first buy_transaction with 
-        b_18 assigned to it, and so on.
-
-        (not a requirement, so implement only if time left) 
-
-    - task 01: write report (16 instead of uc 16 because this is not a uc)
-        Please include a short, 300-word report that highlights three technical elements of your implementation that you find notable.    
-        Explain what problem they solve and why you chose to implement them in this way.   
-        Include this in your repository as a report.md file.
-
-        Our tips regarding the report:
-
-        You may consider using Markdown for your report.
-
-        Markdown is a markup language you can use for styling your plain text. It is widely used in programming, so it could be a good choice, but it is not required.
-        To assist your explanation you may use code snippets.    
-
-        (this is a mandatory requirement)
 
 
-
-6. # TDD-CODING-STEPS-TO-IMPLEMENT-EACH-UC
-[table of contents at the start of markdown file](#6_TDD-CODING-STEPS-TO-IMPLEMENT-EACH-UC) 
-    coding methodology for each uc: implement each use case in its own TDD-iteration
-    Perform the following steps iteratively for each use case from chapter 'List with fn signatures and argparse-command signatures' above. 
-    Workflow: 
-    a. take the first use case: set_system_date_to . Each use case at this point already has:
-       - fn-signature. 
-       - signature to call fn with argparse
-    b. in utils.py create fn set_system_date_to with return pass as fn-body.
-    c. in test_utils.py create a directory fn__test_set_system_date_to. This directory will
-        contain testdata, actual results, expected result, etc. By experimenting I 
-        have figured out what exactly I need in this directory for each testcase.
+5. # TDD-CODING-STEPS-TO-IMPLEMENT-EACH-UC
+[table of contents at the start of markdown file](#5_TDD-CODING-STEPS-TO-IMPLEMENT-EACH-UC) 
     
-    d.  if a fn modifies only a system_date.txt (e.g. set_system_date_to), then script
-        create_testdata_for_csv_files_bought_and_sold.py need not provide any data.
-        elif a fn modifies bought.csv or sold.csv, then the script does need to 
-        provide data.
+    Goal: implement each use case (uc) in its own Test-Driven-Development (TDD) Iteration
+    
+    
+    Workflow: 
+    a. If applicable, first create (a draught version of):
+       - fn-signature, ex: def buy_product(product, price, buy_date, expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file, path_to_csv_bought_output_file)
+       - signature to call fn via argparse cli, ex: e.g. py super.py buy apple 0.45 -sd 2024-05-06 -exp 2024-05-22
+    b. in utils.py create fn with return pass as fn-body.
+    c. in test_utils.py create a directory (ex: fn__test_set_system_date_to). This directory will
+        contain folder with testinput-data, folder with actual results, folder with expected result, and a testscript. 
+    d.  At this point all testcases must still fail 
 
-    e.  At this point all testcases will fail, because the fn-body of the "fn under test"
-        is still empty at this point. 
-
-
-
-    f. in utils.py implement fn-body (i.e. "code that does stuff") of 
-        fn-signature set_system_date_to. The code is ready as soon as all testcases pass.
-        Then call this fn from main.py and check if it sets the system_date correctly.
-       
-    g. in main.py create argparse code that calls fn set_system_date_to . Testing the 
-        argparse interface itself e.g. with a bash script is out of scope.
-
-
+    e. in utils.py (...superpy\utils_superpy\utils.py ) implement the fn until  the testcases pass.
+    f. in super.py call the  fn, but not yet via  argparse cli. Instead, invoke the  fn in main()  and  then  invoke super.py
+        as follows: 
+        ```python
+            py super.py 
+        ```
+    g. in super.py create argparse code to call the fn.
+        Testing the argparse interface itself e.g. with a bash script is out of scope.
     h. take the next use case from step 4: uc time travel in time range
         (repeat the steps above)
 
-    i. about os.getcwd():
-        When using the superpy application via argparse, then  data is always stored inside folder data_directory inside project superpy.
-        So os.getcwd() is static (i.e. always the same) when I run main.py from the command line.
-        By comparison: when I run pytest, os.getcwd() is dynamic, i.e. different for each directory that 
-        contains 1 [or more] testcases to test a fn from utils.py: ex of such a directory: fn_set_system_date_testcase_01
-
-    j. during the (iterative) coding of a uc (e.g. calculate_profit) all testcases for this uc, 
-        together will all testcases for all the already implemented ucs  (i.e. the regression test)
-        can be tested inside project superpy via the cli with the default command 'pytest'. 
-        
-
-        I will use the first uc, set_system_date_to, as a proof of concept to implement, adjust and polish my intended TDD methodology. 
-        Then I use the resulting TDD methodology to implement the remaining ucs. 
-        If needed I make adjustments to the TDD methodology on-the-fly.
-
-
-        bird's-eye view: For TDD of each uc I need 6 "things" / deliverables: 
-        I. fn that performs some data manipulation in system_date.txt, bought.csv or sold.csv. Each fn will be
-            developed with TDD. Each fn will be invoked via argparse-cli. The argparse-cli development
-            itself is out of scope for TDD.
-        II. test-fn in pytest
-        III. fn-input (not all are used in each fn): 
-            - some data (e.g. a string system_date, a product to buy, a product to sell, etc.) --> mandatory fn-parameter.
-            - file path (to system_date.txt, bought.csv or sold.csv). --> 1 of 3 is mandatory fn-parameter.
-
-            - a file system_date.txt is also a fn-input, but only if the goal is to update file system_date.txt.
-              a file bought.csv or sold.csv (not both at the same time) is also fn-input, but only if the goal 
-                is to update bought.csv or sold.csv (with either a bought or sold product).
-              --> 1 of 3 file types is mandatory fn-parameter.
-            
-            Script 'create_testdata_for_csv_files_bought_and_sold' creates testdata for each fn individually.
-
-            filepath is fn-input, because I want the fn-output of (e.g. fn set_system_date_to) when running pytest testcase 
-            to be stored in a testdirectory test_utils, but the same fn-output in "live production" in directory data_directory. ("structure follows strategy")
-
-            file is fn-input to make the fn pure. Otherwise fn has side-effect(s).
-
-        IV. actual_testresult == csv-file or txt-file --> created by running the fn from step 1.
-        V. expected_testresult = csv-file or txt-file --> created manually upfront.
-        VI. fn to compare two files: see filecmp.cmp from standard library for this. file.cmp takes 
+    bird's-eye view: For TDD of each uc I need 6 components: 
+        I. fn that performs some data manipulation in system_date.txt, bought.csv or sold.csv. 
+        II. test-script to test the fn in pytest
+        III. fn-input == e.g. csv-file
+        IV. actual_testresult == e.g. csv-file or txt-file 
+        V. expected_testresult == e.g. csv-file or txt-file 
+        VI. fn or mechanism to compare actual result with expected testresult e.g. filecmp.cmp from standard library for this. file.cmp takes 
             actual_testresult and expected_testresult as its parameters.
 
-            ex:
-            import filecmp
-            def test_set_system_date_to():
-                filecmp.clear_cache()
-                set_system_date_to('2020-01-01')
-                assert filecmp.cmp(actual_test_result_inside_file, expected_path_to_system_date)
-                
-                'expected_path_to_system_date' points to a txt-file that contains '2020-01-01' (if
-                this test is supposed to pass). 
 
 
-7. # IMPLEMENTATION-ORDER-OF-UCS-AND-TASKS
-[table of contents at the start of markdown file](#7_IMPLEMENTATION-ORDER-OF-UCS-AND-TASKS) 
+6. # IMPLEMENTATION-ORDER-OF-UCS
+[table of contents at the start of markdown file](#6_IMPLEMENTATION-ORDER-OF-UCS) 
+    
     First implement the mandatory requirements about super.py from Winc Academy. 
 
     Develop all use cases (ucs) with TDD ( == non-trivial feature 1). See previous chapter 6 for explanation 
@@ -1245,24 +1167,24 @@
     
 
     Display output in Rich ( == non-trivial feature 3):
-    uc_16: display_in_rich_inventory on date
-    uc_17: display_in_rich_expired products in time range between start_date and end_date inclusive
-    uc_18: display_in_rich_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
-    uc_19: display_in_rich_costs in time range between start_date and end_date inclusive
-    uc_20: display_in_rich_revenue in time range between start_date and end_date inclusive
-    uc_21: display_in_rich_profit in time range between start_date and end_date inclusive
+    uc_16: display_in_rich_inventory on date  (done)
+    uc_17: display_in_rich_expired products in time range between start_date and end_date inclusive (done)
+    uc_18: display_in_rich_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive (on backlog)
+    uc_19: display_in_rich_costs in time range between start_date and end_date inclusive  (on backlog)
+    uc_20: display_in_rich_revenue in time range between start_date and end_date inclusive  (on backlog)
+    uc_21: display_in_rich_profit in time range between start_date and end_date inclusive  (on backlog)
 
-    Display output in Matplotlib ( == non-trivial feature 4): (on backlog)
-    uc_22: display_in_matplotlib_inventory on date
-    uc_23: display_in_rich_expired products in time range between start_date and end_date inclusive
-    uc_24: display_in_matplotlib_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive
-    uc_25: display_in_matplotlib_costs in time range between start_date and end_date inclusive
-    uc_26: display_in_matplotlib_revenue in time range between start_date and end_date inclusive
-    uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
+    Display output in Matplotlib ( == non-trivial feature 4): 
+    uc_22: display_in_matplotlib_inventory on date  (on backlog)
+    uc_23: display_in_rich_expired products in time range between start_date and end_date inclusive  (on backlog)
+    uc_24: display_in_matplotlib_sales of number of products (Dutch: afzet) in time range between start_date and end_date inclusive  (on backlog)
+    uc_25: display_in_matplotlib_costs in time range between start_date and end_date inclusive  (on backlog)
+    uc_26: display_in_matplotlib_revenue in time range between start_date and end_date inclusive  (on backlog)
+    uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive  (on backlog)
 
-    more features along the way: (I do not want to keep renumbering ucs, so any new functionality  
-    that pops up, gets a uc-nr, starting in the 40-range.)
+    more features along the way: 
     uc_40: delete all data from bought.csv and  sold.csv via argparse cli (== feature 5) (done)
     uc_41: show bought.csv in console with module rich (== feature 6) (done)
     uc_42: show sold.csv in console with module rich (== feature 7) (done)
+    uc_43: show system_time in console (== little feature 8) (done)
 

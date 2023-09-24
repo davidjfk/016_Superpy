@@ -1,19 +1,30 @@
-# Intro
 
-Goal: Please include a short, 300-word report that highlights three technical elements 
+
+# TABLE OF CONTENTS OF NOTABLE TECHNICAL ELEMENTS:
+### INTRO
+
+### 1_WRITE-DATA-TO-CSV_IN-TESTABLE_MANNER
+### 2_CREATE-PRIMARY-AND-FOREIGN-KEYS-TO-CONNECT-BOUGHT.CSV-AND-SOLD.CSV
+### 3_RUN-PYTEST-WITH-CONTROL-OVER-CWD
+
+
+# INTRO
+[goto Table of Contents at start of markdown file: ](#INTRO) 
+
+Goal: Please include a short, 300-word report that highlights three technical elements   
 of your implementation that you find notable.
 Explain what problem they solve and why you chose to implement them in this way.
 - You may consider using Markdown for your report.
 - To assist your explanation you may use code snippets.
+- Our tips regarding the report:
+- You may consider using Markdown for your report.
+- Markdown is a markup language you can use for styling your plain text. It is widely used  
+    in programming, so it could be a good choice, but it is not required.
+- To assist your explanation you may use code snippets.    
 
-# Table of contents:
-- Technical element 1: write data to csv in testable manner
-- Technical element 2: create primary and foreign keys to connect bought.csv and sold.csv
-- Technical element 3: run pytest inside project superpy in a controlled way, irrespective of my cwd 
 
-
-
-# Technical element 1: write data to csv in testable manner
+# 1_WRITE-DATA-TO-CSV_IN-TESTABLE_MANNER
+[goto Table of Contents at start of markdown file: ](#1_WRITE-DATA-TO-CSV_IN-TESTABLE_MANNER) 
 
 - goal: write data to csv
 - scope: fn buy_product and fn sell_product (see (...\superpy\utils_superpy\utils.py))
@@ -31,14 +42,11 @@ Explain what problem they solve and why you chose to implement them in this way.
         writer.writerow(row)
 ```
 - problem: in append-mode: data gets added to the file with actual testresult. 
-    So after each testrun the file with actual testresult gets longer and longer. So 2nd time 
-    you run pytest (and 3rd, etc.) the testcases will fail! 
-    Solution: as postperation remove the data that has been added to the actual testresult 
-    file during the testrun....I don't like this solution, because this means 
-    an extra step in pytest, extra decision making and possibly more complex code.
+    So after each testrun the file with actual testresult gets longer and longer.  
+    So 1st time you run pytest testcases, they will pass. But 2nd time   
+    you run pytest (and 3rd, etc.) the same testcases will fail!  
 
-
-- final solution: 
+- solution: 
 
 ```python 
     with open(path_to_csv_bought_output_file, 'w', newline='') as file: 
@@ -48,177 +56,201 @@ Explain what problem they solve and why you chose to implement them in this way.
         writer.writerows(rows)
 ```
 
-- advantage: in pytest the actual testresult from the previous testrun is completely overwritten. 
-    in superpy a transaction (buy or sell) still gets appended to csv file (bought.csv or sold.csv)
+- advantage: in pytest the actual testresult from the previous testrun is completely overwritten.   
+    in superpy a transaction (buy or sell) still gets appended to csv file (bought.csv or sold.csv).  
+    
+
+- alternative solution: use tmp_path fixture as a test preparation to remove the data that has been added  
+    to the actual testresult file during the previous testrun.  
+    Because I had  issues with running pytest in a controlled way (not having control about the cwd) (see technical element 3 below),   
+    I did not like any solution  that involves os.remove or any other options to delete files or directories. 
+    But now, with the cwd-issue solved, I will use a fixture next time.  
+
+    
 
 
-# Technical element 2: create primary and foreign keys to connect bought.csv and sold.csv
+# 2_CREATE-PRIMARY-AND-FOREIGN-KEYS-TO-CONNECT-BOUGHT.CSV-AND-SOLD.CSV
+[goto Table of Contents at start of markdown file: ](#2_CREATE-PRIMARY-AND-FOREIGN-KEYS-TO-CONNECT-BOUGHT.CSV-AND-SOLD.CSV) 
 - goal: connect bought.csv and sold.csv with primary and foreign keys
+- 5 problems to solve: 
+- problem 1: 2 options to create buy-transactions: script-that-creates-mock-data and as-a-user. how to create buy_ids for both options? 
+- problem 2: how 2 automatically assign a buy_id to each created MOCK buy-transaction? If script creates  150 buy-transactions, then  
+    each buy-transaction must get a unique buy_id (b_1, b_2, b_3, etc.)
+- problem 3: same problem, but this time for superpy-user buying  products 1 at a time and  doing other stuff in the  
+    mean time: e.g. sell products, show reports of costs, revenue, sales volume, profit, etc.
+- problem 4: how does the option to delete all data in bought.csv and sold.csv have effect on which buy_id to issue next for the  
+    next buy-transaction?
+- problem 5: how to make sure that the buy_ids of a script creating mock-buy-transactions and users creating buy-transactions still  
+    connect to each other? ex: script creates 131 buy-transactions (b_1, b_2, ... b_131), then user creates buy-transaction and superpy
+    creates and assigns b_132 to this transaction.
 
-- challenge 1of5: there are 2 options to create buy-transactions in superpy:
+Solutions:
+- problem-1-solution: there are 2 options to create buy-transactions in superpy:
+        option 1of2 to create buy-transaction: 
+            py super.py create_mock_data 
+                --> bought.csv and sold.csv are filled with mockdata that has
+                    been created with 11 optional arguments with default values.
+            py super.py create_mock_data -product_range 3 -del_row 2 -shelf_life 10 -markup 4 -lower_boundary_year 2024 
+                    --> bought.csv and sold.csv are filled with mockdata that has
+                    been created with 5 optional values, and 6 optional values with a default value.       
+            
+            result  /rule: all previous data in bought.csv and sold.csv are overwritten, including any data 
+                    that has been created by option 1 above.
+            result: superpy creates buy_id (b_1, b_2, b_3, etc.) for each buy-transaction.
 
-option 1 to create buy-transaction: 
-```
-py super.py create_mock_data 
-    --> bought.csv and sold.csv are filled with mockdata that has
-        been created with 11 optional arguments with default values.
-py super.py create_mock_data -product_range 3 -del_row 2 -shelf_life 10 -markup 4 -lower_boundary_year 2024 
-        --> bought.csv and sold.csv are filled with mockdata that has
-        been created with 5 optional values, and 6 optional values with a default value.       
-```
-result  /rule: all previous data in bought.csv and sold.csv are overwritten, including any data 
-        that has been created by option 1 above.
-result: superpy creates buy_id (b_1, b_2, b_3, etc.) for each buy-transaction.
-- challenge 2of5: automatically assign a buy_id to each created mock buy-transaction. super.py must be 
-able to determine the last issued id.
+        option 2of2 to create buy-transaction:
+            py super.py buy apple 1.75 -sd 23-09-15 -exd 23-09-27 
+                --> buy_date is 23-09-15 . expiry_date is 23-09-27
+            py super.py buy pear 3.00 
+                --> default buy_date is system_date and default expiry_date is 'does not expire'
 
+            result: superpy creates buy_id (b_1, b_2, b_3, etc.) for each buy-transaction.
 
-option 2 to create buy-transaction:
-```
-py super.py buy apple 1.75 -sd 23-09-15 -exd 23-09-27 
-    --> buy_date is 23-09-15 . expiry_date is 23-09-27
-py super.py buy pear 3.00 
-    --> default buy_date is system_date and default expiry_date is 'does not expire'
+        So 2 functions must be created that can both create buy_ids:
 
-```
-result: superpy creates buy_id (b_1, b_2, b_3, etc.) for each buy-transaction.
-- challenge 3of5: super.py must be able to determine the last issued id. If apple (above) gets e.g.
-id b_132, then pear (above) must get id b_133. 
+    ```python
+        def buy_product(product, price, buy_date, expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file, path_to_csv_bought_output_file):
+            pass
 
-
-
-- challenge 4of5: option to delete all data in bought.csv and sold.csv:
-```
-py super.py delete
-```
-result: bought.csv and sold.csv are now empty. You can now (again) create buy-transaction(s) in one
-of the 2 ways as described above.
-
-- challenge 5of5: id-ranges of both ways to create buy-transactions must connect to each other.
-ex: 
-step 1: 
-```
-py super.py create_mock_data -pr 9   (-pr == product_range)
-```
-result: 64 lines of mock buy-transactions are created in bought.csv, so buy_ids: b_1, b_2 (...) b_64
-are taken.
-
-step 2:
-```
-py super.py buy apple -sd 2023-10-01 -exd 2023-10-25    (-sd == start_date, exd == expiry_date)
-```
-expected result: super.py assigns buy_id b_65 to this transaction (but NOT b_1)
-
-Solutions to address the challenges:
-- challenge-1-solution:
-2 functions:
-```python
-
-def buy_product(product, price, buy_date, expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file, path_to_csv_bought_output_file):
-    pass
-
-def create_data_for_csv_files_bought_and_sold(product_range, delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling, shelf_life, turnover_time, markup, lower_boundary_year_of_time_interval_in_which_to_create_random_testdata, lower_boundary_month_of_time_interval_in_which_to_create_random_testdata, lower_boundary_week_of_time_interval_in_which_to_create_random_testdata, upper_boundary_nr_of_months_to_add_to_calculate, upper_boundary_nr_of_weeks_to_add_to_calculate, upper_boundary_nr_of_days_to_add_to_calculate, path_to_file_bought_csv, path_to_file_sold_csv, add_days_to_date, create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv, generate_random_buy_date_for_buy_transaction_in_future_in_time_interval):
-    pass
-```
+        def create_data_for_csv_files_bought_and_sold("a lot of parameters"):
+            pass
+    ```    
 
 
 
-- challenge-2-solution:
-Inside fn create_data_for_csv_files_bought_and_sold() the following fn creates a buy_id for each
-buy-transaction. Because this fn create_data_for_csv_files_bought_and_sold() 
-overwrites the current contents of both bought.csv as well as sold.csv, 
-the first issued buy-id by fn create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv()
-will ALWAYS be b_1, the next b_2, etc. Internally fn create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv()
-makes use of a closure to implement this. 
+- problem-2-solution:
+        Inside fn create_data_for_csv_files_bought_and_sold() the following fn creates a buy_id for each
+        buy-transaction. Because this fn create_data_for_csv_files_bought_and_sold() 
+        overwrites the current contents of both bought.csv as well as sold.csv, 
+        the first issued buy-id by fn create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv()
+        will ALWAYS be b_1, the next b_2, etc. Internally fn create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv()
+        makes use of a closure to implement this. 
 
-```python
-def create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created(csv_file_name_first_letter, first_nr_in_range):
-    pass
-```
+    ```python
+    def create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created(csv_file_name_first_letter, first_nr_in_range):
+        pass
+    ```
 
-- challenge-3-solution:
-The last issued buy_id is persistently stored in file 'id_to_use_in_fn_buy_product.txt'
-(...\superpy\data_used_in_superpy\id_to_use_in_fn_buy_product.txt)
-The following fn gets the value from this txt-file (e.g. b_163), increments it with 1, and then
-feeds the incremented nr (b_164)  into the buy-fn above as argument 'id_of_row_in_csv_file_bought':
+- problem-3-solution:
+        The last issued buy_id is persistently stored in file 'id_to_use_in_fn_buy_product.txt'
+        (...\superpy\data_used_in_superpy\id_to_use_in_fn_buy_product.txt)
+        The following fn gets the value from this txt-file (e.g. b_163), increments it with 1, and then
+        feeds the incremented nr (b_164)  into the buy-fn above as argument 'id_of_row_in_csv_file_bought':
 
-```python
-def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number):
-    pass
-```
+    ```python
+    def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number):
+        pass
+    ```
 
-- challenge-4-solution:
-Call the following fn with product-range of 0 (== 'no products'):
-```python
-def create_data_for_csv_files_bought_and_sold(product_range, delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling, shelf_life, turnover_time, markup, lower_boundary_year_of_time_interval_in_which_to_create_random_testdata, lower_boundary_month_of_time_interval_in_which_to_create_random_testdata, lower_boundary_week_of_time_interval_in_which_to_create_random_testdata, upper_boundary_nr_of_months_to_add_to_calculate, upper_boundary_nr_of_weeks_to_add_to_calculate, upper_boundary_nr_of_days_to_add_to_calculate, path_to_file_bought_csv, path_to_file_sold_csv, add_days_to_date, create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv, generate_random_buy_date_for_buy_transaction_in_future_in_time_interval):
-    pass
-```
-This means the fn will overwrite bought.csv and sold.csv with just the header-row, but without
-any buy-transactions, nor sell-transactions.
+- problem-4-solution:
 
-- challenge-5-solution:
+        ```
+        py super.py delete
+        ```
+        result: bought.csv and sold.csv are now empty. You can now (again) create buy-transaction(s) in one
+        of the 2 ways as described above.
 
-When doing this:
-```
-py super.py create_mock_data -pr 9   (-pr == product_range)
-```
-then 3 things happen (triggered by this argparse cli command):
-
-step 1: call fn:
-```python
-def create_data_for_csv_files_bought_and_sold(product_range, delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling, shelf_life, turnover_time, markup, lower_boundary_year_of_time_interval_in_which_to_create_random_testdata, lower_boundary_month_of_time_interval_in_which_to_create_random_testdata, lower_boundary_week_of_time_interval_in_which_to_create_random_testdata, upper_boundary_nr_of_months_to_add_to_calculate, upper_boundary_nr_of_weeks_to_add_to_calculate, upper_boundary_nr_of_days_to_add_to_calculate, path_to_file_bought_csv, path_to_file_sold_csv, add_days_to_date, create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv, generate_random_buy_date_for_buy_transaction_in_future_in_time_interval):
-    pass
-```
-This fn will - as explained above - overwrite all previous data in bought.csv and sold.csv, and then
-any created buy-transactions will start with b_1, then b_2 and so on.
-
-status: after having done this, superpy does not know the id of the last buy-transaction. But superpy needs to know, because a(ny) next buy-transaction
-by the superpy-user also needs a unique buy_id. That is why the next fn will get the  highest buy_id from  bought.csv:
-
-step 2: call fn:
-```python
-def get_highest_buy_id_from_boughtcsv_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(path_to_csv_bought_file):
-    pass
-
-```
-status: now this highest buy_id must be made persistent, so it can be used to calculate the 
-next buy_id for the next buy-transaction.
-
-step 3: call fn:
-```python
-def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id, path_to_buy_id_file):
-    pass
-```
-As described above in 'challenge-2-solution':
-The last issued buy_id is persistently stored in file id_to_use_in_fn_buy_product.txt
-(...\superpy\data_used_in_superpy\id_to_use_in_fn_buy_product.txt)
-
-fn set_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id, path_to_buy_id_file) 
-initializes the value in file 'id_to_use_in_fn_buy_product.txt'.
-ex1: if 65 rows of mock buy-transactions have been created, then b_65 is stored in this txt-file.
-ex2: if 18 rows of mock buy-transactions have been created, then b_18 is stored in this txt-file.
-
-status: bought.csv and sold.csv have been filled with data. If a superpy-user now buys a product,
-then the buy-transaction  must be b_66 (in ex1 above), or b_19 (in ex2 above).
-
-The solution for challenge 2 further above, explains the implementation of assigning b_66 (when
-previous buy_id is b_65) or e.g. b_19 (when previous buy_id is b_18).
+        Call the following fn with product-range of 0 (== 'no products'):
+    ```python
+    def create_data_for_csv_files_bought_and_sold("a lot of parameters"):
+        pass
+    ```
+        This means the fn will overwrite bought.csv and sold.csv with just the header-row, but without
+        any buy-transactions, nor sell-transactions.
 
 
+- problem-5-solution:
+        connect id-range of script 'create_testdata_for_csv_files_bought_and_sold' with id-range of  
+        buy-transactions that are manually added.  
+        Currently id-range id_1 to id_299 are served for this script and range id_300 and beyond are  
+        reserved for buy_transactions that are added by super.py-user.  
+        If script creates e.g. 167 buy_transactions (b_1 - b_167), and super.py-user then creates a few  
+        buy_transactions (starting at b_300), then currently there is a gap between the 2 ranges.  
 
-# Technical element 3: run pytest inside project superpy in a controlled way, irrespective of my cwd 
-- Goal 1: run pytest as part of TDD, Test Driven Development, to develop new functionality.
-- Goal 2: run pytest to run regression tests
-- problem: the cwd can be different each time I run pytest. Different cwd means storing the actual result 
-in a  different and wrong directory each time I run pytest. 
-Consequence 1: superpy file structure gets cluttered with actual-result-files stored in the wrong location.
-Consequence 2: pytest reads file with the actual testresult (being txt-file system_data.txt or
-csv-file bought.csv or sold.csv, depending on the fn under test) from the WRONG file location, making the 
-testresults unreliable. 
+        Goal of this task: connect the 2 ranges, nomatter how many buy_transactions the script creates.  
+        So in ex above, the super.py-user manually creates a buy_transaction that gets assigned b_168 (intead  
+        of b_300).  
+        If script creates 17 buy_transactions (b_1 - b_17), then user creates its first buy_transaction with  
+        b_18 assigned to it, and so on.
 
-- expected / desired "pytest-behavior": when running pytest, I want pytest to run in  a predictable way.
+        ex: 
+        step 1: 
+        ```
+            py super.py create_mock_data -pr 9   (-pr == product_range)
+        ```
+        result: 64 lines of mock buy-transactions are created in bought.csv, so buy_ids: b_1, b_2 (...) b_64
+        are taken.
 
-- solution: my 2 fns below enforce the following "pytest-behavior":
+        step 2:
+        ```
+            py super.py buy apple -sd 2023-10-01 -exd 2023-10-25    (-sd == start_date, exd == expiry_date)
+        ```
+        expected result: super.py assigns buy_id b_65 to this transaction (but NOT b_1)
+
+
+        When doing this:
+        ```
+            py super.py create_mock_data -pr 9   (-pr == product_range)
+        ```
+        then 3 things happen (triggered by this argparse cli command):
+
+        step 1: call fn:
+    ```python
+    def create_data_for_csv_files_bought_and_sold("a lot of parameters"):
+        pass
+    ```
+        This fn will - as explained above - overwrite all previous data in bought.csv and sold.csv, and then
+        any created buy-transactions will start with b_1, then b_2 and so on.
+
+        status: after having done this, superpy does not know the id of the last buy-transaction. But superpy needs to know, because a(ny) next buy-transaction
+        by the superpy-user also needs a unique buy_id. That is why the next fn will get the  highest buy_id from  bought.csv:
+
+        step 2: call fn: (after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv)
+        ```python
+        def get_highest_buy_id_from_boughtcsv(path_to_csv_bought_file):
+            pass
+
+        ```
+        status: now this highest buy_id must be made persistent, so it can be used to calculate the 
+        next buy_id for the next buy-transaction.
+
+        step 3: call fn:
+    ```python
+    def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id, path_to_buy_id_file):
+        pass
+    ```
+        As described above in 'challenge-2-solution':
+        The last issued buy_id is persistently stored in file id_to_use_in_fn_buy_product.txt
+        (...\superpy\data_used_in_superpy\id_to_use_in_fn_buy_product.txt)
+
+        fn set_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id, path_to_buy_id_file) 
+        initializes the value in file 'id_to_use_in_fn_buy_product.txt'.
+        ex1: if 65 rows of mock buy-transactions have been created, then b_65 is stored in this txt-file.
+        ex2: if 18 rows of mock buy-transactions have been created, then b_18 is stored in this txt-file.
+
+        status: bought.csv and sold.csv have been filled with data. If a superpy-user now buys a product,
+        then the buy-transaction  must be b_66 (in ex1 above), or b_19 (in ex2 above).
+
+        The solution for challenge 2 further above, explains the implementation of assigning b_66 (when
+        previous buy_id is b_65) or e.g. b_19 (when previous buy_id is b_18).
+
+
+
+# 3_RUN-PYTEST-WITH-CONTROL-OVER-CWD
+[goto Table of Contents at start of markdown file: ](#3_RUN-PYTEST-WITH-CONTROL-OVER-CWD) 
+- Goal 1: in pytest to run regression tests
+- problem: pytest looks at the cwd to determine where to look for where to read or write
+    * test input files
+    * actual test result files
+    * expected test result files
+    In addition to that, each fn-to-test has its own directory with these files and its own testscript.
+    Being in the "wrong" directory when you run  pytest, results in storing the actual-test-result-files
+    in a wrong directory.
+    Not only do these testcases fail, but also superpy file structure gets cluttered with actual-result-files  
+    stored in the wrong location.
+
+
+- solution: my 2 fns below solve the problem as follows:
 1of3: when cwd points to following directories and I run pytest:
 a. (...\superpy), 
 b. (...\superpy\test_utils)

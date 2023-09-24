@@ -1,22 +1,62 @@
 buy_id,product,buy_price,buy_date,expiry_date
-b_1,eggs,5.2,2023-12-01,2023-12-11
-b_2,onion,3.1,2023-12-01,2023-12-11
-b_3,eggs,0.5,2023-12-02,2023-12-12
-b_4,eggs,1.1,2023-12-04,2023-12-14
-b_5,quinoa,1.4,2023-12-05,2023-12-15
-b_6,onion,1.4,2023-12-05,2023-12-15
-b_7,quinoa,4.0,2023-12-07,2023-12-17
-b_8,eggs,2.5,2023-12-08,2023-12-18
-b_9,eggs,4.0,2023-12-09,2023-12-19
-b_10,onion,0.5,2023-12-09,2023-12-19
-b_11,onion,1.1,2023-12-10,2023-12-20
-b_12,onion,5.2,2023-12-11,2023-12-21
-b_13,eggs,3.1,2023-12-16,2023-12-26
-b_14,eggs,1.4,2023-12-21,2023-12-31
-b_15,quinoa,0.5,2023-12-21,2023-12-31
-b_16,onion,2.5,2023-12-21,2023-12-31
-b_17,quinoa,2.5,2023-12-22,2024-01-01
-b_18,onion,4.0,2023-12-23,2024-01-02
-b_19,quinoa,3.1,2023-12-24,2024-01-03
-b_20,quinoa,5.2,2023-12-24,2024-01-03
-b_21,quinoa,1.1,2023-12-28,2024-01-07
+b_1,Brown beans,2.5,2027-01-08,2027-01-18
+b_2,Beetroot,0.39,2027-01-09,2027-01-19
+b_3,Beetroot,2.5,2027-01-09,2027-01-19
+b_4,Kiwi,4.99,2027-01-09,2027-01-19
+b_5,Kiwi,0.19,2027-01-10,2027-01-20
+b_6,Kiwi,0.79,2027-01-10,2027-01-20
+b_7,Kiwi,3.1,2027-01-10,2027-01-20
+b_8,Kiwi,1.1,2027-01-11,2027-01-21
+b_9,Brown beans,0.5,2027-01-11,2027-01-21
+b_10,Beetroot,0.19,2027-01-13,2027-01-23
+b_11,Kiwi,4.0,2027-01-13,2027-01-23
+b_12,Kiwi,0.69,2027-01-15,2027-01-25
+b_13,Beetroot,0.69,2027-01-16,2027-01-26
+b_14,Kiwi,2.5,2027-01-16,2027-01-26
+b_15,Beetroot,0.5,2027-01-17,2027-01-27
+b_16,Brown beans,0.39,2027-01-17,2027-01-27
+b_17,Beetroot,4.99,2027-01-18,2027-01-28
+b_18,Brown beans,1.4,2027-01-18,2027-01-28
+b_19,Beetroot,0.79,2027-01-19,2027-01-29
+b_20,Brown beans,1.1,2027-01-20,2027-01-30
+b_21,Kiwi,0.39,2027-01-21,2027-01-31
+b_22,Beetroot,1.1,2027-01-22,2027-02-01
+b_23,Beetroot,3.1,2027-01-22,2027-02-01
+b_24,Beetroot,0.29,2027-01-23,2027-02-02
+b_25,Kiwi,0.29,2027-01-23,2027-02-02
+b_26,Brown beans,0.79,2027-01-25,2027-02-04
+b_27,Beetroot,1.4,2027-01-26,2027-02-05
+b_28,Brown beans,0.19,2027-01-27,2027-02-06
+b_29,Beetroot,4.0,2027-01-28,2027-02-07
+b_30,Brown beans,4.0,2027-01-28,2027-02-07
+b_31,Brown beans,4.99,2027-01-29,2027-02-08
+b_32,Kiwi,1.4,2027-01-31,2027-02-10
+b_33,Brown beans,0.29,2027-02-02,2027-02-12
+b_34,Kiwi,0.5,2027-02-03,2027-02-13
+b_35,Brown beans,0.69,2027-02-03,2027-02-13
+b_36,Brown beans,3.1,2027-02-04,2027-02-14
+b_37,apple,1.12,2023-09-25,does not expire
+b_38,apple,1.75,NEXT_MONDAY,does not expire
+b_39,apple,1.75,NEXT_MONDAY,does not expire
+b_40,apple,1.75,NEXT_MONDAY,does not expire
+b_41,apple,1.75,NEXT_MONDAY,does not expire
+b_42,apple,1.75,NEXT_MONDAY,does not expire
+b_43,apple,1.75,NEXT_MONDAY,does not expire
+b_44,apple,1.75,2023-10-02,does not expire
+b_45,apple,1.75,2023-10-02,does not expire
+b_46,apple,1.75,2023-10-02,does not expire
+b_47,apple,1.75,next_monay,does not expire
+b_48,apple,1.75,next_monday,does not expire
+b_49,apple,1.75,next_monday,does not expire
+b_50,apple,1.75,next_monay,does not expire
+b_51,apple,1.75,next_monday,does not expire
+b_52,apple,1.75,2023-10-02,does not expire
+b_53,apple,1.75,2023-10-02,does not expire
+b_54,pear,1.75,2023-10-02,does not expire
+b_55,pear,1.75,next_monday,does not expire
+b_56,pear,1.75,2023-10-02,does not expire
+b_57,pear,1.75,2023-10-02,does not expire
+b_58,pear,1.75,2023-09-27,does not expire
+b_59,apple,1.09,2023-09-25,does not expire
+b_60,pear,1.75,2023-09-27,does not expire
+b_61,apple,1.09,2023-09-29,does not expire
