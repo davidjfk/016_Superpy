@@ -4,7 +4,7 @@ __human_name__ = "superpy"
 # Your code below this line.
 
 # Imports
-import argparse, os, sys
+import argparse, os, sys, socket
 import csv
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -36,10 +36,17 @@ from utils_superpy.utils import calculate_expired_products_on_day
 from utils_superpy.utils import show_list_with_nested_lists_in_console_with_module_rich
 from utils_superpy.utils import calculate_inventory_on_day, calculate_middle_of_time_interval
 from utils_superpy.utils import get_system_date, get_dates_of_next_7_days
+from utils_superpy.utils import show_weekday_from_date
 
+superpy_product_prices = ''
+superpy_product_range = ''
 
 from data_used_in_superpy.product_prices import superpy_product_prices
 from data_used_in_superpy.product_range import superpy_product_range
+# print(superpy_product_range)
+# print(superpy_product_prices)
+
+
 # print(superpy_product_range)
 # print(superpy_product_prices)
 
@@ -130,13 +137,13 @@ def main():
     # Create variables for superpy-user to use in command line interface:
     # warning: as a Superpy-user, plz do not  assign other values to the following variables:
     today = SYSTEM_DATE
-    print(f"today: {today}")
+    # print(f"today: {today}")
     tomorrow = add_days_to_date(today, 1)
-    print(f"tomorrow: {tomorrow}")
+    # print(f"tomorrow: {tomorrow}")
     yesterday = add_days_to_date(today, -1)
-    print(f"yesterday: {yesterday}")
+    # print(f"yesterday: {yesterday}")
     overmorrow = add_days_to_date(today, 2) # yes, this is English...google surprised me.
-    print(f"overmorrow: {overmorrow}")
+    # print(f"overmorrow: {overmorrow}")
 
     # next_monday = get_dates_of_next_7_days(today)[0]
     # print(f"next_monday: {next_monday}")
@@ -150,9 +157,9 @@ def main():
           py super.py buy apple 1.75 -bd NEXT_MONDAY
     '''
     [next_monday, next_tuesday, next_wednesday, next_thursday, next_friday, next_saturday, next_sunday] = get_dates_of_next_7_days(today)
-    print('next monday:')
-    print(next_monday)
-    print(type(next_monday))
+    # print('next monday:')
+    # print(next_monday)
+    # print(type(next_monday))
     # print(f"next_monday: {next_monday}")
     # print(f"next_tuesday: {next_tuesday}")
     # print(f"next_wednesday: {next_wednesday}")
@@ -175,7 +182,7 @@ def main():
     subparser_buy_product.add_argument("price", type=float, help="e.g. 1.20 means 1 euro and 20 cents. 0.2 or 0.20 means 20 cents.") 
     # -buy_date gets its default value from file system_date.txt in the DATA_DIRECTORY:
     subparser_buy_product.add_argument("-buy_date", "-bd", default= SYSTEM_DATE, type=str, help="date object with string representation following the format: '%Y-%m-%d'. ex: 2026-10-21 ") 
-    subparser_buy_product.add_argument("-expiry_date", "-ed", default="does not expire", type=str, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
+    subparser_buy_product.add_argument("-expiry_date", "-expd", default="does not expire", type=str, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
 
     # 2_CREATE_MOCK_DATE: Create subparser "create_mock_data" with help text and add it to the container "command":
@@ -291,7 +298,6 @@ def main():
 
         path_to_csv_bought_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'bought.csv')
         path_to_csv_bought_output_file = path_to_csv_bought_input_file # but not the same in pytest.
-
         '''
         explanation of the following code:
         e.g. next_monday = 2023-09-18, i.e. string in format YYYY-MM-DD. This the output of my fn get_dates_of_next_7_days().
@@ -302,7 +308,6 @@ def main():
             expected result: b_43,apple,1.75,2023-09-25,2023-09-30
         The following code solves this problem (there is probably an "official way" hidden inside the enigmatic mystifying argparse docs, but this works kinda nice :-)
         '''
-
         if args.buy_date == 'next_monday': 
             print('ffoo')
             args.buy_date = next_monday 
@@ -318,9 +323,23 @@ def main():
             args.buy_date = next_saturday
         if args.buy_date == 'next_sunday':
             args.buy_date = next_sunday
-
-
         buy_product(args.product_name, args.price, args.buy_date, args.expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file, path_to_csv_bought_output_file) 
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Current action in Superpy: buy_product                                                              ")
+        print(f" host machine: {socket.gethostname()}                                                             ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy's SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")                                                                                          
+        print(f" Status of: BOUGHT.CSV & SOLD.CSV:                                                                ")    
+        print(f" 1of2: BOUGHT.CSV:                                                                                ")    
+        path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', 'bought.csv')
+        show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')
+        print(f" 2of2: SOLD.CSV:                                                                                  ")  
+        path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', 'sold.csv')
+        show_csv_file_in_console_with_module_rich(path_to_csv_sold_file)
+
 
     # nr 2of16
     if args.command == "create_mock_data":
@@ -360,8 +379,8 @@ def main():
         set_system_date_to(system_date_in_the_middle_of_time_interval, path_to_file_system_datetxt)
 
 
-
-
+        # superpy_product_prices = superpy_product_prices
+        # superpy_product_range = superpy_product_range
 
 
         create_data_for_csv_files_bought_and_sold(
@@ -433,6 +452,23 @@ def main():
         When creating this next buy_transaction, fn 'create_buy_id_that_increments_highest_buy_id_in_boughtcsv 
         will increment 'b_132' with 1, so this next transaction will show up in bought.csv as 'b_133'.
         '''   
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Current action in Superpy: create_mock_data                                                         ")
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy's SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")                                                                                          
+        print(f" Status of: BOUGHT.CSV & SOLD.CSV:                                                                ")    
+        print(f" 1of2: BOUGHT.CSV:                                                                                ")    
+        path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', 'bought.csv')
+        show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')
+        print(f" 2of2: SOLD.CSV:                                                                                  ")  
+        path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', 'sold.csv')
+        show_csv_file_in_console_with_module_rich(path_to_csv_sold_file)
+
+
 
 
     # nr 3of16
@@ -477,6 +513,7 @@ def main():
         upper_boundary_nr_of_weeks_to_add_to_calculate = 0
         upper_boundary_nr_of_days_to_add_to_calculate = 0
 
+
         # set path to file bought.csv:
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
@@ -497,20 +534,41 @@ def main():
             upper_boundary_nr_of_months_to_add_to_calculate,
             upper_boundary_nr_of_weeks_to_add_to_calculate,
             upper_boundary_nr_of_days_to_add_to_calculate,
+            superpy_product_prices,
+            superpy_product_range,
             path_to_file_bought_csv,
             path_to_file_sold_csv,
             add_days_to_date,
             create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created,
             generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
         )
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Current action in Superpy: delete all products from bought.csv and sold.csv                        ")                                                         
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy's SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")                                                                                          
+        print(f" Status of: BOUGHT.CSV & SOLD.CSV:                                                                ")    
+        print(f" 1of2: BOUGHT.CSV:                                                                                ")    
+        path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', 'bought.csv')
+        show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')
+        print(f" 2of2: SOLD.CSV:                                                                                  ")  
+        path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', 'sold.csv')
+        show_csv_file_in_console_with_module_rich(path_to_csv_sold_file)
+
     # nr 4of16
     if args.command == "reset_system_date":
         
         system_date_on_device_outside_of_Superpy = set_system_date_to(datetime.today().strftime('%Y-%m-%d'), PATH_TO_FILE_WITH_SYSTEM_DATE)
         print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Current action in Superpy: reset_system_time of Superpy to system time of host machine          ")                                                         
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy's SYSTEM_DATE: {system_date_on_device_outside_of_Superpy} ({show_weekday_from_date(system_date_on_device_outside_of_Superpy)})")    
         print('                                                                                                   ')
-        print(f"Superpy system_date is reset to the current date of the device (e.g. your laptop) that Superpy    ")
-        print(f'is running on: {system_date_on_device_outside_of_Superpy}                                                                                                   ')
         print('---------------------------------------------------------------------------------------------------')
 
     # nr 5of16
@@ -519,6 +577,21 @@ def main():
         path_to_csv_sold_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'sold.csv')
         path_to_csv_sold_output_file = path_to_csv_sold_input_file # but not the same in pytest.
         sell_product(args.buy_id, args.price, args.sell_date, path_to_csv_sold_input_file, path_to_csv_sold_output_file)
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Current action in Superpy: create_mock_data                                                         ")
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy's SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")                                                                                          
+        print(f" Status of: SOLD.CSV & BOUGHT.CSV:                                                                ")    
+        print(f" 1of2: SOLD.CSV:                                                                                  ")  
+        path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', 'sold.csv')
+        show_csv_file_in_console_with_module_rich(path_to_csv_sold_file)
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')
+        print(f" 2of2: BOUGHT.CSV:                                                                                ")    
+        path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', 'bought.csv')
+        show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
 
     # nr 6of16
     if args.command == "set_system_date":
@@ -532,7 +605,6 @@ def main():
 
     # nr 7of16
     if args.command == "show_bought_csv":
-        # set path to file bought.csv:
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv') 
@@ -540,12 +612,16 @@ def main():
 
     # nr 8of16
     if args.command == "show_cost":
-        # set path to file sold.csv:
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv') 
         cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_bought_csv)
         print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Current action in Superpy: show_cost                                                            ")
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")             
         print('                                                                                                   ')
         print(f"Cost from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {cost}")
         print('                                                                                                   ')
@@ -559,10 +635,14 @@ def main():
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
         expired_products = calculate_expired_products_on_day(args.date, path_to_file_sold_csv, path_to_file_bought_csv)
-        
         print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Current action in Superpy: show_expired_products                                                    ")
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")             
         print('                                                                                                   ')
-        print(f"Expired products on date: {args.date}: ")
+        print(f" Expired products on Superpy date: {args.date}: ")
         print('                                                                                                   ')
         
         show_list_with_nested_lists_in_console_with_module_rich(expired_products)
@@ -576,55 +656,86 @@ def main():
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
         inventory = calculate_inventory_on_day(args.date, path_to_file_sold_csv, path_to_file_bought_csv)
         print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Current action in Superpy: show_inventory                                                          ")
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")             
         print('                                                                                                   ')
-        print(f"Inventory on date: {args.date}: ")
+        print(f" Inventory on Superpy date: {args.date}: ")
         print('                                                                                                   ')
         
         show_list_with_nested_lists_in_console_with_module_rich(inventory)
 
     # nr 11of16
     if args.command == "show_profit":
-        # set path to file sold.csv:
         path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', "sold.csv")
         path_to_csv_bought_file = get_path_to_file('data_used_in_superpy', "bought.csv")
         profit = calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive)
         print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Current action in Superpy: show_profit                                                             ")
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")             
         print('                                                                                                   ')
-        print(f"Profit from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {profit}")
+        print(f" Profit from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {profit}")
         print('                                                                                                   ')
         print('---------------------------------------------------------------------------------------------------')
 
     # nr 12of16
     if args.command == "show_revenue":
-        # set path to file sold.csv:
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
         revenue = calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_sold_csv)
-        # show_csv_file_in_console_with_module_rich
         print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Current action in Superpy: show_revenue                                                            ")
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")             
         print('                                                                                                   ')
-        print(f"Revenue from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {revenue}")
+        print(f" Revenue from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {revenue}")
         print('                                                                                                   ')
         print('---------------------------------------------------------------------------------------------------')
 
 
     # nr 13of16
     if args.command == "show_sales_volume":
-        # set path to file sold.csv:
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
         sales_volume = calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_sold_csv)
         print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Current action in Superpy: show_sales_volume                                                         ")
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")             
         print('                                                                                                   ')
-        print(f"Sales volume from start_date: {args.start_date} to end_date: {args.end_date} inclusive: {sales_volume} products")
+        print(f" Sales volume from start_date: {args.start_date} to end_date: {args.end_date} inclusive: {sales_volume} products")
         print('                                                                                                   ')
         print('---------------------------------------------------------------------------------------------------')
 
     # nr 14of16
     if args.command == "show_sold_csv":
-        # set path to file sold.csv:
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Last action in Superpy: show_sold_csv                                                           ")
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy's SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")                                                                                          
+        print(f" Status of: SOLD.CSV & BOUGHT.CSV:                                                                ")    
+        print(f" 1of2: SOLD.CSV:                                                                                  ")  
+        path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', 'sold.csv')
+        show_csv_file_in_console_with_module_rich(path_to_csv_sold_file)
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')
+        print(f" 2of2: BOUGHT.CSV:                                                                                ")    
+        path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', 'bought.csv')
+        show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
+
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
@@ -634,19 +745,24 @@ def main():
     if args.command == "show_system_date":
         
         system_date_of_superpy = get_system_date( PATH_TO_FILE_WITH_SYSTEM_DATE)
-        print("reset system_date in Superpy to current date on your device outside of Superpy:")
         print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Last action in Superpy: show_system_date                                                          ")
         print('                                                                                                   ')
-        print(f"Superpy SYSTEM_DATE has value: {system_date_of_superpy}"                                           )
+        print(f" Superpy SYSTEM_DATE has value: {system_date_of_superpy}"                                           )
         print('                                                                                                   ')
         print('---------------------------------------------------------------------------------------------------')
 
     # nr 16of16
     if args.command == "time_travel":
         print("time_travel")
-        # step: call fn time_travel_system_date_with_nr_of_days to update file system__date.txt with following date:
         new_system_date = time_travel_system_date_with_nr_of_days(args.nr_of_days, PATH_TO_FILE_WITH_SYSTEM_DATE, PATH_TO_FILE_WITH_SYSTEM_DATE)
-        print(new_system_date) 
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Last action in Superpy: time_travel                                                             ")
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy's new SYSTEM_DATE: {new_system_date} ({show_weekday_from_date(new_system_date)})")                         
 
 if __name__ == "__main__":
     main()

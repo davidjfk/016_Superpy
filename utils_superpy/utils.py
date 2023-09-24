@@ -62,7 +62,7 @@ from typing import Callable
 
 # time_travel_system_date_with_nr_of_days(nr_of_days_to_travel, path_to_input_file, path_to_output_file):
 
-
+# show_weekday_from_date(date: str) -> str:
 
 def add_days_to_date(date_string: str, days_to_add: int) -> str:
     date = datetime.strptime(date_string, '%Y-%m-%d')
@@ -126,8 +126,6 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(
     with open(path_to_csv_bought_file, 'r', newline='') as file_object: 
         reader = csv.DictReader(file_object)
         for row in reader:
-            print('row:')
-            print(row)
             sell_date = row['buy_date']
             sell_date = datetime.strptime(sell_date, '%Y-%m-%d')
             if start_date <= sell_date <= end_date:
@@ -252,18 +250,18 @@ def calculate_middle_of_time_interval(
 
     system_date_as_object = datetime.strptime(SYSTEM_DATE, '%Y-%m-%d')
     lower_boundary_date_object = system_date_as_object # default value
-    print('lower_boundary_date_object: ', lower_boundary_date_object)
+    # print('lower_boundary_date_object: ', lower_boundary_date_object)
 
     upper_boundary_date_object = system_date_as_object + timedelta( weeks= upper_boundary_nr_of_weeks_to_add_to_calculate, days=upper_boundary_nr_of_days_to_add_to_calculate)
-    print('upper_boundary_date_object: ', upper_boundary_date_object)
+    # print('upper_boundary_date_object: ', upper_boundary_date_object)
     upper_boundary_date_object = upper_boundary_date_object + relativedelta(months=upper_boundary_nr_of_months_to_add_to_calculate)
-    print('upper_boundary_date_object: ', upper_boundary_date_object)
+    # print('upper_boundary_date_object: ', upper_boundary_date_object)
 
     time_interval_middle = lower_boundary_date_object + (upper_boundary_date_object - lower_boundary_date_object) / 2
-    print('time_interval_middle: ', time_interval_middle)
+    # print('time_interval_middle: ', time_interval_middle)
     SYSTEM_DATE = datetime.strftime(time_interval_middle, '%Y-%m-%d')
-    print('SYSTEM_DATE: ', SYSTEM_DATE)
-    print(type(SYSTEM_DATE))
+    # print('SYSTEM_DATE: ', SYSTEM_DATE)
+    # print(type(SYSTEM_DATE))
 
     return SYSTEM_DATE
 
@@ -583,11 +581,11 @@ def get_dates_of_next_7_days(today: str) -> list:
     '''
     
     today_as_date_object = datetime.strptime(today, '%Y-%m-%d').date()
-    print(f'today_as_date_object: {today_as_date_object}')
+    # print(f'today_as_date_object: {today_as_date_object}')
     
     day_of_week = (today_as_date_object.weekday() + 1 ) 
     # Monday is 0, Sunday is 6, so add 1 for easier reading.
-    print(f'day_of_week: {day_of_week}')
+    # print(f'day_of_week: {day_of_week}')
     '''
     My code below is bit of a long stretch, but I do not
     know how to make it shorter. 
@@ -600,13 +598,6 @@ def get_dates_of_next_7_days(today: str) -> list:
         friday = today_as_date_object + timedelta(days= 4)
         saturday = today_as_date_object + timedelta(days= 5)
         sunday = today_as_date_object + timedelta(days= 6)
-        # print(f'monday: {monday}')
-        # print(f'tuesday: {tuesday}')
-        # print(f'wednesday: {wednesday}')
-        # print(f'thursday: {thursday}')
-        # print(f'friday: {friday}')
-        # print(f'saturday: {saturday}')
-        # print(f'sunday: {sunday}')
     if day_of_week == 2: # Tuesday
         monday = today_as_date_object + timedelta(days= 6)
         tuesday = today_as_date_object + timedelta(days= 7)
@@ -662,8 +653,6 @@ def get_dates_of_next_7_days(today: str) -> list:
     for day in dates_of_next_7_days:
         day = day.strftime('%Y-%m-%d')
         dates_of_next_7_days_as_strings.append(day)
-        print(day)
-
 
     return dates_of_next_7_days_as_strings
 
@@ -799,7 +788,7 @@ def show_csv_file_in_console_with_module_rich(path_to_csv_file: str) -> None:
         header = next(csv_reader)  
         for column in header:
             table.add_column(column)
-        for row in csv_reader:
+        for row in reversed(list(csv_reader)):
             table.add_row(*row)
     console.print(table)
 
@@ -829,3 +818,8 @@ def time_travel_system_date_with_nr_of_days(
             file.write(current_system_date)
     # returning new_system_date for testing purposes only (returned value is not used in the code)    
     return new_system_date
+
+def show_weekday_from_date(date: str) -> str:
+    date_object = datetime.strptime(date, '%Y-%m-%d')
+    day_of_week = date_object.strftime('%A')
+    return day_of_week

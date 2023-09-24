@@ -2,6 +2,7 @@
 ### INTRO
 ### INSTALLATION
 ### DEFINITIONS
+### LOCATION-OF-IMPORTANT-DIRECTORIES-AND-FILES
 ### DATA-MODEL
 ### USAGE
 ### EXAMPLES-SCENARIOS-WORKFLOWS
@@ -12,7 +13,7 @@
 
 # INTRO
 [goto Table of Contents at start of this markdown file: ](#INTRO) 
-
+<br/>
 Application Superpy can be used to buy and sell products. In addition to that
 all kinds of reports can be created: revenue, cost,  profit, inventory, expired_products, etc.
 
@@ -32,7 +33,7 @@ py super.py -h
 
 # INSTALLATION
 [goto Table of Contents at start of this markdown file: ](#INSTALLATION)
-
+<br/>
 1. The latest version of Superpy is in Github: https://github.com/davidjfk/David_Sneek_Superpy . Check if there is a newer version.
 2. In Powershell navigate into folder Superpy 
 3. create a virtual environment:
@@ -144,20 +145,22 @@ py super.py -h
         (used in fn create_data_for_csv_files_bought_and_sold() )
 
 # LOCATION OF IMPORTANT DIRECTORIES AND FILES
-bought.csv      :  ...\superpy\date_used_in_superpy\bought.csv
-create_testdata_for_csv_files_bought_and_sold   :  ...\superpy\data_pytest_create_boughtcsv_and_soldcsv_for_pytestcases_here\
+[goto Table of Contents at start of this markdown file: ](#LOCATION-OF-IMPORTANT-DIRECTORIES-AND-FILES)
+- bought.csv      :  ...\superpy\date_used_in_superpy\bought.csv
+- create_testdata_for_csv_files_bought_and_sold   :  ...\superpy\data_pytest_create_boughtcsv_and_soldcsv_for_pytestcases_here\
                                                    create_testdata_for_csv_files_bought_and_sold
-erd             :  ...\superpy\erd  (entity relationship diagram)
-readme_files    :  ...\superpy\readme_files
-sold.csv        :  ...\superpy\date_used_in_superpy\sold.csv
-super.py        :  ...\superpy\super.py 
-system_date     :  ...\superpy\date_used_in_superpy\system_date.txt
-test_utils      :  ...\superpy\test_utils   (regression testcases, run in pytest)
-utils.py        :  ...\superpy\test_utils   (functions)
+- erd             :  ...\superpy\erd  (entity relationship diagram)
+- readme_files    :  ...\superpy\readme_files
+- sold.csv        :  ...\superpy\date_used_in_superpy\sold.csv
+- super.py        :  ...\superpy\super.py 
+- system_date     :  ...\superpy\date_used_in_superpy\system_date.txt
+- test_utils      :  ...\superpy\test_utils   (regression testcases, run in pytest)
+- utils.py        :  ...\superpy\test_utils   (functions)
 
 
 # DATA-MODEL
-[goto Table of Contents at start of this markdown file: ](#data-model)
+[goto Table of Contents at start of this markdown file: ](#DATA-MODEL)
+<br/>
 Before moving on, please have a look at the data model. This provides some context to  
 better understand the business tasks of Superpy in next chapter Usage.
 
@@ -168,6 +171,7 @@ better understand the business tasks of Superpy in next chapter Usage.
 
 # Usage 
 [goto Table of Contents at start of this markdown file: ](#USAGE)
+<br/>
 This chapter explains how to use Superpy's command-line interface.  
 Three questions are answered:
 1. Which functions (fns) does Superpy fulfill? (e.g. buy product, sell product, etc.)
@@ -227,14 +231,14 @@ List of superpy functionality with goals:
 - ex1: 
 
 ```
-    py super.py buy apple 1.75 -bd 23-09-15 -sd 23-09-27 
+    py super.py buy apple 1.75 -bd 23-09-15 -expd 23-09-27 
 ```
 
 -   product: apple,  price: &euro; 1.75, buy_date: 23-09-15, expiry_date: 23-09-27   
 
 - ex2: 
 ```
-    py super.py buy linseed 3.00 -exd 23-09-28 
+    py super.py buy linseed 3.00 -expd 23-09-28 
 ```
 -   product: linseed, price: &euro; 3.00, buy_date: system_date as default, expiry_date: 23-09-28   
 
@@ -247,7 +251,7 @@ List of superpy functionality with goals:
 - arg1: positional argument product: e.g. apple, potato, milk
 - arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35   
 - arg3: optional argument -buy_date, -bd (ex: 2023-09-15) with default value system_date 
-- arg4: optional argument -expiry_date, -exd (ex: 2023-10-03) with default value 'does not expire' 
+- arg4: optional argument -expiry_date, -expd (ex: 2023-10-03) with default value 'does not expire' 
 
 
 <br /> 

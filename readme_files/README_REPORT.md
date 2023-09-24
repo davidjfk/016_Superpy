@@ -62,10 +62,9 @@ Explain what problem they solve and why you chose to implement them in this way.
 
 - alternative solution: use tmp_path fixture as a test preparation to remove the data that has been added  
     to the actual testresult file during the previous testrun.  
-    Because I had  issues with running pytest in a controlled way (not having control about the cwd) (see technical element 3 below),   
-    I did not like any solution  that involves os.remove or any other options to delete files or directories. 
-    But now, with the cwd-issue solved, I will use a fixture next time.  
-
+    Because I had  issues with running pytest in such a way that I had control over the cwd (see technical element 3 below),   
+    I did not like any solution  that involveD os.remove() or any other options to delete files or directories. 
+    But now, with the cwd-issue solved, I will try to use fixtures in my next python project. 
     
 
 
