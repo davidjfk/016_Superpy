@@ -352,6 +352,9 @@ def create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_cr
     def counter():
         nonlocal count
         count += 1
+
+        if count < 10:
+            return f"{csv_file_name_first_letter}_0{count}"
         return f"{csv_file_name_first_letter}_{count}"
     return counter
 
@@ -382,8 +385,21 @@ def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_hi
         with open(path_to_id_with_highest_sequence_number, 'r', newline='') as file:
             last_id_used_in_fn_buy_product =file.read()
 
-            id_parts = last_id_used_in_fn_buy_product.split("_")
+            id_parts = last_id_used_in_fn_buy_product.split("_") # e.g. ['b', '323']
             new_id_to_use_in_fn_buy_product = int(id_parts[1]) + 1
+            '''
+            b_1 (...) b_9 must be created as b_01 (...) b_09.
+            reason: 
+            In this the ids of the transactions in sold.csv are created by replacing the 'b' in the buy_id with an 's'.
+            So the ids of the transactions in sold.csv are s_1 (...) s_9, and s_10 (...) s_99, and s_100 (...) s_999, etc.
+            But this is a problem, because the ids of the transactions in sold.csv are sorted alphabetically, not numerically.
+            So s_10 is sorted before s_2, and s_100 is sorted before s_3, etc.
+            So I need to create b_01 (...) b_09, so that s_01 (...) s_09 can be created.
+            '''
+            # if new_id_to_use_in_fn_buy_product < 10:
+            #     print('hi there!!')
+            #     new_id_to_use_in_fn_buy_product = "b_0" + str(new_id_to_use_in_fn_buy_product)
+            # else:
             new_id_to_use_in_fn_buy_product = "b_" + str(new_id_to_use_in_fn_buy_product)
             file.seek(0)
         with open(path_to_id_with_highest_sequence_number, 'w', newline='') as file: 
@@ -733,7 +749,9 @@ def sell_product(bought_product_id: str,
         rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': price, 'sell_date': sell_date}) 
         writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
         writer.writeheader()
-        writer.writerows(rows)
+        # sort rows by sell_id (== first column in sold.csv):
+        sorted_rows = sorted(rows, key=lambda row: row['sell_id'])
+        writer.writerows(sorted_rows)
 
 
 def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id: str, path_to_buy_id_file: str) -> str:

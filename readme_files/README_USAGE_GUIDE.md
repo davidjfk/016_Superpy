@@ -4,7 +4,7 @@
 ### DEFINITIONS
 ### LOCATION-OF-IMPORTANT-DIRECTORIES-AND-FILES
 ### DATA-MODEL
-### USAGE
+### ARGPARSE-SUBPARSER-COMMANDS-AND_ARGUMENTS
 ### EXAMPLES-SCENARIOS-WORKFLOWS
 ### TESTING-THE-APPLICATION-IN-PYTEST
 ### TROUBLE-SHOOTING
@@ -169,8 +169,8 @@ better understand the business tasks of Superpy in next chapter Usage.
 
 
 
-# Usage 
-[goto Table of Contents at start of this markdown file: ](#USAGE)
+# ARGPARSE-SUBPARSER-COMMANDS-AND_ARGUMENTS 
+[goto Table of Contents at start of this markdown file: ](#ARGPARSE-SUBPARSER-COMMANDS-AND_ARGUMENTS)
 <br/>
 This chapter explains how to use Superpy's command-line interface.  
 Three questions are answered:
@@ -261,10 +261,14 @@ List of superpy functionality with goals:
 <br /> 
 2. SUPERPY FUNCTIONALITY: CREATE_MOCK_DATA
 
-[goto chapter Usage --> overview with business tasks ](#create_mock_data) <br />
+[goto chapter Usage --> overview with business tasks ](#create_mock_data)
+ <br />
 - goal: create mock data for bought.csv and sold.csv
 - Of 8 arguments the default values can be changed in (...\superpy\super.py --> goto section 'CONFIGURATION' at start of main.py())
 - Quick summary: 
+- Mock data are created in a time interval (e.g. 2024-02-03 until 2024-04-03 inclusive). The system_date is automatically  
+    set to the middle of the time interval: this is handy and practical when creating the reports: show_inventory, show_expired_products,    
+    show profit, etc.
 - All 11 arguments are optional, so you can do this:
 ```
     py super.py create_mock_data
@@ -924,6 +928,7 @@ List of superpy functionality with goals:
 # EXAMPLES-SCENARIOS-WORKFLOWS
 
 [goto Table of Contents at start of this markdown file: ](#EXAMPLES-SCENARIOS-WORKFLOWS)
+<br/>
 - This chapter provides some examples of common Superpy usage scenarios, demonstrating how to  
     combine different business tasks, command-line options and arguments.
 
@@ -967,7 +972,7 @@ List of superpy functionality with goals:
 
 # TESTING-THE-APPLICATION-IN-PYTEST
 [goto Table of Contents at start of this markdown file: ](#TESTING-THE-APPLICATION-IN-PYTEST)
-
+<br/>
 ## 1of2: run regression testcases:
 
 There are 2 options to run the regression testcases in pytest:
@@ -978,7 +983,7 @@ Option 1of2: run them all (this is usually what you want):
 ```python
     pytest
 ```
-3. all 23 testcases should pass. If not then investigate the failing testcase(s).
+3. all 27 testcases should pass. If not then investigate the failing testcase(s).
 <br/>
 <br/>
 

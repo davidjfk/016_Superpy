@@ -135,38 +135,44 @@ def main():
 
 
     # Create variables for superpy-user to use in command line interface:
+    '''
+    Superpy user can enter following code in command line interface to buy an apple:
+    ex without following code: py super.py buy apple 0.79 -bd 2023-09-25 -ed 2023-09-30
+    But it is easier to enter following code:
+    ex with following code:    py super.py buy apple 0.79 -bd today -ed next_monday
+    '''  
     # warning: as a Superpy-user, plz do not  assign other values to the following variables:
     today = SYSTEM_DATE
     # print(f"today: {today}")
-    tomorrow = add_days_to_date(today, 1)
-    # print(f"tomorrow: {tomorrow}")
-    yesterday = add_days_to_date(today, -1)
-    # print(f"yesterday: {yesterday}")
-    overmorrow = add_days_to_date(today, 2) # yes, this is English...google surprised me.
-    # print(f"overmorrow: {overmorrow}")
+    TOMORROW = add_days_to_date(today, 1)
+    # print(f"TOMORROW: {TOMORROW}")
+    OVERMORROW = add_days_to_date(today, 2) # yes, this is English...google surprised me.
+    # print(f"OVERMORROW: {OVERMORROW}")
+    YESTERDAY = add_days_to_date(today, -1)
+    # print(f"YESTERDAY: {YESTERDAY}")
 
-    # next_monday = get_dates_of_next_7_days(today)[0]
-    # print(f"next_monday: {next_monday}")
+
+    # NEXT_MONDAY = get_dates_of_next_7_days(today)[0]
+    # print(f"NEXT_MONDAY: {NEXT_MONDAY}")
     
     '''
-    next_monday (...) next_sunday are used in subparser 'buy_product' as default values for optional argument -buy_date.
-    They are constants, but because user must enter them as arguments in the command line interface, they are not declared as constants in capitals:
-    it takes more time to enter them in the command line interface with capitals:
-    e.g.: py super.py buy apple 1.75 -bd next_monday 
+    NEXT_MONDAY (...) NEXT_SUNDAY are used in subparser 'buy_product' as user-friendly arguments in -buy_date.
+    Plz note that user can / wants to (and  must) enter these arguments in lowercase:
+    e.g.: py super.py buy apple 1.75 -bd next_monday    (right)
         versus:
-          py super.py buy apple 1.75 -bd NEXT_MONDAY
+          py super.py buy apple 1.75 -bd NEXT_MONDAY    (wrong)
     '''
-    [next_monday, next_tuesday, next_wednesday, next_thursday, next_friday, next_saturday, next_sunday] = get_dates_of_next_7_days(today)
+    [NEXT_MONDAY, NEXT_TUESDAY, NEXT_WEDNESDAY, NEXT_THURSDAY, NEXT_FRIDAY, NEXT_SATURDAY, NEXT_SUNDAY] = get_dates_of_next_7_days(today)
     # print('next monday:')
-    # print(next_monday)
-    # print(type(next_monday))
-    # print(f"next_monday: {next_monday}")
-    # print(f"next_tuesday: {next_tuesday}")
-    # print(f"next_wednesday: {next_wednesday}")
-    # print(f"next_thursday: {next_thursday}")
-    # print(f"next_friday: {next_friday}")
-    # print(f"next_saturday: {next_saturday}")
-    # print(f"next_sunday: {next_sunday}")
+    # print(NEXT_MONDAY)
+    # print(type(NEXT_MONDAY))
+    # print(f"NEXT_MONDAY: {NEXT_MONDAY}")
+    # print(f"NEXT_TUESDAY: {NEXT_TUESDAY}")
+    # print(f"NEXT_WEDNESDAY: {NEXT_WEDNESDAY}")
+    # print(f"NEXT_THURSDAY: {NEXT_THURSDAY}")
+    # print(f"NEXT_FRIDAY: {NEXT_FRIDAY}")
+    # print(f"NEXT_SATURDAY: {NEXT_SATURDAY}")
+    # print(f"NEXT_SUNDAY: {NEXT_SUNDAY}")
 
 
     #step: initialize parser:
@@ -176,7 +182,7 @@ def main():
 
 
     # 1_BUY: create subparser "buy" with help text and add it to the container "command":
-    subparser_buy_product = subparsers.add_parser("buy", help="goal: buy product and add to file bought.csv \n   ex1: py super.py buy apple 1.75 -bd 23-09-15 -sd 23-09-27 \n   product: apple,  price: E 1.75, buy_date: 23-09-15, expiry_date: 23-09-27\n\n   ex2: py super.py buy linseed 3.00 -exd 23-09-28 \n   product: linseed, price: &euro; 3.00, buy_date: system_date as default, expiry_date: 23-09-28\n\n   ex3: py super.py buy cabbage 0.73 \n   product: cabbage, price: E 0.73, buy_date: system_date as default, expiry_date:  'does not expire' as default \n\n   arg1: positional argument product: e.g. apple, potato, milk\n   arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35\n   arg3: optional argument -buy_date, -bd (ex: 2023-09-15) with system_date as default value. \n   arg4: optional argument -expiry_date, -exd (ex: 2023-10-03) with default value 'does not expire' \n\n") 
+    subparser_buy_product = subparsers.add_parser("buy", help="goal: buy product and add to file bought.csv \n   ex1: py super.py buy apple 1.75 -bd 23-09-15 -expd 23-09-27 \n   product: apple,  price: E 1.75, buy_date: 23-09-15, expiry_date: 23-09-27\n\n   ex2: py super.py buy linseed 3.00 -expd 23-09-28 \n   product: linseed, price: &euro; 3.00, buy_date: system_date as default, expiry_date: 23-09-28\n\n   ex3: py super.py buy cabbage 0.73 \n   product: cabbage, price: E 0.73, buy_date: system_date as default, expiry_date:  'does not expire' as default \n\n   arg1: positional argument product: e.g. apple, potato, milk\n   arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35\n   arg3: optional argument -buy_date, -bd (ex: 2023-09-15) with system_date as default value. \n   arg4: optional argument -expiry_date, -exd (ex: 2023-10-03) with default value 'does not expire' \n\n") 
     #step: add the positional and optional arguments to  'subparser_buy_product': 
     subparser_buy_product.add_argument("product_name", type=str, help="e.g. apple, carrot, oats, etc.") 
     subparser_buy_product.add_argument("price", type=float, help="e.g. 1.20 means 1 euro and 20 cents. 0.2 or 0.20 means 20 cents.") 
@@ -292,37 +298,75 @@ def main():
     # nr 1of16
     if args.command == "buy":
         print("buy:")
+        '''
+        explanation of the following code:
+        e.g. NEXT_MONDAY = 2023-09-18, i.e. string in format YYYY-MM-DD. This the output of my fn get_dates_of_next_7_days().
+        problem: 
+        step 1 in argparse cli:     py super.py buy apple 0.79 -bd next_monday -ed 2023-09-30
+        step 2: in bought.csv I get transaction record:
+            actual result: b_43,apple,1.75,NEXT_MONDAY,2023-09-30     --> problem: I do not want "NEXT_MONDAY" in bought.csv, but instead 2023-09-25
+            expected result: b_43,apple,1.75,2023-09-25,2023-09-30
+        The following code solves this problem (there is probably an "official way" hidden inside the enigmatic mystifying argparse docs, but this works kinda nice :-)
+        
+        ex without following code: py super.py buy apple 0.79 -bd 2023-09-18 -ed 2023-09-25
+        ex with following code:    py super.py buy apple 0.79 -bd today -ed -ed 2023-09-25
+        '''
+        if args.buy_date == 'next_monday': 
+            print('ffoo')
+            args.buy_date = NEXT_MONDAY 
+        if args.buy_date == 'next_tuesday': 
+            args.buy_date = NEXT_TUESDAY
+        if args.buy_date == 'next_wednesday':
+            args.buy_date = NEXT_WEDNESDAY
+        if args.buy_date == 'next_thursday':
+            args.buy_date = NEXT_THURSDAY
+        if args.buy_date == 'next_friday':
+            args.buy_date = NEXT_FRIDAY
+        if args.buy_date == 'next_saturday':
+            args.buy_date = NEXT_SATURDAY
+        if args.buy_date == 'next_sunday':
+            args.buy_date = NEXT_SUNDAY
+        if args.buy_date == 'today':
+            args.buy_date = SYSTEM_DATE
+        if args.buy_date == 'tomorrow':
+            args.buy_date = TOMORROW
+        if args.buy_date == 'overmorrow':
+            args.buy_date = OVERMORROW
+        if args.buy_date == 'YESTERDAY':
+            args.buy_date = YESTERDAY
+        '''
+        same recipy for expiry_date: 
+        ex without following code: py super.py buy apple 0.79 -bd today -ed 2023-09-25
+        ex with following code:    py super.py buy apple 0.79 -bd today -ed next_monday
+        '''
+        if args.expiry_date == 'next_monday': 
+            args.expiry_date = NEXT_MONDAY 
+        if args.expiry_date == 'next_tuesday': 
+            args.expiry_date = NEXT_TUESDAY
+        if args.expiry_date == 'next_wednesday':
+            args.expiry_date = NEXT_WEDNESDAY
+        if args.expiry_date == 'next_thursday':
+            args.expiry_date = NEXT_THURSDAY
+        if args.expiry_date == 'next_friday':
+            args.expiry_date = NEXT_FRIDAY
+        if args.expiry_date == 'next_saturday':
+            args.expiry_date = NEXT_SATURDAY
+        if args.expiry_date == 'next_sunday':
+            args.expiry_date = NEXT_SUNDAY
+        if args.expiry_date == 'today':
+            args.expiry_date = SYSTEM_DATE
+        if args.expiry_date == 'tomorrow':
+            args.expiry_date = TOMORROW
+        if args.expiry_date == 'overmorrow':
+            args.expiry_date = OVERMORROW
+        if args.expiry_date == 'yesterday':
+            args.expiry_date = YESTERDAY
         path_to_id_with_highest_sequence_number = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'id_to_use_in_fn_buy_product.txt')
         # print(path_to_id_with_highest_sequence_number)
         id_of_row_in_csv_file_bought = create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number) 
 
         path_to_csv_bought_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'bought.csv')
         path_to_csv_bought_output_file = path_to_csv_bought_input_file # but not the same in pytest.
-        '''
-        explanation of the following code:
-        e.g. next_monday = 2023-09-18, i.e. string in format YYYY-MM-DD. This the output of my fn get_dates_of_next_7_days().
-        problem: 
-        step 1 in argparse cli:     py super.py buy apple 0.79 -bd next_monday -ed 2023-09-30
-        step 2: in bought.csv I get transaction record:
-            actual result: b_43,apple,1.75,next_monday,2023-09-30     --> problem: I do not want "next_monday" in bought.csv, but instead 2023-09-25
-            expected result: b_43,apple,1.75,2023-09-25,2023-09-30
-        The following code solves this problem (there is probably an "official way" hidden inside the enigmatic mystifying argparse docs, but this works kinda nice :-)
-        '''
-        if args.buy_date == 'next_monday': 
-            print('ffoo')
-            args.buy_date = next_monday 
-        if args.buy_date == 'next_tuesday': 
-            args.buy_date = next_tuesday
-        if args.buy_date == 'next_wednesday':
-            args.buy_date = next_wednesday
-        if args.buy_date == 'next_thursday':
-            args.buy_date = next_thursday
-        if args.buy_date == 'next_friday':
-            args.buy_date = next_friday
-        if args.buy_date == 'next_saturday':
-            args.buy_date = next_saturday
-        if args.buy_date == 'next_sunday':
-            args.buy_date = next_sunday
         buy_product(args.product_name, args.price, args.buy_date, args.expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file, path_to_csv_bought_output_file) 
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')        
@@ -574,6 +618,29 @@ def main():
     # nr 5of16
     if args.command == "sell":
         print("sell:")
+        if args.sell_date == 'next_monday': 
+            print('ffoo')
+            args.sell_date = NEXT_MONDAY 
+        if args.sell_date == 'next_tuesday': 
+            args.sell_date = NEXT_TUESDAY
+        if args.sell_date == 'next_wednesday':
+            args.sell_date = NEXT_WEDNESDAY
+        if args.sell_date == 'next_thursday':
+            args.sell_date = NEXT_THURSDAY
+        if args.sell_date == 'next_friday':
+            args.sell_date = NEXT_FRIDAY
+        if args.sell_date == 'next_saturday':
+            args.sell_date = NEXT_SATURDAY
+        if args.sell_date == 'next_sunday':
+            args.sell_date = NEXT_SUNDAY
+        if args.sell_date == 'today':
+            args.sell_date = SYSTEM_DATE
+        if args.sell_date == 'tomorrow':
+            args.sell_date = TOMORROW
+        if args.sell_date == 'overmorrow':
+            args.sell_date = OVERMORROW
+        if args.sell_date == 'YESTERDAY':
+            args.sell_date = YESTERDAY
         path_to_csv_sold_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'sold.csv')
         path_to_csv_sold_output_file = path_to_csv_sold_input_file # but not the same in pytest.
         sell_product(args.buy_id, args.price, args.sell_date, path_to_csv_sold_input_file, path_to_csv_sold_output_file)
