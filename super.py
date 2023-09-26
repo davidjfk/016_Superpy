@@ -182,7 +182,7 @@ def main():
 
 
     # 1_BUY: create subparser "buy" with help text and add it to the container "command":
-    subparser_buy_product = subparsers.add_parser("buy", help="goal: buy product and add to file bought.csv \n   ex1: py super.py buy apple 1.75 -bd 23-09-15 -expd 23-09-27 \n   product: apple,  price: E 1.75, buy_date: 23-09-15, expiry_date: 23-09-27\n\n   ex2: py super.py buy linseed 3.00 -expd 23-09-28 \n   product: linseed, price: &euro; 3.00, buy_date: system_date as default, expiry_date: 23-09-28\n\n   ex3: py super.py buy cabbage 0.73 \n   product: cabbage, price: E 0.73, buy_date: system_date as default, expiry_date:  'does not expire' as default \n\n   arg1: positional argument product: e.g. apple, potato, milk\n   arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35\n   arg3: optional argument -buy_date, -bd (ex: 2023-09-15) with system_date as default value. \n   arg4: optional argument -expiry_date, -exd (ex: 2023-10-03) with default value 'does not expire' \n\n") 
+    subparser_buy_product = subparsers.add_parser("buy", help="goal: buy product and add to file bought.csv \n   ex1: py super.py buy apple 1.75 -bd 23-09-15 -expd 23-09-27 \n   product: apple,  price: E 1.75, buy_date: 23-09-15, expiry_date: 23-09-27\n\n   ex2: py super.py buy linseed 3.00 -expd 23-09-28 \n   product: linseed, price: &euro; 3.00, buy_date: system_date as default, expiry_date: 23-09-28\n\n   ex3: py super.py buy cabbage 0.73 \n   product: cabbage, price: E 0.73, buy_date: system_date as default, expiry_date:  'does not expire' as default \n\n   arg1: positional argument product: e.g. apple, potato, milk\n   arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35\n   arg3: optional argument -buy_date, -bd (ex: 2023-09-15) with system_date as default value. \n   arg4: optional argument -expiry_date, -exd (ex: 2023-10-03) with default value 'does not expire' \n\n   arg with date value can be entered in format YYYY-MM-DD: e.g. 2029-02-03 , or as a word (exhaustive list):\n   today, tomorrow, overmorrow, yesterday, next_monday (...) next_sunday. \n\n") 
     #step: add the positional and optional arguments to  'subparser_buy_product': 
     subparser_buy_product.add_argument("product_name", type=str, help="e.g. apple, carrot, oats, etc.") 
     subparser_buy_product.add_argument("price", type=float, help="e.g. 1.20 means 1 euro and 20 cents. 0.2 or 0.20 means 20 cents.") 
@@ -225,7 +225,7 @@ def main():
 
 
     # 5_SELL: create subparser "sell" with help text and add it to the container "command":
-    subparser_sell_product = subparsers.add_parser("sell", help="goal: sell product and add to file sold.csv \n   ex1: py super.py b_15 3.75 -sd 2023-11-15 \n   product: row with id b_15 in bought.csv is sold, price: E 3.75, sell_date: 23-11-15\n\n   ex2: py super.py b_16 5.15 \n   product: row with id b_15 in bought.csv is sold, price: E 5.15, sell_date: system_date as default\n\n   ex3: py super.py b_128 2.42 \n   product: row with id b_128 in bought.csv is sold, price: E 2.42, sell_date: system_date as default\n\n   arg1: positional argument buy_id: e.g. b_7, b_18, etc. See bought.csv for buy_ids\n   arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35\n   arg3: optional argument -sell_date, -sd (ex: -sd 2023-09-15) with system_date as default value. \n \n\n")
+    subparser_sell_product = subparsers.add_parser("sell", help="goal: sell product and add to file sold.csv \n   ex1: py super.py b_15 3.75 -sd 2023-11-15 \n   product: row with id b_15 in bought.csv is sold, price: E 3.75, sell_date: 23-11-15\n\n   ex2: py super.py b_16 5.15 \n   product: row with id b_15 in bought.csv is sold, price: E 5.15, sell_date: system_date as default\n\n   ex3: py super.py b_128 2.42 \n   product: row with id b_128 in bought.csv is sold, price: E 2.42, sell_date: system_date as default\n\n   arg1: positional argument buy_id: e.g. b_7, b_18, etc. See bought.csv for buy_ids\n   arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35\n   arg3: optional argument -sell_date, -sd (ex: -sd 2023-09-15) with system_date as default value. \n\n   arg with date value can be entered in format YYYY-MM-DD: e.g. 2029-02-03 , or as a word (exhaustive list):\n   today, tomorrow, overmorrow, yesterday, next_monday (...) next_sunday. \n\n")
     #step: add the positional and optional arguments to 'subparser_set_date': 
     subparser_sell_product.add_argument("buy_id", type=str, help="e.g. apple, carrot, oats, etc.") 
     subparser_sell_product.add_argument("price", type=float, help="e.g. 1.20 means 1 euro and 20 cents. 0.2 or 0.20 means 20 cents.") 
@@ -235,7 +235,7 @@ def main():
 
 
     # 6_SET_DATE: create subparser "set_system_date" with help text and add it to the container "command":
-    subparser_set_date = subparsers.add_parser("set_system_date", help="goal: set_system_date_to a specific date in the file system_date.txt\n   ex1: py super.py set_date 2025-01-01 \n   system_date: 2025-01-01\n result: 'Superpy system_date is set to date (e.g.) 2028-03-10' \n\n   arg1: positional argument system_date, e.g. 2023-10-11. \n   --> string representation in format 'yyy-mm-dd'\n\n")
+    subparser_set_date = subparsers.add_parser("set_system_date", help="goal: set_system_date_to a specific date in the file system_date.txt\n   ex1: py super.py set_date 2025-01-01 \n   system_date: 2025-01-01\n result: 'Superpy system_date is set to date (e.g.) 2028-03-10' \n\n   arg1: positional argument system_date, e.g. 2023-10-11. \n   --> string representation in format 'yyy-mm-dd'\n\n   arg with date value can be entered in format YYYY-MM-DD: e.g. 2029-02-03 , or as a word (exhaustive list):\n   today, tomorrow, overmorrow, yesterday, next_monday (...) next_sunday. \n\n")
     #step: add the positional and optional arguments to 'subparser_set_date': 
     subparser_set_date.add_argument("new_system_date", type=str, help="specify the new system date in format YYYY-MM-DD") 
 
@@ -308,11 +308,12 @@ def main():
             expected result: b_43,apple,1.75,2023-09-25,2023-09-30
         The following code solves this problem (there is probably an "official way" hidden inside the enigmatic mystifying argparse docs, but this works kinda nice :-)
         
-        ex without following code: py super.py buy apple 0.79 -bd 2023-09-18 -ed 2023-09-25
-        ex with following code:    py super.py buy apple 0.79 -bd today -ed -ed 2023-09-25
+        ex date in format YYYY-MM-DD: py super.py buy apple 0.79 -bd 2023-09-18 -ed 2023-09-25
+        ex with date as 'temporal deictic' (credits to google for this word) py super.py buy apple 0.79 -bd today -ed -ed 2023-09-25
+
+        All temporal deictics: (next_monday, next_tuesday, etc.) are converted to date in format YYYY-MM-DD:
         '''
         if args.buy_date == 'next_monday': 
-            print('ffoo')
             args.buy_date = NEXT_MONDAY 
         if args.buy_date == 'next_tuesday': 
             args.buy_date = NEXT_TUESDAY
@@ -336,8 +337,8 @@ def main():
             args.buy_date = YESTERDAY
         '''
         same recipy for expiry_date: 
-        ex without following code: py super.py buy apple 0.79 -bd today -ed 2023-09-25
-        ex with following code:    py super.py buy apple 0.79 -bd today -ed next_monday
+        ex with date in format YYYY-MM-DD: py super.py buy apple 0.79 -bd today -ed 2023-09-25
+        ex with date as temporal deictic: py super.py buy apple 0.79 -bd today -ed next_monday
         '''
         if args.expiry_date == 'next_monday': 
             args.expiry_date = NEXT_MONDAY 
@@ -618,8 +619,11 @@ def main():
     # nr 5of16
     if args.command == "sell":
         print("sell:")
+        '''
+        ex with  date in format YYYY-MM-DD: py super.py sell apple 0.79 -sd 2023-09-26
+        ex with date as temporal deictic: py super.py sell apple 0.79 -sd today 
+        '''        
         if args.sell_date == 'next_monday': 
-            print('ffoo')
             args.sell_date = NEXT_MONDAY 
         if args.sell_date == 'next_tuesday': 
             args.sell_date = NEXT_TUESDAY
@@ -662,12 +666,38 @@ def main():
 
     # nr 6of16
     if args.command == "set_system_date":
+        '''
+        ex with date in format YYYY-MM-DD: py super.py set_system_date 2023-09-26
+        ex with date as temporal deictic: py super.py set_system_date next_week
+        '''
+        if args.new_system_date == 'next_monday': 
+            args.new_system_date = NEXT_MONDAY 
+        if args.new_system_date == 'next_tuesday': 
+            args.new_system_date = NEXT_TUESDAY
+        if args.new_system_date == 'next_wednesday':
+            args.new_system_date = NEXT_WEDNESDAY
+        if args.new_system_date == 'next_thursday':
+            args.new_system_date = NEXT_THURSDAY
+        if args.new_system_date == 'next_friday':
+            args.new_system_date = NEXT_FRIDAY
+        if args.new_system_date == 'next_saturday':
+            args.new_system_date = NEXT_SATURDAY
+        if args.new_system_date == 'next_sunday':
+            args.new_system_date = NEXT_SUNDAY
+        if args.new_system_date == 'today':
+            args.new_system_date = SYSTEM_DATE
+        if args.new_system_date == 'tomorrow':
+            args.new_system_date = TOMORROW
+        if args.new_system_date == 'overmorrow':
+            args.new_system_date = OVERMORROW
+        if args.new_system_date == 'YESTERDAY':
+            args.new_system_date = YESTERDAY
         print("set_system_date")
         # step: call fn set_system_date_to to update file system__date.txt with following date:
         new_system_date = set_system_date_to(args.new_system_date, PATH_TO_FILE_WITH_SYSTEM_DATE)
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')
-        print(f"Superpy system_date is set to date: {new_system_date}                    ")
+        print(f"Superpy system_date is set to date: {new_system_date}                                             ")
         print('---------------------------------------------------------------------------------------------------')
 
     # nr 7of16

@@ -397,7 +397,6 @@ def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_hi
             So I need to create b_01 (...) b_09, so that s_01 (...) s_09 can be created.
             '''
             # if new_id_to_use_in_fn_buy_product < 10:
-            #     print('hi there!!')
             #     new_id_to_use_in_fn_buy_product = "b_0" + str(new_id_to_use_in_fn_buy_product)
             # else:
             new_id_to_use_in_fn_buy_product = "b_" + str(new_id_to_use_in_fn_buy_product)
@@ -441,7 +440,14 @@ def create_data_for_csv_files_bought_and_sold(
         because it could make parsing with argparse cli more difficult (not sure).
 
         This fn cannot be tested with pytest, because I use random.sample() in this fn.
-    
+
+        backlog idea: add fn-arg price_range (implement same way as product_range). 
+            Edge case to test while implementing this backlog feature:
+            1. create mock_data with product_range and price_range of 1
+            2. result: less than 10 transactions in bought.csv
+            3. now check if fn create_buy_id_that_increments_highest_buy_id_in_boughtcsv() still
+            works as expected: i.e. can handle an input of e.g. b_9 and return b_10.
+            Up until now the lowest input into  this fn has been  b_12, b_13 etc. 
     '''
     # PART 1 OF 2: create testdata for bought.csv: 
 

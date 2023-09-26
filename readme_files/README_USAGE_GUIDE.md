@@ -247,12 +247,14 @@ List of superpy functionality with goals:
     py super.py buy cabbage 0.73 
 ```
 -   product: cabbage, price: &euro; 0.73, buy_date: system_date as default, expiry_date:  'does not expire' as default 
-
+<br/>
 - arg1: positional argument product: e.g. apple, potato, milk
 - arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35   
 - arg3: optional argument -buy_date, -bd (ex: 2023-09-15) with default value system_date 
 - arg4: optional argument -expiry_date, -expd (ex: 2023-10-03) with default value 'does not expire' 
-
+<br/>
+- arg with date value can be entered in format YYYY-MM-DD: e.g. 2029-02-03 , or as a word (exhaustive list):  
+    today, tomorrow, overmorrow, yesterday, next_monday (...) next_sunday.
 
 <br /> 
 <br /> 
@@ -547,11 +549,13 @@ List of superpy functionality with goals:
     py super.py b_128 2.42 
 ```
 -   product: row with id b_128 in bought.csv is sold, price: &euro; 2.42, sell_date: system_date as default
-
+<br/>
 - arg1: positional argument buy_id: e.g. b_7, b_18, etc. See bought.csv for buy_ids
 - arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35  
 - arg3: optional argument -sell_date, -sd (ex: -sd 2023-09-15) with default value system_date 
-
+<br/>
+- arg with date value can be entered in format YYYY-MM-DD: e.g. 2029-02-03 , or as a word (exhaustive list):  
+    today, tomorrow, overmorrow, yesterday, next_monday (...) next_sunday.
 <br /> 
 <br /> 
 - -----------------------------------------------------------------------------------------------
@@ -579,10 +583,11 @@ List of superpy functionality with goals:
 
 - system_date: 2023-09-20
 - result: 'Superpy system_date is set to date: 2023-09-20'
-
+</br>
 - arg1: positional argument system_date, e.g. 2023-10-11 --> string representation in format 'yyy-mm-dd'<br/>
-
-
+</br>
+- arg with date value can be entered in format YYYY-MM-DD: e.g. 2029-02-03 , or as a word (exhaustive list):  
+    today, tomorrow, overmorrow, yesterday, next_monday (...) next_sunday.
 
 <br /> 
 <br /> 
