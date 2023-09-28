@@ -477,10 +477,10 @@ def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_hi
             So s_10 is sorted before s_2, and s_100 is sorted before s_3, etc.
             So I need to create b_01 (...) b_09, so that s_01 (...) s_09 can be created.
             '''
-            # if new_id_to_use_in_fn_buy_product < 10:
-            #     new_id_to_use_in_fn_buy_product = "b_0" + str(new_id_to_use_in_fn_buy_product)
-            # else:
-            new_id_to_use_in_fn_buy_product = "b_" + str(new_id_to_use_in_fn_buy_product)
+            if new_id_to_use_in_fn_buy_product < 10:
+                new_id_to_use_in_fn_buy_product = "b_0" + str(new_id_to_use_in_fn_buy_product)
+            else:
+                new_id_to_use_in_fn_buy_product = "b_" + str(new_id_to_use_in_fn_buy_product)
             file.seek(0)
     except FileNotFoundError:
         print(f"File '{path_to_id_with_highest_sequence_number}' not found.")
@@ -900,7 +900,14 @@ def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_cr
     and foreign keys to connect bought.csv and sold.csv 
     '''
     if buy_id == None: # if bought.csv is empty
-        buy_id = 'b_1'
+        buy_id = 'b_00' 
+        '''
+        # pitfall: at this point in the code you can fill out b_00 or b_0. It does not matter.
+        Later, in fn create_buy_id_that_increments_highest_buy_id_in_boughtcsv(), b_00 will be converted to b_1.
+        '''
+        
+
+
     try:
         with open(path_to_buy_id_file, 'w', newline='') as file:
             file.write(buy_id)

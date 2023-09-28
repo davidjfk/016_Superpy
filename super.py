@@ -606,7 +606,7 @@ def main():
 
         '''
         # postperation: with all data having been deleted from bought.csv and sold.csv, the next buy_id must be 
-        reset to b_1 for the first buy_transaction to be added to bought.csv by the USER of the superpy-app:
+        reset to b_01 for the first buy_transaction to be added to bought.csv by the USER of the superpy-app:
         '''
         path_to_file_with_name_id_to_use_in_fn_buy_product = get_path_to_file("data_used_in_superpy", "id_to_use_in_fn_buy_product.txt")
         highest_buy_id_in_boughtcsv = "b_0"
