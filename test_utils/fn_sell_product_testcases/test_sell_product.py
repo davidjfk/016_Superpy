@@ -1,7 +1,7 @@
 import filecmp, os, sys
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
-from utils_superpy.utils import sell_product, get_path_to_directory_of_file
+from utils.utils import sell_product, get_path_to_directory_of_file
 
 directory_of_testcase = "fn_sell_product_testcases" 
 path_to_directory_of_testcase = get_path_to_directory_of_file(directory_of_testcase)

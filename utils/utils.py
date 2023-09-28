@@ -91,18 +91,32 @@ def buy_product(
     Only when testing fn buy_product in pytest, input and output csv file are different.
     reason: when testing fn buy_product in pytest, I want to keep the csv-file with testdata intact.
     '''
-    with open(path_to_csv_bought_input_file, 'r', newline='') as file: 
-        reader = csv.DictReader(file)
-        rows = list(reader)
-        print('type of rows:')
-        print(type(rows))
-        file.seek(0)
+    try:
+        with open(path_to_csv_bought_input_file, 'r', newline='') as file: 
+            reader = csv.DictReader(file)
+            rows = list(reader)
+            print('type of rows:')
+            print(type(rows))
+            file.seek(0)
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_bought_input_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_bought_input_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_bought_input_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
 
-    with open(path_to_csv_bought_output_file, 'w', newline='') as file: 
-        rows.append({'buy_id': id_of_row_in_csv_file_bought, 'product': product, 'buy_price': price, 'buy_date': buy_date, 'expiry_date': expiry_date}) 
-        writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
+    try:
+        with open(path_to_csv_bought_output_file, 'w', newline='') as file: 
+            rows.append({'buy_id': id_of_row_in_csv_file_bought, 'product': product, 'buy_price': price, 'buy_date': buy_date, 'expiry_date': expiry_date}) 
+            writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+    except PermissionError:
+        print(f"You don't have permission to write to '{path_to_csv_bought_output_file}'.")
+    except csv.Error as e:
+        print(f"Error while writing CSV file: {e}")   
 
 
 def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(
@@ -123,15 +137,25 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(
     end_date = datetime.strptime(str(end_date), '%Y-%m-%d')
     cost = 0
     cost_rounded = 0
-    with open(path_to_csv_bought_file, 'r', newline='') as file_object: 
-        reader = csv.DictReader(file_object)
-        for row in reader:
-            sell_date = row['buy_date']
-            sell_date = datetime.strptime(sell_date, '%Y-%m-%d')
-            if start_date <= sell_date <= end_date:
-                cost += float(row['buy_price'])
-                cost_rounded = round(cost, 2)
-    return cost_rounded
+
+    try:
+        with open(path_to_csv_bought_file, 'r', newline='') as file_object: 
+            reader = csv.DictReader(file_object)
+            for row in reader:
+                sell_date = row['buy_date']
+                sell_date = datetime.strptime(sell_date, '%Y-%m-%d')
+                if start_date <= sell_date <= end_date:
+                    cost += float(row['buy_price'])
+                    cost_rounded = round(cost, 2)
+        return cost_rounded
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_bought_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_bought_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_bought_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
 
 
 def calculate_expired_products_on_day(
@@ -145,47 +169,65 @@ def calculate_expired_products_on_day(
 
     # sold.csv:
     sell_data = {}
-    with open(path_to_csv_sold_file, 'r') as file_object:
-        reader = csv.reader(file_object)
-        next(reader)  
-        for row in reader:
-            sell_id, buy_id, sell_price, sell_date = row
-            sell_data[buy_id] = sell_date if sell_date else None
-
+    try:
+        with open(path_to_csv_sold_file, 'r') as file_object:
+            reader = csv.reader(file_object)
+            next(reader)  
+            for row in reader:
+                sell_id, buy_id, sell_price, sell_date = row
+                sell_data[buy_id] = sell_date if sell_date else None
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_sold_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_sold_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_sold_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
 
     # bought.csv:
     expired_products = []
-    with open(path_to_csv_bought_file, 'r') as file_object:
-        reader = csv.reader(file_object)
-        next(reader)  
-        for row in reader:
-            # I have access to sold.csv and bought.csv:
-            buy_id, product, buy_price, buy_date, expiry_date = row
-            buy_date = datetime.strptime(buy_date, '%Y-%m-%d').date()
-            '''
-            about 'does not expire': 
-            uc: if user buys a product via argparse cli ( calling fn buy_product) without setting expiry_date as a flag, then
-            default value for expiry_date is 'does not expire'. Reason: supermarket also sells e.g. magazines, 
-            light bulbs, etc. that do not expire)
-            '''
-            if expiry_date == 'does not expire':
-                if date_on_which_to_calculate_expired_products > buy_date and expiry_date == 'does not expire' and sell_data.get(buy_id) is None:
-                    expired_products.append(row)
-            else: 
-                expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date() 
-                if date_on_which_to_calculate_expired_products > buy_date and date_on_which_to_calculate_expired_products > expiry_date and sell_data.get(buy_id) is None:
-                    expired_products.append(row)             
-            '''
-            there is only 1 difference between  this fn and fn calculate_expired_products_on_day: 
-            "<" in "date_on_which_to_calculate_products_in_inventory < expiry_date" above.
+    try:
+        with open(path_to_csv_bought_file, 'r') as file_object:
+            reader = csv.reader(file_object)
+            next(reader)  
+            for row in reader:
+                # I have access to sold.csv and bought.csv:
+                buy_id, product, buy_price, buy_date, expiry_date = row
+                buy_date = datetime.strptime(buy_date, '%Y-%m-%d').date()
+                '''
+                about 'does not expire': 
+                uc: if user buys a product via argparse cli ( calling fn buy_product) without setting expiry_date as a flag, then
+                default value for expiry_date is 'does not expire'. Reason: supermarket also sells e.g. magazines, 
+                light bulbs, etc. that do not expire)
+                '''
+                if expiry_date == 'does not expire':
+                    if date_on_which_to_calculate_expired_products > buy_date and expiry_date == 'does not expire' and sell_data.get(buy_id) is None:
+                        expired_products.append(row)
+                else: 
+                    expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date() 
+                    if date_on_which_to_calculate_expired_products > buy_date and date_on_which_to_calculate_expired_products > expiry_date and sell_data.get(buy_id) is None:
+                        expired_products.append(row)             
+                '''
+                there is only 1 difference between  this fn and fn calculate_expired_products_on_day: 
+                "<" in "date_on_which_to_calculate_products_in_inventory < expiry_date" above.
 
-            in bought.csv: (by convention) buy_date is always set with either an expiry_date or 'does not expire'.
+                in bought.csv: (by convention) buy_date is always set with either an expiry_date or 'does not expire'.
 
-            about 'does not expire': 
-            uc: if user buys a product via argparse cli (fn buy_product) without setting expiry_date, then
-            default value for expiry_date is 'does not expire' (supermarket also sells e.g. magazines, light bulbs, etc. that do not expire)
-            '''
+                about 'does not expire': 
+                uc: if user buys a product via argparse cli (fn buy_product) without setting expiry_date, then
+                default value for expiry_date is 'does not expire' (supermarket also sells e.g. magazines, light bulbs, etc. that do not expire)
+                '''
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_bought_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_bought_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_bought_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
     return expired_products
+
 
 
 def calculate_inventory_on_day(
@@ -199,45 +241,64 @@ def calculate_inventory_on_day(
 
     # sold.csv:
     sell_data = {}
-    with open(path_to_csv_sold_file, 'r') as file_object:
-        reader = csv.reader(file_object)
-        next(reader)  
-        for row in reader:
-            sell_id, buy_id, sell_price, sell_date = row
-            sell_data[buy_id] = sell_date if sell_date else None
-    
+    try:
+        with open(path_to_csv_sold_file, 'r') as file_object:
+            reader = csv.reader(file_object)
+            next(reader)  
+            for row in reader:
+                sell_id, buy_id, sell_price, sell_date = row
+                sell_data[buy_id] = sell_date if sell_date else None
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_sold_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_sold_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_sold_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
+
+        
     # bought.csv:
     products_in_inventory = []
-    with open(path_to_csv_bought_file, 'r') as file_object:
-        reader = csv.reader(file_object)
-        next(reader)  
-        for row in reader:
-            # I have access to sold.csv and bought.csv:
-            buy_id, product, buy_price, buy_date, expiry_date = row
-            buy_date = datetime.strptime(buy_date, '%Y-%m-%d').date()
-            '''
-            about 'does not expire': 
-            uc: if user buys a product via argparse cli ( calling fn buy_product) without setting expiry_date as a flag, then
-            default value for expiry_date is 'does not expire'. Reason: supermarket also sells e.g. magazines, 
-            light bulbs, etc. that do not expire)
-            '''
-            if expiry_date == 'does not expire':
-                if date_on_which_to_calculate_products_in_inventory > buy_date and expiry_date == 'does not expire' and sell_data.get(buy_id) is None:
-                    products_in_inventory.append(row)
-            else: 
-                expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date() 
-                if date_on_which_to_calculate_products_in_inventory > buy_date and date_on_which_to_calculate_products_in_inventory < expiry_date and sell_data.get(buy_id) is None:
-                    products_in_inventory.append(row) 
-            '''
-            there is only 1 difference between  this fn and fn calculate_expired_products_on_day: 
-            "<" in "date_on_which_to_calculate_products_in_inventory < expiry_date" above.
+    try:
+        with open(path_to_csv_bought_file, 'r') as file_object:
+            reader = csv.reader(file_object)
+            next(reader)  
+            for row in reader:
+                # I have access to sold.csv and bought.csv:
+                buy_id, product, buy_price, buy_date, expiry_date = row
+                buy_date = datetime.strptime(buy_date, '%Y-%m-%d').date()
+                '''
+                about 'does not expire': 
+                uc: if user buys a product via argparse cli ( calling fn buy_product) without setting expiry_date as a flag, then
+                default value for expiry_date is 'does not expire'. Reason: supermarket also sells e.g. magazines, 
+                light bulbs, etc. that do not expire)
+                '''
+                if expiry_date == 'does not expire':
+                    if date_on_which_to_calculate_products_in_inventory > buy_date and expiry_date == 'does not expire' and sell_data.get(buy_id) is None:
+                        products_in_inventory.append(row)
+                else: 
+                    expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date() 
+                    if date_on_which_to_calculate_products_in_inventory > buy_date and date_on_which_to_calculate_products_in_inventory < expiry_date and sell_data.get(buy_id) is None:
+                        products_in_inventory.append(row) 
+                '''
+                there is only 1 difference between  this fn and fn calculate_expired_products_on_day: 
+                "<" in "date_on_which_to_calculate_products_in_inventory < expiry_date" above.
 
-            in bought.csv: (by convention) buy_date is always set with either an expiry_date or 'does not expire'.
+                in bought.csv: (by convention) buy_date is always set with either an expiry_date or 'does not expire'.
 
-            about 'does not expire': 
-            uc: if user buys a product via argparse cli (fn buy_product) without setting expiry_date, then
-            default value for expiry_date is 'does not expire' (supermarket also sells e.g. magazines, light bulbs, etc. that do not expire)
-            '''
+                about 'does not expire': 
+                uc: if user buys a product via argparse cli (fn buy_product) without setting expiry_date, then
+                default value for expiry_date is 'does not expire' (supermarket also sells e.g. magazines, light bulbs, etc. that do not expire)
+                '''
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_bought_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_bought_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_bought_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
     return products_in_inventory
 
 
@@ -297,15 +358,25 @@ def calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusi
     start_date = datetime.strptime(str(start_date), '%Y-%m-%d')
     end_date = datetime.strptime(str(end_date), '%Y-%m-%d')
     sales_volume = 0
-    with open(path_to_csv_sold_file, 'r', newline='') as file_object: 
-        reader = csv.DictReader(file_object)
-        for row in reader:
-            sell_date = row['sell_date']
-            sell_date = datetime.strptime(sell_date, '%Y-%m-%d')
-            if start_date <= sell_date <= end_date:
-                sales_volume += 1
+    try:
+        with open(path_to_csv_sold_file, 'r', newline='') as file_object: 
+            reader = csv.DictReader(file_object)
+            for row in reader:
+                sell_date = row['sell_date']
+                sell_date = datetime.strptime(sell_date, '%Y-%m-%d')
+                if start_date <= sell_date <= end_date:
+                    sales_volume += 1
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_sold_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_sold_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_sold_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
 
     return sales_volume
+
 
 def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(
         start_date: str, 
@@ -326,15 +397,24 @@ def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(
 
     revenue = 0
     revenue_rounded = 0
-    with open(path_to_csv_sold_file, 'r', newline='') as file: 
-        reader = csv.DictReader(file)
-        for row in reader:
-            sell_date = row['sell_date']
-            sell_date = datetime.strptime(sell_date, '%Y-%m-%d')
-            if start_date <= sell_date <= end_date:
-                revenue += float(row['sell_price'])
-                revenue_rounded = round(revenue, 2)
-    return revenue_rounded
+    try:
+        with open(path_to_csv_sold_file, 'r', newline='') as file: 
+            reader = csv.DictReader(file)
+            for row in reader:
+                sell_date = row['sell_date']
+                sell_date = datetime.strptime(sell_date, '%Y-%m-%d')
+                if start_date <= sell_date <= end_date:
+                    revenue += float(row['sell_price'])
+                    revenue_rounded = round(revenue, 2)
+        return revenue_rounded
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_sold_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_sold_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_sold_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
 
 
 def create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created(
@@ -357,6 +437,7 @@ def create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_cr
             return f"{csv_file_name_first_letter}_0{count}"
         return f"{csv_file_name_first_letter}_{count}"
     return counter
+
 
 def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number: str) -> str:
     '''
@@ -401,13 +482,25 @@ def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_hi
             # else:
             new_id_to_use_in_fn_buy_product = "b_" + str(new_id_to_use_in_fn_buy_product)
             file.seek(0)
+    except FileNotFoundError:
+        print(f"File '{path_to_id_with_highest_sequence_number}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_id_with_highest_sequence_number}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_id_with_highest_sequence_number}'.")
+    except IOError as e:
+        print(f"Error while reading file: {e}")
+
+    try:
         with open(path_to_id_with_highest_sequence_number, 'w', newline='') as file: 
             print(new_id_to_use_in_fn_buy_product)  
             file.write(new_id_to_use_in_fn_buy_product)
-    except IOError:
-        print("Error in fn create_id_with_unused_highest_sequence_nr()")
-    return new_id_to_use_in_fn_buy_product
+    except PermissionError:
+        print(f"You don't have permission to write to '{path_to_id_with_highest_sequence_number}'.")
+    except IOError as e:
+        print(f"Error while writing file: {e}")
 
+    return new_id_to_use_in_fn_buy_product
 
 
 def create_data_for_csv_files_bought_and_sold(
@@ -504,12 +597,16 @@ def create_data_for_csv_files_bought_and_sold(
         row_in_csv_file_bought.insert(0, csv_file_bought_id())
 
     # step 9: save data to bought.csv:
-    with open(path_to_file_bought_csv, 'w', newline='') as csvfile:    
-        writer = csv.writer(csvfile)
-        writer.writerow(['buy_id', 'product', 'buy_price', 'buy_date', 'expiry_date'])
-        writer.writerows(products_with_bought_date) 
-        # writerows() expects a list of lists.
-
+    try:
+        with open(path_to_file_bought_csv, 'w', newline='') as csvfile:    
+            writer = csv.writer(csvfile)
+            writer.writerow(['buy_id', 'product', 'buy_price', 'buy_date', 'expiry_date'])
+            writer.writerows(products_with_bought_date) 
+            # writerows() expects a list of lists.
+    except PermissionError:
+        print(f"You don't have permission to write to '{path_to_file_bought_csv}'.")
+    except csv.Error as e:
+        print(f"Error while writing CSV file: {e}")
 
     # PART 2 OF 2: create testdata for sold.csv: 
 
@@ -565,11 +662,15 @@ def create_data_for_csv_files_bought_and_sold(
     '''
 
     # step 4: save data to sold.csv:
-    with open(path_to_file_sold_csv, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['sell_id', 'buy_id', 'sell_price', 'sell_date'])
-        writer.writerows(products_with_sold_date) # note to self: writerows() expects a list of lists.
-
+    try:
+        with open(path_to_file_sold_csv, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['sell_id', 'buy_id', 'sell_price', 'sell_date'])
+            writer.writerows(products_with_sold_date) # note to self: writerows() expects a list of lists.
+    except PermissionError:
+        print(f"You don't have permission to write to '{path_to_file_sold_csv}'.")
+    except csv.Error as e:
+        print(f"Error while writing CSV file: {e}")
 
 
 def generate_random_buy_date_for_buy_transaction_in_future_in_time_interval(
@@ -601,7 +702,6 @@ def get_dates_of_next_7_days(today: str) -> list:
     instead of e.g.:
     'py super.py buy apple 1.10 2021-09-25'
     '''
-    
     today_as_date_object = datetime.strptime(today, '%Y-%m-%d').date()
     # print(f'today_as_date_object: {today_as_date_object}')
     
@@ -690,13 +790,22 @@ def get_highest_buy_id_from_boughtcsv(path_to_csv_bought_file: str) -> str:
     b_1, b_2, b_3, etc.  
     '''
     highest_buy_id = 'b_0' 
-    with open(path_to_csv_bought_file, 'r') as file_object:
-        reader = csv.reader(file_object)
-        next(reader) # skip header row
-        for row in reader:
-            csv_column_1 = row[0] # ex: b_1, or: b_2, or: b_3, etc
-            if int(csv_column_1.split('_')[1]) > int(highest_buy_id.split('_')[1]):
-                highest_buy_id = csv_column_1
+    try: 
+        with open(path_to_csv_bought_file, 'r') as file_object:
+            reader = csv.reader(file_object)
+            next(reader) # skip header row
+            for row in reader:
+                csv_column_1 = row[0] # ex: b_1, or: b_2, or: b_3, etc
+                if int(csv_column_1.split('_')[1]) > int(highest_buy_id.split('_')[1]):
+                    highest_buy_id = csv_column_1
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_bought_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_bought_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_bought_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
     return highest_buy_id
 
 
@@ -729,8 +838,14 @@ def get_system_date(path_to_system_date: str) -> str:
     try:
         with open(path_to_system_date, 'r', newline='') as file:
             system_date = file.read()
-    except IOError:
-        print("fn get_system_date: trying to get system_date. Plz investigate error.")
+    except FileNotFoundError:
+        print(f"File '{path_to_system_date}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_system_date}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_system_date}'.")
+    except IOError as e:
+        print(f"Error while reading file: {e}")
     return system_date
 
 
@@ -746,18 +861,32 @@ def sell_product(bought_product_id: str,
     Only when testing fn buy_product in pytest, input and output csv file are different.
     reason: when testing fn buy_product in pytest, I want to keep the csv-file with testdata intact.
     '''
-    with open(path_to_csv_bought_input_file, 'r', newline='') as file: 
-        reader = csv.DictReader(file)
-        rows = list(reader)
-        file.seek(0)
-        sold_product_id = bought_product_id.replace('b', 's')
-    with open(path_to_csv_bought_output_file, 'w', newline='') as file: 
-        rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': price, 'sell_date': sell_date}) 
-        writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
-        writer.writeheader()
-        # sort rows by sell_id (== first column in sold.csv):
-        sorted_rows = sorted(rows, key=lambda row: row['sell_id'])
-        writer.writerows(sorted_rows)
+    try: 
+        with open(path_to_csv_bought_input_file, 'r', newline='') as file: 
+            reader = csv.DictReader(file)
+            rows = list(reader)
+            file.seek(0)
+            sold_product_id = bought_product_id.replace('b', 's')
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_bought_input_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_bought_input_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_bought_input_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
+    try:            
+        with open(path_to_csv_bought_output_file, 'w', newline='') as file: 
+            rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': price, 'sell_date': sell_date}) 
+            writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
+            writer.writeheader()
+            # sort rows by sell_id (== first column in sold.csv):
+            sorted_rows = sorted(rows, key=lambda row: row['sell_id'])
+            writer.writerows(sorted_rows)
+    except PermissionError:
+        print(f"You don't have permission to write to '{path_to_csv_bought_output_file}'.")
+    except csv.Error as e:
+        print(f"Error while writing CSV file: {e}")
 
 
 def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id: str, path_to_buy_id_file: str) -> str:
@@ -775,17 +904,22 @@ def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_cr
     try:
         with open(path_to_buy_id_file, 'w', newline='') as file:
             file.write(buy_id)
-    except IOError:
-        print("Inside fn set_system_date_to() --> Plz investigate IOError.  ")
+    except PermissionError:
+        print(f"You don't have permission to write to '{path_to_buy_id_file}'.")
+    except IOError as e:
+        print(f"Error while writing file: {e}")
     return buy_id
+
 
 def set_system_date_to(system_date: str, path_to_system_date: str) -> str:
     # system_date is datetime object, ex: '2020-01-01'
     try:
         with open(path_to_system_date, 'w', newline='') as file:
             file.write(system_date)
-    except IOError:
-        print("Inside fn set_system_date_to() --> Plz investigate IOError.  ")
+    except PermissionError:
+        print(f"You don't have permission to write to '{path_to_system_date}'.")
+    except IOError as e:
+        print(f"Error while writing file: {e}")
     return system_date
 
 
@@ -804,17 +938,28 @@ def show_list_with_nested_lists_in_console_with_module_rich(list: list) -> Table
     console.print(rich_table)
     return rich_table
 
+
 def show_csv_file_in_console_with_module_rich(path_to_csv_file: str) -> None:
     console = Console()
     table = Table(show_header=True, header_style="bold magenta")
-    with open(path_to_csv_file, 'r') as file:
-        csv_reader = csv.reader(file)
-        header = next(csv_reader)  
-        for column in header:
-            table.add_column(column)
-        for row in reversed(list(csv_reader)):
-            table.add_row(*row)
+    try:
+        with open(path_to_csv_file, 'r') as file:
+            csv_reader = csv.reader(file)
+            header = next(csv_reader)  
+            for column in header:
+                table.add_column(column)
+            for row in reversed(list(csv_reader)):
+                table.add_row(*row)
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
     console.print(table)
+
 
 def time_travel_system_date_with_nr_of_days(
         nr_of_days_to_travel: int, 
@@ -828,18 +973,24 @@ def time_travel_system_date_with_nr_of_days(
             current_system_date = file.readline().split(',')[0]
             print('current_system_date: ', current_system_date)
             file.seek(0)
+    except FileNotFoundError:
+        print(f"File '{path_to_input_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_input_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_input_file}'.")
+    except IOError as e:
+        print(f"Error while reading file: {e}")
 
+    try:
         with open(path_to_output_file, 'w', newline='') as file:
             new_system_date = add_days_to_date(current_system_date, nr_of_days_to_travel)
             file.write(new_system_date)
             print('new_system_date: ', new_system_date)
-
-    except IOError:
-        print("Error: File is already / still open. Plz investigate.")
-        file.close()
-        print("status: File has been closed (as a work-around). But error must still be investigated.")
-        with open(os.path.join(path_to_output_file), 'w', newline='') as file:
-            file.write(current_system_date)
+    except PermissionError:
+        print(f"You don't have permission to write to '{path_to_output_file}'.")
+    except IOError as e:
+        print(f"Error while writing file: {e}")
     # returning new_system_date for testing purposes only (returned value is not used in the code)    
     return new_system_date
 

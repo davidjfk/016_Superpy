@@ -1,7 +1,7 @@
 import filecmp, os, sys
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
-from utils_superpy.utils import get_path_to_directory_of_file, set_system_date_to
+from utils.utils import get_path_to_directory_of_file, set_system_date_to
 
 directory_of_testcase = "fn_set_system_date_testcases" 
 path_to_directory_of_testcase = get_path_to_directory_of_file(directory_of_testcase)     

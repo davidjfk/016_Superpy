@@ -1,34 +1,64 @@
 
-## TABLE OF CONTENTS: click link to goto chapter: (press CTRL-key)
-### INTRO
-### ANALYSIS:
-###   DEFINITIONS
-### DESIGN:
-###   1_CREATE-DATAMODEL-ERD   
-###   2_CREATE-FN-create_data_for_csv_files_bought_and_sold.py 
-###   3_USE-CASES
-###   4_MVC-MODEL-VIEW-CONTROLLER
-###   5_TDD-CODING-STEPS-TO-IMPLEMENT-EACH-UC
-###   6_IMPLEMENTATION-ORDER-OF-UCS
+## Table of contents
 
-# INTRO
-[table of contents at the start of markdown file](#INTRO)
-To create application super.py I do the following:
-1. create ERD
-2. create fn to quickly create testdata for  bought.csv and sold.csv
-3. define the ucs to implement (e.g. buy_product, sell_product, etc.)
-4. define a workflow to implement each uc with Test Driven Development (TDD): in
-    iteration first create testcases for a uc and then make testcases pass
-    by developing the functionality. 
-    Then the next iteration: create testcases for next uc and then make
-    testcases pass by developing the functionality. 
-    etc.
+- [Intro](#intro)
+- [Analysis:](#analysis)
+  - [Definitions:](#definitions)
+- [Design:](#design)
+  - [Create datamodel as erd](#create-datamodel-as-erd)
+  - [Create fn to create mock data for csv files bought and sold](#create-fn-to-create-mock-data-for-csv-files-bought-and-sold)
+  - [Use cases](#use-cases)
+    - [uc\_01: set the system\_date in time range](#uc_01-set-the-system_date-in-time-range)
+    - [uc\_02: timetravel in time range.](#uc_02-timetravel-in-time-range)
+    - [uc\_03: buy product (and add to bought.csv)](#uc_03-buy-product-and-add-to-boughtcsv)
+    - [uc\_04: sell product (and add to sold.csv)](#uc_04-sell-product-and-add-to-soldcsv)
+    - [uc\_05: cancel\_buy\_transaction (cruD: Delete part 1)](#uc_05-cancel_buy_transaction-crud-delete-part-1)
+    - [uc\_06: cancel\_sell\_transaction (cruD: Delete part 2)](#uc_06-cancel_sell_transaction-crud-delete-part-2)
+    - [uc\_07: update\_buy\_transaction](#uc_07-update_buy_transaction)
+    - [uc\_08: update\_sell\_transaction](#uc_08-update_sell_transaction)
+    - [uc\_09: fill bought.csv and sold.csv with mock data](#uc_09-fill-boughtcsv-and-soldcsv-with-mock-data)
+    - [uc\_10: calculate inventory on date](#uc_10-calculate-inventory-on-date)
+    - [uc\_11: calculate expired products on date](#uc_11-calculate-expired-products-on-date)
+    - [uc\_12: calculate sales volume in time range between](#uc_12-calculate-sales-volume-in-time-range-between)
+    - [uc\_13: calculate costs in time range between start\_date and end\_date inclusive](#uc_13-calculate-costs-in-time-range-between-start_date-and-end_date-inclusive)
+    - [uc\_14: calculate revenue in time range between start\_date and end\_date inclusive](#uc_14-calculate-revenue-in-time-range-between-start_date-and-end_date-inclusive)
+    - [uc\_15: calculate profit in time range between start\_date and end\_date inclusive](#uc_15-calculate-profit-in-time-range-between-start_date-and-end_date-inclusive)
+    - [ucs to display output in Rich](#ucs-to-display-output-in-rich)
+    - [ucs to display output in Rich](#ucs-to-display-output-in-rich-1)
+    - [uc\_40: delete all data in bought.csv and sold.csv](#uc_40-delete-all-data-in-boughtcsv-and-soldcsv)
+    - [uc\_41: show bought.csv in console with module rich](#uc_41-show-boughtcsv-in-console-with-module-rich)
+    - [uc\_42: show sold.csv in console with module rich](#uc_42-show-soldcsv-in-console-with-module-rich)
+  - [MVC: model-view-controller](#mvc-model-view-controller)
+    - [MODEL LAYER (MVC-model):](#model-layer-mvc-model)
+    - [VIEW LAYER (MVC-model):](#view-layer-mvc-model)
+    - [CONTROLLER LAYER (MVC-model):](#controller-layer-mvc-model)
+  - [TDD: workflow to implement each uc](#tdd-workflow-to-implement-each-uc)
+  - [Implementation order of ucs](#implementation-order-of-ucs)
 
 
-# ANALYSIS
-[table of contents at the start of markdown file](#ANALYSIS)
-1. # DEFINITIONS:
-[table of contents at the start of markdown file](#DEFINITIONS)
+
+# Intro
+[Table of contents](#table-of-contents)
+
+The software design for Superpy has been created roughly in the order of the topics  
+in the table of contents of this document. Goal of this document is to structure
+the many tasks that need(ed) to be done.
+
+Developers are the reader target reader group of this document in case of  
+extensions or modifications to Superpy later on.  
+As a Superpy-user please go to the README_USAGE_GUIDE instead.  
+
+However, parts of the design have been implemented in a different way, because of  
+new insights during the coding process. So use this document to get a quick unpolished
+idea of the design.
+
+
+
+# Analysis:
+[Table of contents](#table-of-contents)
+
+## Definitions:
+[Table of contents](#definitions)
     
     date == calendar day == date object with string representation in format: '%Y-%m-%d', e.g. '2025-10-15'. --> 
         system_date is a date with a special purpose. See system_date below. 
@@ -100,12 +130,12 @@ To create application super.py I do the following:
         23-09-12     23-09-15         3
         (used in fn create_data_for_csv_files_bought_and_sold() )
 
+# Design:
+[Table of contents](#table-of-contents)
 
+## Create datamodel as erd
+[Table of contents](#table-of-contents)
 
-# DESIGN
-[table of contents at the start of markdown file](#DESIGN)
-1. # CREATE DATAMODEL-ERD 
-[table of contents at the start of markdown file](#1_CREATE-DATAMODEL-ERD) 
     Goal: decide about how to connect csv-tables bought.csv and sold.csv.
     -- design idea 1: all data in 1 big csv-file
       (tldr; bad idea: readability, performance, security).
@@ -290,8 +320,8 @@ To create application super.py I do the following:
 
 
 
-2.  # CREATE-FN-create_data_for_csv_files_bought_and_sold.py
-[table of contents at the start of markdown file](#2_CREATE-FN-create_data_for_csv_files_bought_and_sold.py) 
+## Create fn to create mock data for csv files bought and sold
+[Table of contents](#table-of-contents)
     
     precondition: ERD (see prev par) must be ready before creating script.
 
@@ -299,7 +329,7 @@ To create application super.py I do the following:
     1. provide pytest testcases (path: (...)superpy\dir test_utils) with testdata, both input as well
         as expected output to test a fn.
 
-        This data is created in directory: (...)\superpy\data_pytest_create_boughtcsv_and_soldcsv_for_pytestcases_here
+        This data is created in directory: (...)\superpy\create_boughtcsv_and_soldcsv_for_pytestcases_here\
         with script 'create_testdata_for_csv_files_bought_and_sold.py'. The created files bought.csv and  sold.csv
         are then moved to the relevant testcases inside directory (...)\superpy\test_utils. 
 
@@ -383,8 +413,9 @@ To create application super.py I do the following:
 
 
 
-3.  # USE CASES
-[table of contents at the start of markdown file](#3_USE-CASES) 
+## Use cases
+[Table of contents](#table-of-contents)
+
    - intro
         If a uc is about implementing a fn, then in the uc the following 2 signatures are provided:
         1. fn-signature (e.g. buy_product(product, price, buy_date, expiry_date))
@@ -403,11 +434,9 @@ To create application super.py I do the following:
 
 
 
+### uc_01: set the system_date in time range
+[Table of contents](#table-of-contents)
 
-
-
-
-    - uc_01: set the system_date in time range
         This creates a baseline to timetravel ('back to the future, yeah, here I come')
 
         Order of events: 
@@ -432,7 +461,9 @@ To create application super.py I do the following:
 
 
     
-    - uc_02: timetravel in time range.
+### uc_02: timetravel in time range.
+[Table of contents](#table-of-contents)
+
         example code: $ py main.py time_travel 2
 
         To 'advance' means to move forward in purposeful way. But this superpy-app can also timetravel to 
@@ -456,7 +487,8 @@ To create application super.py I do the following:
 
 
 
-    - uc_03: buy product (and add to bought.csv) 
+### uc_03: buy product (and add to bought.csv) 
+[Table of contents](#table-of-contents)
 
         pyt fn:
         def buy_product(product_type, price_per_unit, buy_date, expiryDate):
@@ -488,8 +520,8 @@ To create application super.py I do the following:
 
         SOURCE OF IDS 2OF2: the application user and/or pytest-"engine"-user buys and sells products and by doing so also makes the superpy-app create ids.
         2 use cases:
-        1. as a supermarket-logistics-employee-user of superpy create new data in the production application .
-        2. as pytest create the file with the actual testresult. 
+        4. as a supermarket-logistics-employee-user of superpy create new data in the production application .
+        5. as pytest create the file with the actual testresult. 
         superpy-app keeps track of the next-id-to-use in file id_to_use_in_fn_buy_product.txt in directory data_directory.
 
         To avoid source 1 and 2 accidentally create a buy or sell record with the 
@@ -522,7 +554,9 @@ To create application super.py I do the following:
             It would be very user-unfriendly to type in such an id when deleting e.g. a product with such an id.
 
 
-    - uc_04: sell product (and add to sold.csv)
+### uc_04: sell product (and add to sold.csv)
+[Table of contents](#table-of-contents)
+
         Rule 1: each id in buy.csv (e.g. b_08) and sell.csv (e.g. s_08) MUST be unique.
         Rule 2: a primary key id in sold.csv can only be created if there is a primary key in
             bought.csv with the same nr. examples:
@@ -553,7 +587,8 @@ To create application super.py I do the following:
             ERROR: Product not in stock.
 
 
-    - uc_05: cancel_buy_transaction (cruD: Delete part 1)
+### uc_05: cancel_buy_transaction (cruD: Delete part 1)
+[Table of contents](#table-of-contents)
         
         Rule 1: a bought product can be sold if it has not yet been sold. (exception: see rule 4)
         Rule 2: a bought product cannot be deleted if it has already been sold.
@@ -571,7 +606,8 @@ To create application super.py I do the following:
         Rule 4: after cancelling a sold transaction (see next uc: cancel_sell_transaction) (e.g. s_179), the 
             buy_transaction (here: b_179) can  now also be cancelled. 
     
-    - uc_06: cancel_sell_transaction (cruD: Delete part 2)
+### uc_06: cancel_sell_transaction (cruD: Delete part 2)
+[Table of contents](#table-of-contents)
         
         Rule 1: a sale (i.e. the sales transaction) of a product can  be undone / cancelled. 
         Rule 2: also the sales transaction of an  expired  product can be cancelled: it does 
@@ -597,7 +633,8 @@ To create application super.py I do the following:
 
         (implement only if there is time left)        
 
-    - uc_07: update_buy_transaction
+### uc_07: update_buy_transaction
+[Table of contents](#table-of-contents)
 
         update_buy_transaction = cancel_buy_transaction (uc 05) + buy_product (uc 03)
         So to update you first do cancel_buy_transaction (uc 05) and then buy the same product
@@ -612,7 +649,8 @@ To create application super.py I do the following:
         Nothing to do here.
         
 
-    - uc_08: update_sell_transaction
+### uc_08: update_sell_transaction
+[Table of contents](#table-of-contents)
 
         update_sell_transaction = cancel_sell_transaction (uc 06) + buy_product (uc 04)
         So to update you first do cancel_buy_transaction (uc 06) and then buy the same product
@@ -628,7 +666,8 @@ To create application super.py I do the following:
 
 
 
-    - uc_09: fill bought.csv and sold.csv with mock data
+### uc_09: fill bought.csv and sold.csv with mock data
+[Table of contents](#table-of-contents)
 
         goal: call fn def create_data_for_csv_files_bought_and_sold() in utils.py from argparse interface
               to quickly create specific (test) application data.
@@ -723,7 +762,9 @@ To create application super.py I do the following:
     
 
 
-    - uc_10: calculate inventory on date
+### uc_10: calculate inventory on date
+[Table of contents](#table-of-contents)
+
         (implement if time left) 
 
         business logic:
@@ -795,7 +836,9 @@ To create application super.py I do the following:
 
 
 
-    - uc_11: calculate expired products on date
+### uc_11: calculate expired products on date
+[Table of contents](#table-of-contents)
+
         (implement if time left) 
 
         business logic:
@@ -856,7 +899,9 @@ To create application super.py I do the following:
 
 
 
-    - uc_12: calculate sales volume in time range between 
+### uc_12: calculate sales volume in time range between 
+[Table of contents](#table-of-contents)
+
         start_date and end_date inclusive 
 
         pyt fn:
@@ -891,7 +936,9 @@ To create application super.py I do the following:
 
 
 
-    - uc_13: calculate costs in time range between start_date and end_date inclusive
+### uc_13: calculate costs in time range between start_date and end_date inclusive
+[Table of contents](#table-of-contents)
+
         --> this uc serves as necessary input to calculate revenue 
         (calculate revenue is mandatory) 
 
@@ -919,7 +966,9 @@ To create application super.py I do the following:
 
 
 
-    - uc_14: calculate revenue in time range between start_date and end_date inclusive
+### uc_14: calculate revenue in time range between start_date and end_date inclusive
+[Table of contents](#table-of-contents)
+
         (mandatory Winc Academy requirement)
 
         pyt fn:
@@ -947,7 +996,9 @@ To create application super.py I do the following:
 
 
 
-    - uc_15: calculate profit in time range between start_date and end_date inclusive
+### uc_15: calculate profit in time range between start_date and end_date inclusive
+[Table of contents](#table-of-contents)
+
         (mandatory Winc Academy requirement)
 
         pyt fn:
@@ -976,6 +1027,8 @@ To create application super.py I do the following:
             Display output in Rich and/or Matplotlib. See ucs further down below.
 
 
+### ucs to display output in Rich
+[Table of contents](#table-of-contents)
 
     Display output in Rich ( == non-trivial feature 3):
     - uc_16: display_in_rich_inventory on date
@@ -984,6 +1037,9 @@ To create application super.py I do the following:
     - uc_19: display_in_rich_costs in time range between start_date and end_date inclusive
     - uc_20: display_in_rich_revenue in time range between start_date and end_date inclusive
     - uc_21: display_in_rich_profit in time range between start_date and end_date inclusive
+
+### ucs to display output in Rich
+[Table of contents](#table-of-contents)
 
     Display output in Matplotlib ( == non-trivial feature 4):
     - uc_22: display_in_matplotlib_inventory on date
@@ -994,8 +1050,11 @@ To create application super.py I do the following:
     - uc_27: display_in_matplotlib_profit in time range between start_date and end_date inclusive
 
 
-    Extra features
-    - uc_40: delete all data in bought.csv and sold.csv  (implemented on branch 'branch_07_uc_create_mock_data_in_csv_files_bought_and_sold_via_argparse_cli')
+
+### uc_40: delete all data in bought.csv and sold.csv  
+[Table of contents](#table-of-contents)
+
+        (implemented on branch 'branch_07_uc_create_mock_data_in_csv_files_bought_and_sold_via_argparse_cli')
         This is not a Winc Requirement, but makes superpy application more  fun to use:
         step 1: add mock data with uc_09 'fill bought.csv and sold.csv with mock data'
         step 2: add buy transactions to bought.csv
@@ -1012,25 +1071,33 @@ To create application super.py I do the following:
         py super.py delete 
         'delete' is a subparser without any arguments.
 
-    - uc_41: show bought.csv in console with module rich (implemented on branch 'branch_07_uc_create_mock_data_in_csv_files_bought_and_sold_via_argparse_cli')
+### uc_41: show bought.csv in console with module rich  
+[Table of contents](#table-of-contents)
+
+        (implemented on branch 'branch_07_uc_create_mock_data_in_csv_files_bought_and_sold_via_argparse_cli')
         Why this functionality is necessary: selling a product takes place with the buy_id. 
         Ex: py super.py sell b_18 3.10 23-10-21. This means: sell transaction with buy_id 'b_18' for 3.10 euro on 2023-10-21.
         Ex: py super.py sell b_37 6.30 . This means: sell transaction with buy_id 'b_37' for 6.30 euro on system_date (e.g. 2023-09-16)
         So right before you sell a product, you need to have an overview in the console with all bought products.
 
-    - uc_42: show sold.csv in console with module rich (implemented on branch 'branch_07_uc_create_mock_data_in_csv_files_bought_and_sold_via_argparse_cli')
+### uc_42: show sold.csv in console with module rich  
+[Table of contents](#table-of-contents)
+
+        (implemented on branch 'branch_07_uc_create_mock_data_in_csv_files_bought_and_sold_via_argparse_cli')
         Why this functionality is necessary: selling a product takes place with the buy_id. 
         Ex: py super.py sell b_18 3.10 23-10-21. This means: sell transaction with buy_id 'b_18' for 3.10 euro on 2023-10-21.
         Ex: py super.py sell b_37 6.30 . This means: sell transaction with buy_id 'b_37' for 6.30 euro on system_date (e.g. 2023-09-16)
         So right before you sell a product, you need to have an overview in the console with all sold products.
 
 
-4. # MVC-MODEL-VIEW-CONTROLLER 
-[table of contents at the start of markdown file](#4_MVC-MODEL-VIEW-CONTROLLER) 
+## MVC: model-view-controller
+[Table of contents](#table-of-contents)
     
-    Looking at the ucs from previous chapter 3 from a bird's-eye view:
+    Looking at the ucs from previous chapter from a bird's-eye view:
 
-    MODEL LAYER (MVC-model):
+###    MODEL LAYER (MVC-model):
+[Table of contents](#table-of-contents)
+
         The following ucs are in the Model layer (MVC-model):
         uc_01: set the system_date in time range
         uc_02: timetravel in time range.
@@ -1063,7 +1130,9 @@ To create application super.py I do the following:
 
         uc_40: delete all data in bought.csv and sold.csv
 
-    VIEW LAYER (MVC-model):
+###    VIEW LAYER (MVC-model):
+[Table of contents](#table-of-contents)
+
         The following ucs are in the View layer (MVC-model) of the application, 
         because they are about how the data is presented to the users (with 'rich' and/or
         matplotlib).
@@ -1088,15 +1157,21 @@ To create application super.py I do the following:
         I have selected tool 'rich' instead of tool 'tabulate' because of the better rating on 
         https://www.libhunt.com/compare-python-tabulate-vs-rich (especially with regard to amount of stars)
         
-    CONTROLLER LAYER (MVC-model):   
+###    CONTROLLER LAYER (MVC-model): 
+[Table of contents](#table-of-contents)
+  
         The argparse cli in super.py ( (...)\superpy\super.py) acts as the controller between MODEL and VIEW. 
 
 
 
-5. # TDD-CODING-STEPS-TO-IMPLEMENT-EACH-UC
-[table of contents at the start of markdown file](#5_TDD-CODING-STEPS-TO-IMPLEMENT-EACH-UC) 
+## TDD: workflow to implement each uc
+[Table of contents](#table-of-contents)
     
-    Goal: implement each use case (uc) in its own Test-Driven-Development (TDD) Iteration
+-  Goal: implement each use case (uc) in its own Test-Driven-Development (TDD) Iteration.
+-  The idea of TDD is to do this is to create testcases for a uc and then make testcases pass
+    by developing the functionality. 
+    Then the next iteration: create testcases for next uc and then make
+    testcases pass by developing the functionality, etc. 
     
     
     Workflow: 
@@ -1130,8 +1205,8 @@ To create application super.py I do the following:
 
 
 
-6. # IMPLEMENTATION-ORDER-OF-UCS
-[table of contents at the start of markdown file](#6_IMPLEMENTATION-ORDER-OF-UCS) 
+## Implementation order of ucs
+[Table of contents](#table-of-contents)
     
     First implement the mandatory requirements about super.py from Winc Academy. 
 
@@ -1187,4 +1262,3 @@ To create application super.py I do the following:
     uc_41: show bought.csv in console with module rich (== feature 6) (done)
     uc_42: show sold.csv in console with module rich (== feature 7) (done)
     uc_43: show system_time in console (== little feature 8) (done)
-

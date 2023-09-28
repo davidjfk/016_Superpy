@@ -1,7 +1,7 @@
 import filecmp, os, sys
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
-from utils_superpy.utils import get_path_to_directory_of_file, time_travel_system_date_with_nr_of_days
+from utils.utils import get_path_to_directory_of_file, time_travel_system_date_with_nr_of_days
 
 directory_of_testcase = "fn_time_travel_system_date_with_nr_of_days_testcases" 
 path_to_directory_of_testcase = get_path_to_directory_of_file(directory_of_testcase)
