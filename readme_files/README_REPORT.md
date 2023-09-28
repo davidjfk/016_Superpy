@@ -133,8 +133,8 @@ Solutions:
     ```
 
 - problem-3-solution:
-        The last issued buy_id is persistently stored in file 'id_to_use_in_fn_buy_product.txt'
-        (...\superpy\data_used_in_superpy\id_to_use_in_fn_buy_product.txt)
+        The last issued buy_id is persistently stored in file 'buy_id_counter.txt'
+        (...\superpy\data_used_in_superpy\buy_id_counter.txt)
         The following fn gets the value from this txt-file (e.g. b_163), increments it with 1, and then
         feeds the incremented nr (b_164)  into the buy-fn above as argument 'id_of_row_in_csv_file_bought':
 
@@ -161,9 +161,9 @@ Solutions:
 
 
 - problem-5-solution:
-        connect id-range of script 'create_testdata_for_csv_files_bought_and_sold' with id-range of  
+        connect id-range of fn 'produce_testdata_for_csv_files_bought_and_sold' with id-range of  
         buy-transactions that are manually added.  
-          
+
         Currently id-range id_1 to id_299 are served for this script and range id_300 and beyond are  
         reserved for buy_transactions that are added by super.py-user.  
         If script creates e.g. 167 buy_transactions (b_1 - b_167), and super.py-user then creates a few  
@@ -219,15 +219,15 @@ Solutions:
 
         step 3: call fn:
     ```python
-    def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id, path_to_buy_id_file):
+    def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt(buy_id, path_to_buy_id_file):
         pass
     ```
         As described above in 'challenge-2-solution':
-        The last issued buy_id is persistently stored in file id_to_use_in_fn_buy_product.txt
-        (...\superpy\data_used_in_superpy\id_to_use_in_fn_buy_product.txt)
+        The last issued buy_id is persistently stored in file buy_id_counter.txt
+        (...\superpy\data_used_in_superpy\buy_id_counter.txt)
 
         fn set_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id, path_to_buy_id_file) 
-        initializes the value in file 'id_to_use_in_fn_buy_product.txt'.
+        initializes the value in file 'buy_id_counter.txt'.
         ex1: if 65 rows of mock buy-transactions have been created, then b_65 is stored in this txt-file.
         ex2: if 18 rows of mock buy-transactions have been created, then b_18 is stored in this txt-file.
 

@@ -28,7 +28,7 @@ from utils.utils import sell_product, set_system_date_to, time_travel_system_dat
 from utils.utils import show_csv_file_in_console_with_module_rich
 from utils.utils import calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive
 from utils.utils import get_highest_buy_id_from_boughtcsv
-from utils.utils import set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv
+from utils.utils import set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt
 from utils.utils import calculate_cost_in_time_range_between_start_date_and_end_date_inclusive
 from utils.utils import calculate_profit_in_time_range_between_start_date_and_end_date_inclusive
 from utils.utils import calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive
@@ -363,7 +363,7 @@ def main():
             args.expiry_date = OVERMORROW
         if args.expiry_date == 'yesterday':
             args.expiry_date = YESTERDAY
-        path_to_id_with_highest_sequence_number = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'id_to_use_in_fn_buy_product.txt')
+        path_to_id_with_highest_sequence_number = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'buy_id_counter.txt')
         # print(path_to_id_with_highest_sequence_number)
         id_of_row_in_csv_file_bought = create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number) 
 
@@ -485,15 +485,15 @@ def main():
         print(f"highest_buy_id_in_boughtcsv: {highest_buy_id_in_boughtcsv}")
         # pitfall: do not increment buy_id with 1 for the next buy-transaction: e.g. b_1 --> b_2. This will be done at other point in the code. 
 
-        path_to_file_with_name_id_to_use_in_fn_buy_product = get_path_to_file("data_used_in_superpy", "id_to_use_in_fn_buy_product.txt")
+        path_to_file_with_name_buy_id_counter = get_path_to_file("data_used_in_superpy", "buy_id_counter.txt")
 
-        buy_id = set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(highest_buy_id_in_boughtcsv, path_to_file_with_name_id_to_use_in_fn_buy_product)
+        buy_id = set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt(highest_buy_id_in_boughtcsv, path_to_file_with_name_buy_id_counter)
         print(f"new_system_date: {buy_id}")
         '''
         suppose fn 'create_data_for_csv_files_bought_and_sold' has just created 132 rows of mock data for bought.csv 
         (the nr of rows in sold.csv depend on how many are deleted from these 132 rows by the script).
         That means that the nex buy_transaction to be added to bought.csv by the USER of the superpy-app, must have buy_id b_133. 
-        For this to happen, in directory 'data_used_in_superpy': file 'id_to_use_in_fn_buy_product.txt' must now be set to buy_id 'b_132'.
+        For this to happen, in directory 'data_used_in_superpy': file 'buy_id_counter.txt' must now be set to buy_id 'b_132'.
         
         When creating this next buy_transaction, fn 'create_buy_id_that_increments_highest_buy_id_in_boughtcsv 
         will increment 'b_132' with 1, so this next transaction will show up in bought.csv as 'b_133'.
@@ -608,10 +608,10 @@ def main():
         # postperation: with all data having been deleted from bought.csv and sold.csv, the next buy_id must be 
         reset to b_01 for the first buy_transaction to be added to bought.csv by the USER of the superpy-app:
         '''
-        path_to_file_with_name_id_to_use_in_fn_buy_product = get_path_to_file("data_used_in_superpy", "id_to_use_in_fn_buy_product.txt")
+        path_to_file_with_name_buy_id_counter = get_path_to_file("data_used_in_superpy", "buy_id_counter.txt")
         highest_buy_id_in_boughtcsv = "b_0"
         # pitfall: do not reset to b_1. This will be done at other point in the code.
-        buy_id = set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(highest_buy_id_in_boughtcsv, path_to_file_with_name_id_to_use_in_fn_buy_product)
+        buy_id = set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt(highest_buy_id_in_boughtcsv, path_to_file_with_name_buy_id_counter)
         print(f"new_system_date: {buy_id}")
 
 
@@ -659,7 +659,8 @@ def main():
             args.sell_date = YESTERDAY
         path_to_csv_sold_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'sold.csv')
         path_to_csv_sold_output_file = path_to_csv_sold_input_file # but not the same in pytest.
-        sell_product(args.buy_id, args.price, args.sell_date, path_to_csv_sold_input_file, path_to_csv_sold_output_file)
+        path_to_csv_bought_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'bought.csv')
+        sell_product(args.buy_id, args.price, args.sell_date, path_to_csv_sold_input_file, path_to_csv_sold_output_file, path_to_csv_bought_input_file)
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')        
         print(f" Current action in Superpy: create_mock_data                                                         ")

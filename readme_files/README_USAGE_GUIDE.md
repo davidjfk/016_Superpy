@@ -1343,8 +1343,8 @@ quick links:
 <br/>
 
 - bought.csv      :  ...\superpy\date_used_in_superpy\bought.csv
-- create_testdata_for_csv_files_bought_and_sold   :  ...\superpy\data_pytest_create_boughtcsv_and_soldcsv_for_pytestcases_here\
-                                                   create_testdata_for_csv_files_bought_and_sold
+- produce_testdata_for_csv_files_bought_and_sold   :  ...\superpy\data_pytest_create_boughtcsv_and_soldcsv_for_pytestcases_here\
+                                                   produce_testdata_for_csv_files_bought_and_sold
 - erd             :  ...\superpy\erd  (entity relationship diagram)
 - readme_files    :  ...\superpy\readme_files
 - sold.csv        :  ...\superpy\date_used_in_superpy\sold.csv
@@ -1408,13 +1408,13 @@ Option 2of2: run only the testcase(s) that test a specific function:
 
 Creating testdata involves creating testdata for bought.csv and sold.csv.
 
-1. navigate into (...\superpy\data_pytest_create_boughtcsv_and_soldcsv_for_pytestcases_here)
+1. navigate into (...\superpy\pytest_testdata_factory)
 2. run the following script:
 ```python
-    py create_testdata_for_csv_files_bought_and_sold.py
+    py produce_testdata_for_csv_files_bought_and_sold.py
 ```
 3. bought.csv and sold.csv have now been created. You can find them in the same location
-    as the script: (...\superpy\data_pytest_create_boughtcsv_and_soldcsv_for_pytestcases_here)
+    as the script: (...\superpy\pytest_testdata_factory)
 
 - Inside this script at the beginning of main() in section 'CONFIGURATION', the following variables  
     (actually fn-arguments) can be assigned another value to your liking:

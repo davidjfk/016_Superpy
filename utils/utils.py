@@ -52,7 +52,7 @@ from typing import Callable
 
 # sell_product(bought_product_id, price, sell_date, path_to_csv_bought_input_file, path_to_csv_bought_output_file):
 
-# set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id, path_to_buy_id_file):
+# set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt(buy_id, path_to_buy_id_file):
 
 # set_system_date_to(system_date, path_to_system_date):
 
@@ -422,7 +422,7 @@ def create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_cr
         first_nr_in_range: int
 ) -> Callable[[], int]:
     ''' 
-    scope: only used by script create_testdata_for_csv_files_bought_and_sold.py.
+    scope: only used by script produce_testdata_for_csv_files_bought_and_sold.py.
     e.g. "b" is abbreviation of 'bought.csv'. This 'b' will be part of 
     argparse argument, so needs to be concise for pleasant user 
     experience.    
@@ -455,19 +455,19 @@ def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_hi
 
     The products that are bought by superpy-user and/or pytest-"testengine" user  start
     at id b_300 and count up from there.
-    The range id_1 to id_299 is reserved for script 'create_testdata_for_csv_files_bought_and_sold'
+    The range id_1 to id_299 is reserved for script 'produce_testdata_for_csv_files_bought_and_sold'
     in directory create_new_testdata_for_csv_files.
 
     '''
     print('path_to_id_with_highest_sequence_number')
     print(path_to_id_with_highest_sequence_number)
-    # new_id_to_use_in_fn_buy_product = ''
+    # new_buy_id_counter = ''
     try:
         with open(path_to_id_with_highest_sequence_number, 'r', newline='') as file:
             last_id_used_in_fn_buy_product =file.read()
 
             id_parts = last_id_used_in_fn_buy_product.split("_") # e.g. ['b', '323']
-            new_id_to_use_in_fn_buy_product = int(id_parts[1]) + 1
+            new_buy_id_counter = int(id_parts[1]) + 1
             '''
             b_1 (...) b_9 must be created as b_01 (...) b_09.
             reason: 
@@ -477,10 +477,10 @@ def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_hi
             So s_10 is sorted before s_2, and s_100 is sorted before s_3, etc.
             So I need to create b_01 (...) b_09, so that s_01 (...) s_09 can be created.
             '''
-            if new_id_to_use_in_fn_buy_product < 10:
-                new_id_to_use_in_fn_buy_product = "b_0" + str(new_id_to_use_in_fn_buy_product)
+            if new_buy_id_counter < 10:
+                new_buy_id_counter = "b_0" + str(new_buy_id_counter)
             else:
-                new_id_to_use_in_fn_buy_product = "b_" + str(new_id_to_use_in_fn_buy_product)
+                new_buy_id_counter = "b_" + str(new_buy_id_counter)
             file.seek(0)
     except FileNotFoundError:
         print(f"File '{path_to_id_with_highest_sequence_number}' not found.")
@@ -493,14 +493,14 @@ def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_hi
 
     try:
         with open(path_to_id_with_highest_sequence_number, 'w', newline='') as file: 
-            print(new_id_to_use_in_fn_buy_product)  
-            file.write(new_id_to_use_in_fn_buy_product)
+            print(new_buy_id_counter)  
+            file.write(new_buy_id_counter)
     except PermissionError:
         print(f"You don't have permission to write to '{path_to_id_with_highest_sequence_number}'.")
     except IOError as e:
         print(f"Error while writing file: {e}")
 
-    return new_id_to_use_in_fn_buy_product
+    return new_buy_id_counter
 
 
 def create_data_for_csv_files_bought_and_sold(
@@ -852,8 +852,103 @@ def get_system_date(path_to_system_date: str) -> str:
 def sell_product(bought_product_id: str, 
                  price: float, 
                  sell_date: str, 
-                 path_to_csv_bought_input_file: str, 
-                 path_to_csv_bought_output_file: str
+                 path_to_csv_sold_input_file: str, 
+                 path_to_csv_sold_output_file: str,
+                 path_to_csv_bought_file: str
+) -> None:
+    '''
+    About the input_file and output_file:
+    when using superpy as user, input and output csv file are the same.
+    Only when testing fn buy_product in pytest, input and output csv file are different.
+    reason: when testing fn buy_product in pytest, I want to keep the csv-file with testdata intact.
+    '''
+
+    try: 
+        with open(path_to_csv_bought_file, 'r', newline='') as file: 
+            '''
+            Goal: check if product exists in bought.csv:
+            Business rule: each product has a unique buy_id (e.g. b_01, b_02, ...).
+            Business rule: each product is sold by its buy_id.
+            So, if bought_product_id does not exist in bought.csv, then it cannot
+            be sold in sold.csv. 
+
+            Both options below work. I prefer the  first option, because it is more consistent 
+            with the try-catch-blocks further below.
+            '''
+            
+            # option 1of2:
+            is_bought_product_id_in_bought_csv = False
+            reader = csv.DictReader(file)
+            rows = list(reader)
+            for row in rows:
+                if row['buy_id'] == bought_product_id:
+                    is_bought_product_id_in_bought_csv = True
+            if not is_bought_product_id_in_bought_csv:
+                raise ValueError(f"Buy_id'{bought_product_id}' does not exist in bought.csv!!")
+            
+            # option 2of2:
+            # is_bought_product_id_in_bought_csv = False
+            # reader = csv.reader(file)
+            # for row in reader:
+            #     if row[0] == bought_product_id:
+            #         is_bought_product_id_in_bought_csv = True
+            # if not is_bought_product_id_in_bought_csv:
+            #     raise ValueError(f"Buy_id'{bought_product_id}' does not exist in bought.csv!!")
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_bought_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_bought_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_bought_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
+
+
+    try: 
+        with open(path_to_csv_sold_input_file, 'r', newline='') as file: 
+            '''
+            Goal: check if product has already been sold: 
+            Business rule: each product has a unique buy_id (e.g. b_01, b_02, ...).
+            Business rule: each product is sold by its buy_id.
+            So, if bought_product_id is already in sold.csv, then raise error:
+            '''
+            reader = csv.DictReader(file)
+            rows = list(reader)
+            for row in rows:
+                print(row['buy_id'])
+                if row['buy_id'] == bought_product_id:
+                    raise ValueError(f"Product with buy_id '{bought_product_id}' has already been sold!!")
+            file.seek(0)
+            sold_product_id = bought_product_id.replace('b', 's')
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_sold_input_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_sold_input_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_sold_input_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
+    
+  
+    try:            
+        with open(path_to_csv_sold_output_file, 'w', newline='') as file: 
+            rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': price, 'sell_date': sell_date}) 
+            writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
+            writer.writeheader()
+            # sort rows by sell_id (== first column in sold.csv):
+            sorted_rows = sorted(rows, key=lambda row: row['sell_id'])
+            writer.writerows(sorted_rows)
+    except PermissionError:
+        print(f"You don't have permission to write to '{path_to_csv_sold_output_file}'.")
+    except csv.Error as e:
+        print(f"Error while writing CSV file: {e}")
+
+
+def sell_product_old(bought_product_id: str, 
+                 price: float, 
+                 sell_date: str, 
+                 path_to_csv_sold_input_file: str, 
+                 path_to_csv_sold_output_file: str
 ) -> None:
     '''
     About the input_file and output_file:
@@ -862,21 +957,21 @@ def sell_product(bought_product_id: str,
     reason: when testing fn buy_product in pytest, I want to keep the csv-file with testdata intact.
     '''
     try: 
-        with open(path_to_csv_bought_input_file, 'r', newline='') as file: 
+        with open(path_to_csv_sold_input_file, 'r', newline='') as file: 
             reader = csv.DictReader(file)
             rows = list(reader)
             file.seek(0)
             sold_product_id = bought_product_id.replace('b', 's')
     except FileNotFoundError:
-        print(f"File '{path_to_csv_bought_input_file}' not found.")
+        print(f"File '{path_to_csv_sold_input_file}' not found.")
     except PermissionError:
-        print(f"You don't have permission to access '{path_to_csv_bought_input_file}'.")
+        print(f"You don't have permission to access '{path_to_csv_sold_input_file}'.")
     except UnicodeDecodeError:
-        print(f"Invalid Unicode character found in '{path_to_csv_bought_input_file}'.")
+        print(f"Invalid Unicode character found in '{path_to_csv_sold_input_file}'.")
     except csv.Error as e:
         print(f"Error while reading CSV file: {e}")
     try:            
-        with open(path_to_csv_bought_output_file, 'w', newline='') as file: 
+        with open(path_to_csv_sold_output_file, 'w', newline='') as file: 
             rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': price, 'sell_date': sell_date}) 
             writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
             writer.writeheader()
@@ -884,16 +979,16 @@ def sell_product(bought_product_id: str,
             sorted_rows = sorted(rows, key=lambda row: row['sell_id'])
             writer.writerows(sorted_rows)
     except PermissionError:
-        print(f"You don't have permission to write to '{path_to_csv_bought_output_file}'.")
+        print(f"You don't have permission to write to '{path_to_csv_sold_output_file}'.")
     except csv.Error as e:
         print(f"Error while writing CSV file: {e}")
 
 
-def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id: str, path_to_buy_id_file: str) -> str:
+def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt(buy_id: str, path_to_buy_id_file: str) -> str:
     '''
     # pitfall: read first part of fn-name 'file_id_to_use_in_fn_to_buy_product_txt' as a reference to a file. 
     # arg1: ex of buy_id: b_1, or: b_2, or: b_3, etc
-    # arg2: location of file: (...superpy\\data_used_in_superpy\\id_to_use_in_fn_buy_product.txt)
+    # arg2: location of file: (...superpy\\data_used_in_superpy\\buy_id_counter.txt)
     
     Context: this fn is  only used in file super.py.
     More info about how this fn fits into  the bigger picture, see: README_REPORT.md --> '# Technical element 2: create primary 

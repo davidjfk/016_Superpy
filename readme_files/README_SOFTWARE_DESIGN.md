@@ -6,7 +6,7 @@
   - [Definitions:](#definitions)
 - [Design:](#design)
   - [Create datamodel as erd](#create-datamodel-as-erd)
-  - [Create fn to create mock data for csv files bought and sold](#create-fn-to-create-mock-data-for-csv-files-bought-and-sold)
+  - [Create fn to produce mock data for csv files bought and sold](#create-fn-to-produce-mock-data-for-csv-files-bought-and-sold)
   - [Use cases](#use-cases)
     - [uc\_01: set the system\_date in time range](#uc_01-set-the-system_date-in-time-range)
     - [uc\_02: timetravel in time range.](#uc_02-timetravel-in-time-range)
@@ -320,7 +320,7 @@ idea of the design.
 
 
 
-## Create fn to create mock data for csv files bought and sold
+## Create fn to produce mock data for csv files bought and sold
 [Table of contents](#table-of-contents)
     
     precondition: ERD (see prev par) must be ready before creating script.
@@ -330,7 +330,7 @@ idea of the design.
         as expected output to test a fn.
 
         This data is created in directory: (...)\superpy\create_boughtcsv_and_soldcsv_for_pytestcases_here\
-        with script 'create_testdata_for_csv_files_bought_and_sold.py'. The created files bought.csv and  sold.csv
+        with script 'produce_testdata_for_csv_files_bought_and_sold.py'. The created files bought.csv and  sold.csv
         are then moved to the relevant testcases inside directory (...)\superpy\test_utils. 
 
     2. provide application superpy with start data. In file super.py (path: (...)superpy\super.py)
@@ -342,7 +342,7 @@ idea of the design.
 
     The script by default creates random transactions in bought.csv and sold.csv 
 
-    Fn create_testdata_for_csv_files_bought_and_sold() has the following configurable options:
+    Fn produce_testdata_for_csv_files_bought_and_sold() has the following configurable options:
         product_range
         delete_every_nth_row,
         shelf_life,
@@ -511,7 +511,7 @@ idea of the design.
 
         There are 2 different SOURCES that create ids in the application (each record in bought.csv and
         sold.csv starts with an id):
-        SOURCE OF IDS 1OF2: script create_testdata_for_csv_files_bought_and_sold creates ids.
+        SOURCE OF IDS 1OF2: script produce_testdata_for_csv_files_bought_and_sold.py creates ids.
         3 use cases for this script:
         1. start the production application with real-looking data.
         2. create input files for testcases.
@@ -522,7 +522,7 @@ idea of the design.
         2 use cases:
         4. as a supermarket-logistics-employee-user of superpy create new data in the production application .
         5. as pytest create the file with the actual testresult. 
-        superpy-app keeps track of the next-id-to-use in file id_to_use_in_fn_buy_product.txt in directory data_directory.
+        superpy-app keeps track of the next-id-to-use in file buy_id_counter.txt in directory data_directory.
 
         To avoid source 1 and 2 accidentally create a buy or sell record with the 
         same id, I stick to the following convention:
