@@ -9,7 +9,7 @@
   - [Set system date](#set-system-date)
   - [Show bought.csv](#show-boughtcsv)
   - [Show cost](#show-cost)
-  - [SHOW\_EXPIRED\_PRODUCTS](#show_expired_products)
+  - [Show expired products](#show-expired-products)
   - [Show inventory](#show-inventory)
   - [Show profit](#show-profit)
   - [Show revenue](#show-revenue)
@@ -20,15 +20,14 @@
   - [intro](#intro-1)
   - [UC: get familiar with the data](#uc-get-familiar-with-the-data)
   - [UC: buy and sell a few products](#uc-buy-and-sell-a-few-products)
+  - [UC: enter system date (e.g. 2031-04-21, tomorrow, etc.)](#uc-enter-system-date-eg-2031-04-21-tomorrow-etc)
   - [UC: show all management reports](#uc-show-all-management-reports)
-  - [UC: create\_mock\_date and add buy and sell transactions](#uc-create_mock_date-and-add-buy-and-sell-transactions)
-  - [UC: buy products in all syntax-variations](#uc-buy-products-in-all-syntax-variations)
-  - [UC: sell products in all syntax-variations](#uc-sell-products-in-all-syntax-variations)
-  - [UC: time travel to the future and past](#uc-time-travel-to-the-future-and-past)
+  - [UC: change the management reports' data by travelling through time](#uc-change-the-management-reports-data-by-travelling-through-time)
+  - [UC: show reports in custom time intervals](#uc-show-reports-in-custom-time-intervals)
+  - [UC: create mock data and add individual buy and sell transaction](#uc-create-mock-data-and-add-individual-buy-and-sell-transaction)
+  - [UC: sell product violating business rules](#uc-sell-product-violating-business-rules)
+  - [UC: suffer a loss](#uc-suffer-a-loss)
   - [UC: make profit](#uc-make-profit)
-  - [UC: make loss](#uc-make-loss)
-  - [UC: inventory "versus" expired products...let's time\_travel](#uc-inventory-versus-expired-productslets-time_travel)
-  - [UC: show reports from start of financial year](#uc-show-reports-from-start-of-financial-year)
 - [INSTALLATION](#installation)
 - [DEFINITIONS](#definitions)
 - [LOCATION OF IMPORTANT DIRECTORIES AND FILES](#location-of-important-directories-and-files)
@@ -354,11 +353,11 @@ Goal: create mock data for bought.csv and sold.csv
 <br/>
 
 - arg9: nr_of_months_to_calculate_upper_boundary_month
-    - flags: -ubmnr, -upper_boundary_month_nr
+    - flags: -ubm, -upper_boundary_month_nr
 
     - ex1:
     ```
-    py super.py create_mock_data -ubmnr 3
+    py super.py create_mock_data -ubm 3
     ```
     - nr_of_months_to_calculate_upper_boundary_month: 3 months
     - result: upper boundary month of time interval in which to create data is 3 months in the future
@@ -367,11 +366,11 @@ Goal: create mock data for bought.csv and sold.csv
 <br/>
 
 - arg10: nr_of_weeks_to_calculate_upper_boundary_week
-    - flags: -ubwnr, -upper_boundary_weeknr
+    - flags: -ubw, -upper_boundary_weeknr
 
     - ex1:
     ```
-    py super.py create_mock_data -ubwnr 8
+    py super.py create_mock_data -ubw 8
     ```
     - nr_of_weeks_to_calculate_upper_boundary_month: 3 weeks
     - result: upper boundary week of time interval in which to create data is 8 weeks in the future
@@ -380,11 +379,11 @@ Goal: create mock data for bought.csv and sold.csv
 <br/>
 
 - arg11: nr_of_days_to_calculate_upper_boundary_day
-    - flags: -ubwnr, -upper_boundary_weeknr
+    - flags: -ubd, -upper_boundary_daynr
 
     - ex1:
     ```
-    py super.py create_mock_data -ubdnr 3
+    py super.py create_mock_data -ubd 3
     ```
     - nr_of_days_to_calculate_upper_boundary_day: 3 weeks
     - upper boundary day of time interval in which to create data is 3 days in the future
@@ -609,7 +608,7 @@ Goal: show cost in time range between start_date and end_date inclusive
 <br /> 
 <br /> 
 
-## SHOW_EXPIRED_PRODUCTS
+## Show expired products
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Argparse commands and arguments](#argparse-commands-and-arguments)
@@ -900,7 +899,7 @@ quick links:
 [Table of contents](#table-of-contents)
 
 -   The commands and arguments from the previous chapter, a.k.a. building blocks that each provide  
-    a certain functionality a.k.a. lego blocks are put together in this chapter to create
+    a certain functionality, are put together in this chapter to create
     use cases (ucs).
 
     A use case is a description of how Superpy will be used by its user to achieve a  
@@ -987,8 +986,8 @@ quick links:
         |-------------------|-----------------------------------------------------------------------------------------------|
         | -b                | -buy_date                                                                                     |          
         | -denr             | -delete_every_nth_row                                                                         |   
-        | -e                | -expiry-date
-        | -lbd              | -'lower_boundary_day_of_time_interval_in_which_to_create_random_testdata'                     |
+        | -e                | -expiry-date                                                                                  |
+        | -lbd              | -lower_boundary_day_of_time_interval_in_which_to_create_random_testdata                       |
         | -lbm              | -lower_boundary_month_of_time_interval_in_which_to_create_random_testdatareset_system_date    |
         | -lby              | -lower_boundary_year_of_time_interval_in_which_to_create_random_testdata                      |
         | -mu               | -markup                                                                                       |
@@ -1066,125 +1065,349 @@ quick links:
         py super.py show_bought_csv
         py super.py show_sold_csv
     ```  
-    - step 3: reset the system_date to the system_date of your  
-        host machine:
+    - step 3: set system_date: 
     ```python
-        py super.py reset_system_date
+        py super.py set_system_date 2024-09-15
     ```
 
     - step 4: buy the following products: 
     ```python
-        py super.py buy apple 0.29 -b 2023-09-27 -e 2023-10-04
-        py super.py buy banana 0.29 -b tomorrow -e next_tuesday
-        py super.py buy mandarin 0.29 -b yesterday -e next_sunday
-        py super.py buy pineapple 0.29 -b 2023-09-15 -e today
-    
+        py super.py buy apple 0.29 -b 2024-09-17 -e 2024-10-04
+        py super.py buy banana 0.19 -b yesterday -e 2024-10-28
+        py super.py buy mandarin 0.19 -b yesterday -e next_sunday
+        py super.py buy pineapple 0.49 -b 2024-09-01 -e today
     ```
     - step 5: show transactions in bought.csv:
     ```python
         py super.py show_bought_csv
     ```  
-    - step 4: sell_product
-    - step 5: show_sold_csv
+    - step 6: now sell these products:
+    ```python
+        py super.py sell b_01 1.29 -s 2024-09-22 
+        py super.py sell b_02 0.59 -s tomorrow 
+        py super.py sell b_03 0.49 -s overmorrow
+        py super.py sell b_03 2.29 -s next_thursday
+    ```  
 
+    - step 7: show_sold_csv
+    ```python
+        py super.py show_sold_csv
+    ```  
 
+## UC: enter system date (e.g. 2031-04-21, tomorrow, etc.)
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Use cases](#use-cases)
+<br/><br/>
+    - option 1: save the date!...or well...set the system_date.  
+        There are various ways to set and change
+        the system_date: 
 
-        py super.py set_system_date 2023-09-27
+    ```python
+        py super.py set_system_date 2026-09-27
         py super.py set_system_date 2022-10-15
         py super.py set_system_date yesterday
         py super.py set_system_date tomorrow
         py super.py set_system_date next_thursday
+    ```
+    - option 2: Back to the future! Let's bend time and space  
+        and travel to our desired system_date.
 
+    ```python
+        py super.py set_system_date 2527-07-14
+        py super.py show_system_date
+        py super.py time_travel -7
+        py super.py show_system_date
+        py super.py time_travel 18
+        py super.py show_system_date
+    ``` 
+
+
+    - option 3: Back to reality. Reset the system_date to  
+        the system_date of your host machine:
+    ```python
+        py super.py set_system_date 2327-07-04
+        py super.py show_system_date
+        py super.py reset_system_date
+        py super.py show_system_date
+    ``` 
+
+
+    - trick question: what is the problem here?
+    ```python
+        py super.py set_system_date today
+    ```
 
 ## UC: show all management reports
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Use cases](#use-cases)
 <br/><br/>
-
-    - step 1: create_mock_data
-        by default: if data is created in time interval between e.g. 2024-02-01 and 2024-04-01, then  
-                    the system_date is automatically set to the middle of the interval. 
-    - step 2: show_cost
+    - info: by default: if mock data is created in time interval between  
+        e.g. 2024-03-01 and 2024-07-01, then the system_date is automatically  
+        set to the middle of the interval: 2024-05-01. 
+    - step 1: create_mock_data:
+    - more info: Chapter 'Argparse commands and arguments' explains exactly the following options.  
+        Alternatively, look them  up in the help file:
+    ```python
+        py super.py -h
+    ```        
+    ```python
+        py super.py create_mock_data -pr 15 -lby 2024 -lbm 3 -lbd 1 -ubm 4 -ubw 0 -ubd 0 -mu 4 -denr 2 -sl 5 -tt 3
+    ```
+    - step 2: show system_date:
+    ```python
+        py super.py show_system_date
+    ``` 
+    
     - step 3: show_expired_products
+    ```python
+        py super.py show_expired_products
+    ```   
+
     - step 4: show_inventory
-    - step 5: show_profit
-    - step 6: show_revenue
-    - step 7: show_cost
-    - step 8: show_sales_volume
+    ```python
+        py super.py show_inventory
+    ```    
 
 
-## UC: create_mock_date and add buy and sell transactions
+    - info: the following commands all require a time interval consisting of a start date and an end date  
+        If you do not specify them, then the following default values apply:  
+
+        * start date: January 1st of the year that contains the system_date. Ex: if system_date is 2024-05-01,  
+        then start of financial year: 2024-01-01.  
+
+        * end date: system_date (e.g. 2024-05-01)  
+
+        Now let's create some reports with these default values. While you are at it, make a few mental notes,  
+        because in the next uc, we are going to travel through time (and space...who knows) with the just  
+        created mock data to witness the amount of cost, revenue, profit, sales volume, expired products  
+        and inventory change, as time progresses and degresses. 
+
+    - step 2: show_cost:
+    ```python
+        py super.py show_cost
+    ```   
+    - step 5: show_profit:
+    ```python
+        py super.py show_profit
+    ```     
+    - step 6: show_revenue:
+    ```python
+        py super.py show_revenue
+    ```     
+    - step 7: show_sales_volume:
+    ```python
+        py super.py show_sales_volume
+    ```  
+    - step 8: the next uc is a continuation of this uc.
+
+
+## UC: change the management reports' data by travelling through time
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Use cases](#use-cases)
 <br/><br/>
-    - step 1: let's  start with a clean slate: so let's  
-        delete all data in bought.csv and sold.csv
-    - step 2: buy the following products:
+    - info: this is a continuation of the previous uc.
+    - show_system_date:
+    ```python
+        py super.py show_system_date
+    ```    
+    - time travel to the beginning of the interval: you are right  
+        in the middle of an interval of 4 months, so go back 2 months:
+    ```python
+        py super.py set_system_date 2024-03-01
+    ```       
+    - step: read all the reports:
+    ```python
+        py super.py show_inventory
+        py super.py show_expired_products
+        py super.py show_cost
+        py super.py show_sales_volume
+        py super.py show_revenue
+        py super.py show_profit
+    ```
+    - step time travel 14 days into the past:
+    ```python
+        py super.py time_travel 10
+    ```
+    - repeat the previous 2 steps 5 times.    
+
+    - observation: while we move from the start of the time interval
+        towards the end of the time interval with a time leap ('step size')  
+        of  10 days, the amount of expired products increases as well  
+        as the sales volume, cost, revenue and profit.  
+
+        On the other hand, the amount of inventory won't increase, because
+        turnover time ('-tt') is set to 3 days.
+
+
+## UC: show reports in custom time intervals
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Use cases](#use-cases)
+<br/><br/>
+    - info: now it is time to create reports for custom time intervals  
+        e.g. 2 weeks, 3.5 months, etc. Let's first create a lot of mock  
+        data in calendar year 2024:
+    ```python
+        py super.py create_mock_data -pr 30 -lby 2024 -lbm 1 -lbd 1 -ubm 12 -ubw 0 -ubd 0 -mu 7 -denr 2 -sl 10 -tt 12
+    ```
+    - show_system_date:
+    ```python
+        py super.py show_system_date
+    ```    
+    - time travel to the beginning of the interval: you are   
+        in the middle of an interval of 12 months on system_date 2024-07-02.  
+        Do not change the system_date. Create the following reports:
+    
+    ```python
+        py super.py show_cost -sd 2024-02-01 -ed 2024-03-01
+        py super.py show_sales_volume -sd 2024-03-01 -ed today
+        py super.py show_revenue -sd yesterday -ed 2024-12-31
+        py super.py show_profit -sd next_wednesday -ed 2024-10-15
+
+    ```   
+
+
+
+
+## UC: create mock data and add individual buy and sell transaction
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Use cases](#use-cases)
+<br/><br/>
+    - step 1: create some mock data
+    ```python
+        py super.py create_mock_data -pr 3 -denr 2
+    ```  
+    - step 2: make note of the highest buy_id and sell_id:
+    ```python
+        py super.py show_bought_csv
+        py super.py show_sold_csv
+    ```    
     - 
-    - step 1: create_mock_data
-    - step 2: buy_product
-    - step 3: show_bought_csv
-    - step 4: sell_product
-    - step 5: show_sold_csv
+    - step 3: buy a product:
+    ```python
+        py super.py pizza 4.44 -b today -e next_friday
+    ```  
+    - step 3: check if product has been added to top of the list  
+        in bought.csv:
+    ```python
+        py super.py show_bought_csv
+    ```  
+    - step 4: sell an unsold product:
+    ```python
+        py super.py sell b_02 9.99 -s tomorrow
+    ```    
+    - step 5: check if sell-transaction  has been added to sold.csv  
+        If buy_id is b_04, then transaction sell_id becomes s_02. 
+        In sold.csv transactions are sorted on sell_id, so  
+        sell-transaction s_04 can be found between sell_transactions  
+        b_03 and b_05 (assuming that b_03 and b_05 have been sold).
+    ```python
+        py super.py show_sold_csv
+    ```     
 
 
-
-## UC: buy products in all syntax-variations 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
-
-
-## UC: sell products in all syntax-variations 
+## UC: sell product violating business rules 
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Use cases](#use-cases)
 <br/><br/>
+- intro: 2 business rules have been implemented in fn sell_product:  
+
+- business rule 1of2: if the product is not in the bought.csv, then the product cannot be sold:
+- step 1: create a bit of mock data:    
+    ```python
+        py super.py create_mock_data -pr 2 -denr 2
+    ```  
+- step 2: have a look at the range of created  
+    transactions in bought.csv
+    ```python
+        py super.py show_sold_csv
+    ```  
+- step 3: now try to sell a product that is not in bought.csv:
+    ```python
+        py super.py sell b_12345 -s next_wednesday
+    ```  
+- expected result: message in the console: 'ValueError: Buy_id'b_12345' does not exist in bought.csv!!' 
+<br/><br/>
+
+- business rule 2of2: if the product has already been sold, then it cannot be sold again:
+- step 1: create a bit of mock data:    
+    ```python
+        py super.py create_mock_data -pr 2 -denr 2
+    ```  
+- step 2: look for a product that you can sell:
+    ```python
+        py super.py show_bought_csv
+        py super.py show_sold_csv
+    ```  
+- step 1: sell  a product 
+    ```python
+        py super.py sell b_02 4.34 -s today
+    ```  
+- step 2: have a look at bought.csv:
+    ```python
+        py super.py show_sold_csv
+    ```  
+
+- step 3: try to sell this exact same product again
+    ```python
+        py super.py sell b_02 4.34 -s tomorrow
+    ``` 
+- expected result: message in the console: 'ValueError: Product with buy_id 'b_02' has already been sold!!'
 
 
-## UC: time travel to the future and past
+
+## UC: suffer a loss
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Use cases](#use-cases)
 <br/><br/>
-
-    - step 1: create_mock_data --> use custom optional arguments. 
-        by default: if data is created in time interval between e.g. 2024-02-01 and 2024-04-01, then  
-                    the system_date is automatically set to the middle of the interval. 
-    - step 2: show_cost
-    - step 3: show_expired_products
-    - step 4: show_inventory
-    - step 5: show_profit
-    - step 6: show_revenue
-    - step 7: show_cost
-    - step 8: show_sales_volume
-    - step 9: time_travel to the past and future and  check the differences in the reports. 
+    - info: oh no, financial trouble lies ahead! Competition, inflation
+        regulation, lack of innovation, no sustainable competitive advantages...
+    - step 1: create mock data with a markup of 0.5. that means we are going to loose 50 cent  
+        on every hard-earned Euro...
+    ```python
+        py super.py create_mock_data -pr 12 -lby 2024 -lbm 4 -lbd 1 -ubm 4 -ubw 0 -ubd 0 -mu 0.5 -denr 2 -sl 5 -tt 10
+    ```        
+    - step 2: ...and in these trying times we want to have a solid understanding of our  
+        financial position:
+    ```python
+        py super.py show_revenue
+        py super.py show_sales_volume
+        py super.py show_cost
+    ```  
+    - step 3: and now the final verdict of 4 months of hard work in the supermarket...
+    ```python
+        py super.py show_profit
+    ```  
 
 ## UC: make profit
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Use cases](#use-cases)
 <br/><br/>
+    - info: hardsip no more, everything our supermarket touches, turns into gold.  
+        Finally, profit, cashflow, return on investment and happy shareholders...
+    - step 1: create mock data with a markup of 10.4 that means we are going to earn 10.4 euro  
+        on sold products for each spent euro on bought products. 
+    ```python
+        py super.py create_mock_data -pr 12 -lby 2024 -lbm 8 -lbd 1 -ubm 4 -ubw 0 -ubd 0 -mu 10.4 -denr 2 -sl 5 -tt 10
+    ```        
+    - step 2: check the financial position:
+    ```python
+        py super.py show_revenue
+        py super.py show_sales_volume
+        py super.py show_cost
+    ```  
+    - step 3: and again the final verdict of 4 months of hard work in the supermarket...
+    ```python
+        py super.py show_profit
+    ``` 
 
-## UC: make loss
-quick links: 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
-
-## UC: inventory "versus" expired products...let's time_travel
-quick links: 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
-
-## UC: show reports from start of financial year
-quick links: 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
 
 
 <br/><br/><br/>

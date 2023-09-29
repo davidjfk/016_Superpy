@@ -43,12 +43,6 @@ superpy_product_range = ''
 
 from data_used_in_superpy.product_prices import superpy_product_prices
 from data_used_in_superpy.product_range import superpy_product_range
-# print(superpy_product_range)
-# print(superpy_product_prices)
-
-
-# print(superpy_product_range)
-# print(superpy_product_prices)
 
 def main():
 
@@ -145,17 +139,9 @@ def main():
     '''  
     # warning: as a Superpy-user, plz do not  assign other values to the following variables:
     today = SYSTEM_DATE
-    # print(f"today: {today}")
     TOMORROW = add_days_to_date(today, 1)
-    # print(f"TOMORROW: {TOMORROW}")
     OVERMORROW = add_days_to_date(today, 2) # yes, this is English...google surprised me.
-    # print(f"OVERMORROW: {OVERMORROW}")
     YESTERDAY = add_days_to_date(today, -1)
-    # print(f"YESTERDAY: {YESTERDAY}")
-
-
-    # NEXT_MONDAY = get_dates_of_next_7_days(today)[0]
-    # print(f"NEXT_MONDAY: {NEXT_MONDAY}")
     
     '''
     NEXT_MONDAY (...) NEXT_SUNDAY are used in subparser 'buy_product' as user-friendly arguments in -buy_date.
@@ -165,17 +151,6 @@ def main():
           py super.py buy apple 1.75 -bd NEXT_MONDAY    (wrong)
     '''
     [NEXT_MONDAY, NEXT_TUESDAY, NEXT_WEDNESDAY, NEXT_THURSDAY, NEXT_FRIDAY, NEXT_SATURDAY, NEXT_SUNDAY] = get_dates_of_next_7_days(today)
-    # print('next monday:')
-    # print(NEXT_MONDAY)
-    # print(type(NEXT_MONDAY))
-    # print(f"NEXT_MONDAY: {NEXT_MONDAY}")
-    # print(f"NEXT_TUESDAY: {NEXT_TUESDAY}")
-    # print(f"NEXT_WEDNESDAY: {NEXT_WEDNESDAY}")
-    # print(f"NEXT_THURSDAY: {NEXT_THURSDAY}")
-    # print(f"NEXT_FRIDAY: {NEXT_FRIDAY}")
-    # print(f"NEXT_SATURDAY: {NEXT_SATURDAY}")
-    # print(f"NEXT_SUNDAY: {NEXT_SUNDAY}")
-
 
     #step: initialize parser:
     parser = argparse.ArgumentParser(prog='super.py',description="Welcome to inventory management tool Superpy.", epilog="The line between disorder and order lies in logistics.", formatter_class=argparse.RawTextHelpFormatter)
@@ -194,13 +169,13 @@ def main():
 
 
     # 2_CREATE_MOCK_DATE: Create subparser "create_mock_data" with help text and add it to the container "command":
-    subparser_create_mock_data = subparsers.add_parser("create_mock_data", help="goal: create mock data for bought.csv and sold.csv\n   All 11 arguments have default values that can be changed in (...\superpy\super.py --> goto CONSTANTS at start of main.py()) \n   All 11 arguments are optional, so you can do this:  \n\n   ex1: py super.py create_mock_data \n   result: bought.csv and sold.csv are filled with mockdata that has \n   been created with default values.   \n\n   arg1 = product_range \n   flags: -pr, -product_range.\n   product_range == product_assortment == the amount of different products in Superpy.\n   minimum value: 1 (generates 8 transactions in bought.csv) \n   maximum value: 40 (generates 280 transactions in bought.csv)\n   ex1: py super.py create_mock_data -pr 3 \n   product_range: 3 random products: e.g. 'apple', 'cabbage' and 'beetroot' as input to create mock data \n   ex2: py super.py create_mock_data -pr 2 \n   product_range: 2 random products: e.g. 'coffee' and 'potato' as input to create mock data. \n   More products in product_range lead to more rows in bought.csv and sold.csv. \n   flags: -pr, -product_range \n   ex2: py super.py create_mock_data -pr 3 \n   result: 3 random products are selected from a pre-filled list to \n   create the testdata.  \n\n   arg2 =  delete every nth row in sold.csv \n   purpose: deleting rows makes them expire while time travelling: \n   After creating mock data for bought.csv, a copy is made to create sold.csv. \n   Then rows are deleted from sold.csv (e.g. every 3rd row). \n   By time travelling to the future these bought_products (e.g. every 3rd row) will expire. \n   flags: -denr, -delete_every_nth_row  \n   ex1: py super.py create_mock_data -denr 3 \n   delete_every_nth_row: 3  \n\n   arg3 = shelf_life == shelf_time == number of days between buying a product and \n   its expiry_date. \n   flags: -sl, -shelf_life  \n   ex1: py super.py create_mock_data -sl 10\n   shelf_life: 10 days \n   result: a bought product will expire after 10 days.\n\n   arg4 = turnover_time == inventory turnover == the number of days \n   between buying and selling a product. \n   flags: -turnover_time, -tt  \n   ex1: py super.py create_mock_data -tt 4\n   turnover_time: 4 days  \n\n   arg5 = markup = the amount of money a business adds to the cost of a product or service in order to make a profit. \n   In super.py markup is calculated as a factor: ex: if buy_price is 3 euro and sell_price is 4 euro, then markup is 4/3 = 1.33 \n   flags: -mu, -markup  \n   ex: py super.py create_mock_data -mu 3 \n    markup: factor 3  \n   result: if buy_price in bought.csv is 3 euro, then sell_price will be 9 euro in sold.csv.  \n\n   arg6 = lower_boundary_year == lower_boundary_year_of_time_interval_in_which_to_create_random_testdata. \n   flags: -lby, -lower_boundary_year  \n   ex1: py super.py create_mock_data -lby 2024\n   lower_boundary_year: 2024  \n\n   arg7 = lower_boundary_month == lower_boundary_month_of_time_interval_in_which_to_create_random_testdata. \n   flags: -lbm, -lower_boundary_month  \n   ex1: py super.py create_mock_data -lbm 10\n   lower_boundary_month: October  \n\n   arg8 = lower_boundary_day == lower_boundary_day_of_time_interval_in_which_to_create_random_testdata.  \n   flags: -lbd, -lower_boundary_day  \n   ex1: py super.py create_mock_data -lbd 15  \n   lower_boundary_day: 15th day of  the  month \n\n   arg9 =  nr_of_months_to_calculate_upper_boundary_month    \n   flags: -ubmnr, -upper_boundary_month_nr   \n   ex1: py super.py create_mock_data -ubmnr 3\n   nr_of_months_to_calculate_upper_boundary_month: 3 months  \n   result: upper boundary month of time interval in which to create data is 3 months in the future. \n   default value: 0 months.  \n\n   arg10 = nr_of_weeks_to_calculate_upper_boundary_week. \n   flags: -ubwnr, -upper_boundary_weeknr  \n   ex1: py super.py create_mock_data -ubwnr 8\n   nr_of_weeks_to_calculate_upper_boundary_week: 8 months  \n   result: upper boundary week of time interval in which to create data is 8 weeks in the future.  \n\n   arg11 = nr_of_days_to_calculate_upper_boundary_day. \n   flags: -ubdnr, -upper_boundary_day_nr  \n   ex: py super.py create_mock_data -ubdnr 3\n   nr_of_days_to_calculate_upper_boundary_day: 3 days  \n   result: upper boundary day of time interval in which to create data is 3 days in the future.  \n   default value: 0 days.\n\n")
+    subparser_create_mock_data = subparsers.add_parser("create_mock_data", help="goal: create mock data for bought.csv and sold.csv\n   All 11 arguments have default values that can be changed in (...\superpy\super.py --> goto CONSTANTS at start of main.py()) \n   All 11 arguments are optional, so you can do this:  \n\n   ex1: py super.py create_mock_data \n   result: bought.csv and sold.csv are filled with mockdata that has \n   been created with default values.   \n\n   arg1 = product_range \n   flags: -pr, -product_range.\n   product_range == product_assortment == the amount of different products in Superpy.\n   minimum value: 1 (generates 8 transactions in bought.csv) \n   maximum value: 40 (generates 280 transactions in bought.csv)\n   ex1: py super.py create_mock_data -pr 3 \n   product_range: 3 random products: e.g. 'apple', 'cabbage' and 'beetroot' as input to create mock data \n   ex2: py super.py create_mock_data -pr 2 \n   product_range: 2 random products: e.g. 'coffee' and 'potato' as input to create mock data. \n   More products in product_range lead to more rows in bought.csv and sold.csv. \n   flags: -pr, -product_range \n   ex2: py super.py create_mock_data -pr 3 \n   result: 3 random products are selected from a pre-filled list to \n   create the testdata.  \n\n   arg2 =  delete every nth row in sold.csv \n   purpose: deleting rows makes them expire while time travelling: \n   After creating mock data for bought.csv, a copy is made to create sold.csv. \n   Then rows are deleted from sold.csv (e.g. every 3rd row). \n   By time travelling to the future these bought_products (e.g. every 3rd row) will expire. \n   flags: -denr, -delete_every_nth_row  \n   ex1: py super.py create_mock_data -denr 3 \n   delete_every_nth_row: 3  \n\n   arg3 = shelf_life == shelf_time == number of days between buying a product and \n   its expiry_date. \n   flags: -sl, -shelf_life  \n   ex1: py super.py create_mock_data -sl 10\n   shelf_life: 10 days \n   result: a bought product will expire after 10 days.\n\n   arg4 = turnover_time == inventory turnover == the number of days \n   between buying and selling a product. \n   flags: -turnover_time, -tt  \n   ex1: py super.py create_mock_data -tt 4\n   turnover_time: 4 days  \n\n   arg5 = markup = the amount of money a business adds to the cost of a product or service in order to make a profit. \n   In super.py markup is calculated as a factor: ex: if buy_price is 3 euro and sell_price is 4 euro, then markup is 4/3 = 1.33 \n   flags: -mu, -markup  \n   ex: py super.py create_mock_data -mu 3 \n    markup: factor 3  \n   result: if buy_price in bought.csv is 3 euro, then sell_price will be 9 euro in sold.csv.  \n\n   arg6 = lower_boundary_year == lower_boundary_year_of_time_interval_in_which_to_create_random_testdata. \n   flags: -lby, -lower_boundary_year  \n   ex1: py super.py create_mock_data -lby 2024\n   lower_boundary_year: 2024  \n\n   arg7 = lower_boundary_month == lower_boundary_month_of_time_interval_in_which_to_create_random_testdata. \n   flags: -lbm, -lower_boundary_month  \n   ex1: py super.py create_mock_data -lbm 10\n   lower_boundary_month: October  \n\n   arg8 = lower_boundary_day == lower_boundary_day_of_time_interval_in_which_to_create_random_testdata.  \n   flags: -lbd, -lower_boundary_day  \n   ex1: py super.py create_mock_data -lbd 15  \n   lower_boundary_day: 15th day of  the  month \n\n   arg9 =  nr_of_months_to_calculate_upper_boundary_month    \n   flags: -ubm, -upper_boundary_month_nr   \n   ex1: py super.py create_mock_data -ubm 3\n   nr_of_months_to_calculate_upper_boundary_month: 3 months  \n   result: upper boundary month of time interval in which to create data is 3 months in the future. \n   default value: 0 months.  \n\n   arg10 = nr_of_weeks_to_calculate_upper_boundary_week. \n   flags: -ubw, -upper_boundary_weeknr  \n   ex1: py super.py create_mock_data -ubw 8\n   nr_of_weeks_to_calculate_upper_boundary_week: 8 months  \n   result: upper boundary week of time interval in which to create data is 8 weeks in the future.  \n\n   arg11 = nr_of_days_to_calculate_upper_boundary_day. \n   flags: -ubd, -upper_boundary_day_nr  \n   ex: py super.py create_mock_data -ubd 3\n   nr_of_days_to_calculate_upper_boundary_day: 3 days  \n   result: upper boundary day of time interval in which to create data is 3 days in the future.  \n   default value: 0 days.\n\n")
     #step: add the optional arguments to 'subparser_create_mock_data':
     subparser_create_mock_data.add_argument("-product_range", "-pr", default=PRODUCT_RANGE, type=int, help=" ") 
     subparser_create_mock_data.add_argument("-delete_every_nth_row", "-denr", default=DELETE_EVERY_NTH_ROW_IN_SOLDCSV_SO_EVERY_NTH_ROW_IN_BOUGHTCSV_CAN_EXPIRE_WHEN_TIME_TRAVELLING, type=int, help=" ") 
     subparser_create_mock_data.add_argument("-shelf_life", "-sl", default=SHELF_LIFE, type=int, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
     subparser_create_mock_data.add_argument("-turnover_time", "-tt", default=TURNOVER_TIME, type=int, help=" ")
-    subparser_create_mock_data.add_argument("-markup", "-mu", default=MARKUP, type=int, help=" ")
+    subparser_create_mock_data.add_argument("-markup", "-mu", default=MARKUP, type=float, help=" ")
     # ex of system_date: 2023-10-11
     default_year = int(SYSTEM_DATE[:4])
     default_month = int(SYSTEM_DATE[5:7])
@@ -334,7 +309,7 @@ def main():
             args.buy_date = TOMORROW
         if args.buy_date == 'overmorrow':
             args.buy_date = OVERMORROW
-        if args.buy_date == 'YESTERDAY':
+        if args.buy_date == 'yesterday':
             args.buy_date = YESTERDAY
         '''
         same recipy for expiry_date: 
@@ -364,7 +339,6 @@ def main():
         if args.expiry_date == 'yesterday':
             args.expiry_date = YESTERDAY
         path_to_id_with_highest_sequence_number = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'buy_id_counter.txt')
-        # print(path_to_id_with_highest_sequence_number)
         id_of_row_in_csv_file_bought = create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number) 
 
         path_to_csv_bought_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'bought.csv')
@@ -416,18 +390,24 @@ def main():
         can immediately create a(ny) report using JUST the default arguments. This makes it easier to learn and play around with the superpy-app.
         The following code makes that happen:
         ''' 
+        system_date_year = int(args.lower_boundary_year_of_time_interval_in_which_to_create_random_testdata)
+        # print(f"system_date_year: {system_date_year}")
+        system_date_month = int(args.lower_boundary_month_of_time_interval_in_which_to_create_random_testdata)
+        # print(f"system_date_month: {system_date_month}")
+        system_date_day = int(args.lower_boundary_day_of_time_interval_in_which_to_create_random_testdata)
+        # print(f"system_date_day: {system_date_day}")
+        SYSTEM_DATE = date(system_date_year, system_date_month, system_date_day).strftime("%Y-%m-%d")
         system_date_in_the_middle_of_time_interval = calculate_middle_of_time_interval(
             SYSTEM_DATE, 
             args.upper_boundary_nr_of_months_to_add_to_calculate, 
             args.upper_boundary_nr_of_weeks_to_add_to_calculate, 
             args.upper_boundary_nr_of_days_to_add_to_calculate)
+        
+        print(f"system_date_in_the_middle_of_time_interval: {system_date_in_the_middle_of_time_interval}")
+
         path_to_file_system_datetxt = get_path_to_file('data_used_in_superpy', 'system_date.txt')
         set_system_date_to(system_date_in_the_middle_of_time_interval, path_to_file_system_datetxt)
-
-
-        # superpy_product_prices = superpy_product_prices
-        # superpy_product_range = superpy_product_range
-
+        print(f"system_date: {get_system_date(path_to_file_system_datetxt)}")
 
         create_data_for_csv_files_bought_and_sold(
             args.product_range,
@@ -497,13 +477,14 @@ def main():
         
         When creating this next buy_transaction, fn 'create_buy_id_that_increments_highest_buy_id_in_boughtcsv 
         will increment 'b_132' with 1, so this next transaction will show up in bought.csv as 'b_133'.
-        '''   
+        '''  
+        system_date_of_superpy = get_system_date( PATH_TO_FILE_WITH_SYSTEM_DATE) 
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')        
         print(f" Current action in Superpy: create_mock_data                                                         ")
         print(f" host machine: {socket.gethostname()}                                                            ")     
         print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
-        print(f" Superpy's SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")                                                                                          
+        print(f" Superpy's SYSTEM_DATE: {system_date_of_superpy} ({show_weekday_from_date(system_date_of_superpy)})")                                                                                          
         print(f" Status of: BOUGHT.CSV & SOLD.CSV:                                                                ")    
         print(f" 1of2: BOUGHT.CSV:                                                                                ")    
         path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', 'bought.csv')
@@ -588,6 +569,7 @@ def main():
             create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created,
             generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
         )
+
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')        
         print(f" Current action in Superpy: delete all products from bought.csv and sold.csv                        ")                                                         
@@ -655,7 +637,7 @@ def main():
             args.sell_date = TOMORROW
         if args.sell_date == 'overmorrow':
             args.sell_date = OVERMORROW
-        if args.sell_date == 'YESTERDAY':
+        if args.sell_date == 'yesterday':
             args.sell_date = YESTERDAY
         path_to_csv_sold_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'sold.csv')
         path_to_csv_sold_output_file = path_to_csv_sold_input_file # but not the same in pytest.
@@ -703,7 +685,7 @@ def main():
             args.new_system_date = TOMORROW
         if args.new_system_date == 'overmorrow':
             args.new_system_date = OVERMORROW
-        if args.new_system_date == 'YESTERDAY':
+        if args.new_system_date == 'yesterday':
             args.new_system_date = YESTERDAY
         print("set_system_date")
         # step: call fn set_system_date_to to update file system__date.txt with following date:
@@ -721,7 +703,51 @@ def main():
         show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
 
     # nr 8of16
-    if args.command == "show_cost":
+        if args.command == "show_cost":
+            if args.start_date == 'next_monday': 
+                args.start_date = NEXT_MONDAY 
+            if args.start_date == 'next_tuesday': 
+                args.start_date = NEXT_TUESDAY
+            if args.start_date == 'next_wednesday':
+                args.start_date = NEXT_WEDNESDAY
+            if args.start_date == 'next_thursday':
+                args.start_date = NEXT_THURSDAY
+            if args.start_date == 'next_friday':
+                args.start_date = NEXT_FRIDAY
+            if args.start_date == 'next_saturday':
+                args.start_date = NEXT_SATURDAY
+            if args.start_date == 'next_sunday':
+                args.start_date = NEXT_SUNDAY
+            if args.start_date == 'today':
+                args.start_date = SYSTEM_DATE
+            if args.start_date == 'tomorrow':
+                args.start_date = TOMORROW
+            if args.start_date == 'overmorrow':
+                args.start_date = OVERMORROW
+            if args.start_date == 'yesterday':
+                args.start_date = YESTERDAY
+            if args.end_date == 'next_monday': 
+                args.end_date = NEXT_MONDAY 
+            if args.end_date == 'next_tuesday': 
+                args.end_date = NEXT_TUESDAY
+            if args.end_date == 'next_wednesday':
+                args.end_date = NEXT_WEDNESDAY
+            if args.end_date == 'next_thursday':
+                args.end_date = NEXT_THURSDAY
+            if args.end_date == 'next_friday':
+                args.end_date = NEXT_FRIDAY
+            if args.end_date == 'next_saturday':
+                args.end_date = NEXT_SATURDAY
+            if args.end_date == 'next_sunday':
+                args.end_date = NEXT_SUNDAY
+            if args.end_date == 'today':
+                args.end_date = SYSTEM_DATE
+            if args.end_date == 'tomorrow':
+                args.end_date = TOMORROW
+            if args.end_date == 'overmorrow':
+                args.end_date = OVERMORROW
+            if args.end_date == 'yesterday':
+                args.end_date = YESTERDAY        
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv') 
@@ -739,6 +765,28 @@ def main():
 
     # nr 9of16
     if args.command == "show_expired_products":
+        if args.date == 'next_monday': 
+            args.date = NEXT_MONDAY 
+        if args.date == 'next_tuesday': 
+            args.date = NEXT_TUESDAY
+        if args.date == 'next_wednesday':
+            args.date = NEXT_WEDNESDAY
+        if args.date == 'next_thursday':
+            args.date = NEXT_THURSDAY
+        if args.date == 'next_friday':
+            args.date = NEXT_FRIDAY
+        if args.date == 'next_saturday':
+            args.date = NEXT_SATURDAY
+        if args.date == 'next_sunday':
+            args.date = NEXT_SUNDAY
+        if args.date == 'today':
+            args.date = SYSTEM_DATE
+        if args.date == 'tomorrow':
+            args.date = TOMORROW
+        if args.date == 'overmorrow':
+            args.date = OVERMORROW
+        if args.date == 'yesterday':
+            args.date = YESTERDAY
         path_to_directory_testdata = ''
         path_to_file_bought_csv = ''
         path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', "bought.csv")
@@ -759,6 +807,28 @@ def main():
 
     # nr 10of16
     if args.command == "show_inventory":
+        if args.date == 'next_monday': 
+            args.date = NEXT_MONDAY 
+        if args.date == 'next_tuesday': 
+            args.date = NEXT_TUESDAY
+        if args.date == 'next_wednesday':
+            args.date = NEXT_WEDNESDAY
+        if args.date == 'next_thursday':
+            args.date = NEXT_THURSDAY
+        if args.date == 'next_friday':
+            args.date = NEXT_FRIDAY
+        if args.date == 'next_saturday':
+            args.date = NEXT_SATURDAY
+        if args.date == 'next_sunday':
+            args.date = NEXT_SUNDAY
+        if args.date == 'today':
+            args.date = SYSTEM_DATE
+        if args.date == 'tomorrow':
+            args.date = TOMORROW
+        if args.date == 'overmorrow':
+            args.date = OVERMORROW
+        if args.date == 'yesterday':
+            args.date = YESTERDAY
         path_to_directory_testdata = ''
         path_to_file_bought_csv = ''
         path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', "bought.csv")
@@ -779,6 +849,50 @@ def main():
 
     # nr 11of16
     if args.command == "show_profit":
+        if args.start_date == 'next_monday': 
+            args.start_date = NEXT_MONDAY 
+        if args.start_date == 'next_tuesday': 
+            args.start_date = NEXT_TUESDAY
+        if args.start_date == 'next_wednesday':
+            args.start_date = NEXT_WEDNESDAY
+        if args.start_date == 'next_thursday':
+            args.start_date = NEXT_THURSDAY
+        if args.start_date == 'next_friday':
+            args.start_date = NEXT_FRIDAY
+        if args.start_date == 'next_saturday':
+            args.start_date = NEXT_SATURDAY
+        if args.start_date == 'next_sunday':
+            args.start_date = NEXT_SUNDAY
+        if args.start_date == 'today':
+            args.start_date = SYSTEM_DATE
+        if args.start_date == 'tomorrow':
+            args.start_date = TOMORROW
+        if args.start_date == 'overmorrow':
+            args.start_date = OVERMORROW
+        if args.start_date == 'yesterday':
+            args.start_date = YESTERDAY
+        if args.end_date == 'next_monday': 
+            args.end_date = NEXT_MONDAY 
+        if args.end_date == 'next_tuesday': 
+            args.end_date = NEXT_TUESDAY
+        if args.end_date == 'next_wednesday':
+            args.end_date = NEXT_WEDNESDAY
+        if args.end_date == 'next_thursday':
+            args.end_date = NEXT_THURSDAY
+        if args.end_date == 'next_friday':
+            args.end_date = NEXT_FRIDAY
+        if args.end_date == 'next_saturday':
+            args.end_date = NEXT_SATURDAY
+        if args.end_date == 'next_sunday':
+            args.end_date = NEXT_SUNDAY
+        if args.end_date == 'today':
+            args.end_date = SYSTEM_DATE
+        if args.end_date == 'tomorrow':
+            args.end_date = TOMORROW
+        if args.end_date == 'overmorrow':
+            args.end_date = OVERMORROW
+        if args.end_date == 'yesterday':
+            args.end_date = YESTERDAY  
         path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', "sold.csv")
         path_to_csv_bought_file = get_path_to_file('data_used_in_superpy', "bought.csv")
         profit = calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive)
@@ -795,6 +909,50 @@ def main():
 
     # nr 12of16
     if args.command == "show_revenue":
+        if args.start_date == 'next_monday': 
+            args.start_date = NEXT_MONDAY 
+        if args.start_date == 'next_tuesday': 
+            args.start_date = NEXT_TUESDAY
+        if args.start_date == 'next_wednesday':
+            args.start_date = NEXT_WEDNESDAY
+        if args.start_date == 'next_thursday':
+            args.start_date = NEXT_THURSDAY
+        if args.start_date == 'next_friday':
+            args.start_date = NEXT_FRIDAY
+        if args.start_date == 'next_saturday':
+            args.start_date = NEXT_SATURDAY
+        if args.start_date == 'next_sunday':
+            args.start_date = NEXT_SUNDAY
+        if args.start_date == 'today':
+            args.start_date = SYSTEM_DATE
+        if args.start_date == 'tomorrow':
+            args.start_date = TOMORROW
+        if args.start_date == 'overmorrow':
+            args.start_date = OVERMORROW
+        if args.start_date == 'yesterday':
+            args.start_date = YESTERDAY
+        if args.end_date == 'next_monday': 
+            args.end_date = NEXT_MONDAY 
+        if args.end_date == 'next_tuesday': 
+            args.end_date = NEXT_TUESDAY
+        if args.end_date == 'next_wednesday':
+            args.end_date = NEXT_WEDNESDAY
+        if args.end_date == 'next_thursday':
+            args.end_date = NEXT_THURSDAY
+        if args.end_date == 'next_friday':
+            args.end_date = NEXT_FRIDAY
+        if args.end_date == 'next_saturday':
+            args.end_date = NEXT_SATURDAY
+        if args.end_date == 'next_sunday':
+            args.end_date = NEXT_SUNDAY
+        if args.end_date == 'today':
+            args.end_date = SYSTEM_DATE
+        if args.end_date == 'tomorrow':
+            args.end_date = TOMORROW
+        if args.end_date == 'overmorrow':
+            args.end_date = OVERMORROW
+        if args.end_date == 'yesterday':
+            args.end_date = YESTERDAY  
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
@@ -813,6 +971,50 @@ def main():
 
     # nr 13of16
     if args.command == "show_sales_volume":
+        if args.start_date == 'next_monday': 
+            args.start_date = NEXT_MONDAY 
+        if args.start_date == 'next_tuesday': 
+            args.start_date = NEXT_TUESDAY
+        if args.start_date == 'next_wednesday':
+            args.start_date = NEXT_WEDNESDAY
+        if args.start_date == 'next_thursday':
+            args.start_date = NEXT_THURSDAY
+        if args.start_date == 'next_friday':
+            args.start_date = NEXT_FRIDAY
+        if args.start_date == 'next_saturday':
+            args.start_date = NEXT_SATURDAY
+        if args.start_date == 'next_sunday':
+            args.start_date = NEXT_SUNDAY
+        if args.start_date == 'today':
+            args.start_date = SYSTEM_DATE
+        if args.start_date == 'tomorrow':
+            args.start_date = TOMORROW
+        if args.start_date == 'overmorrow':
+            args.start_date = OVERMORROW
+        if args.start_date == 'yesterday':
+            args.start_date = YESTERDAY
+        if args.end_date == 'next_monday': 
+            args.end_date = NEXT_MONDAY 
+        if args.end_date == 'next_tuesday': 
+            args.end_date = NEXT_TUESDAY
+        if args.end_date == 'next_wednesday':
+            args.end_date = NEXT_WEDNESDAY
+        if args.end_date == 'next_thursday':
+            args.end_date = NEXT_THURSDAY
+        if args.end_date == 'next_friday':
+            args.end_date = NEXT_FRIDAY
+        if args.end_date == 'next_saturday':
+            args.end_date = NEXT_SATURDAY
+        if args.end_date == 'next_sunday':
+            args.end_date = NEXT_SUNDAY
+        if args.end_date == 'today':
+            args.end_date = SYSTEM_DATE
+        if args.end_date == 'tomorrow':
+            args.end_date = TOMORROW
+        if args.end_date == 'overmorrow':
+            args.end_date = OVERMORROW
+        if args.end_date == 'yesterday':
+            args.end_date = YESTERDAY  
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
