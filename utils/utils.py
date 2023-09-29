@@ -848,8 +848,131 @@ def get_system_date(path_to_system_date: str) -> str:
         print(f"Error while reading file: {e}")
     return system_date
 
-
 def sell_product(bought_product_id: str, 
+                 price: float, 
+                 sell_date: str, 
+                 path_to_csv_sold_input_file: str, 
+                 path_to_csv_sold_output_file: str,
+                 path_to_csv_bought_file: str
+) -> None:
+    '''
+    In this fn 3 checks are performed:
+    1. check if product exists in bought.csv before creating a sell-transaction in sold.csv
+    2. check if product has already been sold before creating a sell-transaction in sold.csv
+    3. check if product has expired before creating a sell-transaction in sold.csv
+    (this order makes most sense to  me)
+
+    Note about 'path_to_csv_sold_input_file' and 'path_to_csv_sold_output_file':
+    when using superpy as user, input and output csv file are the same.
+    Only when testing fn sell_product in pytest, input and output csv file are different.
+    reason: when testing fn sell_product in pytest, I want to keep the csv-file with input-testdata intact.
+    If and when switching to using a fixture in pytest, then I can probably remove the 2nd  
+    parameter 'path_to_csv_sold_output_file'.
+
+    pitfall: try-catch-blocks open 'bought.csv', then 'sold.csv', then 'bought.csv' again.
+    If no error is raised, then sell-transacion is created in sold.csv. So imho do not 
+    try to merge the try-catch-blocks below. 
+    '''
+    # 1of3: check if product exists in bought.csv:
+    try: 
+        with open(path_to_csv_bought_file, 'r', newline='') as file: 
+            '''
+            Goal: check if product exists in bought.csv:
+            Business rule: each product has a unique buy_id (e.g. b_01, b_02, ...).
+            Business rule: each product is sold by its buy_id.
+            So, if bought_product_id does not exist in bought.csv, then it cannot
+            be sold in sold.csv. 
+            '''
+            
+            # option 1of2:
+            is_bought_product_id_in_bought_csv = False
+            reader = csv.DictReader(file)
+            rows = list(reader)
+            for row in rows:
+                if row['buy_id'] == bought_product_id:
+                    is_bought_product_id_in_bought_csv = True
+            if not is_bought_product_id_in_bought_csv:
+                raise ValueError(f"Wrong buy_id: product with buy_id '{bought_product_id}' does not exist in bought.csv, so you cannot sell it.")
+            
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_bought_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_bought_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_bought_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
+
+    # 2of3: check if product has already been sold:
+    try: 
+        with open(path_to_csv_sold_input_file, 'r', newline='') as file: 
+            '''
+            Goal: check if product has already been sold: 
+            Business rule: each product has a unique buy_id (e.g. b_01, b_02, ...).
+            Business rule: each product is sold by its buy_id.
+            So, if bought_product_id is already in sold.csv, then raise error:
+            '''
+            reader = csv.DictReader(file)
+            rows = list(reader)
+            for row in rows:
+                print(row['buy_id'])
+                if row['buy_id'] == bought_product_id:
+                    raise ValueError(f"Product with buy_id '{bought_product_id}' has already been sold!!")
+            file.seek(0)
+            # sold_product_id is used in second try block below
+            sold_product_id = bought_product_id.replace('b', 's')
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_sold_input_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_sold_input_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_sold_input_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
+
+
+    # 3of3: check if product has expired: 
+    try:
+        with open(path_to_csv_bought_file, 'r', newline='') as file:
+            '''
+            Goal: check if product has expired, before selling it:
+            Buy_id of 'candidate product to be sold' is bought_product_id, so only
+            loop thru bought.csv to find the row with buy_id == bought_product_id. 
+            '''
+            reader_bought_csv = csv.DictReader(file)
+            for reader_bought_row in reader_bought_csv:
+                    print('bla_foo')
+                    if reader_bought_row['buy_id'] == bought_product_id:
+                        print('jojojoj')
+                        expiry_date = reader_bought_row['expiry_date']
+                    
+                        if expiry_date < sell_date:
+                            raise ValueError("Product has expired, so it cannot be sold!!") 
+    except FileNotFoundError:
+        print(f"File not found.")
+    except PermissionError:
+        print(f"You don't have permission to access the file.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in the file.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
+
+    # create sell transaction in sold.csv:
+    try:            
+        with open(path_to_csv_sold_output_file, 'w', newline='') as file: 
+            rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': price, 'sell_date': sell_date}) 
+            writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
+            writer.writeheader()
+            # sort rows by sell_id (== first column in sold.csv):
+            sorted_rows = sorted(rows, key=lambda row: row['sell_id'])
+            writer.writerows(sorted_rows)
+    except PermissionError:
+        print(f"You don't have permission to write to '{path_to_csv_sold_output_file}'.")
+    except csv.Error as e:
+        print(f"Error while writing CSV file: {e}")
+
+
+def sell_product_OLD_OLD_without_checking_expired_products(bought_product_id: str, 
                  price: float, 
                  sell_date: str, 
                  path_to_csv_sold_input_file: str, 
@@ -944,44 +1067,6 @@ def sell_product(bought_product_id: str,
         print(f"Error while writing CSV file: {e}")
 
 
-def sell_product_old(bought_product_id: str, 
-                 price: float, 
-                 sell_date: str, 
-                 path_to_csv_sold_input_file: str, 
-                 path_to_csv_sold_output_file: str
-) -> None:
-    '''
-    About the input_file and output_file:
-    when using superpy as user, input and output csv file are the same.
-    Only when testing fn buy_product in pytest, input and output csv file are different.
-    reason: when testing fn buy_product in pytest, I want to keep the csv-file with testdata intact.
-    '''
-    try: 
-        with open(path_to_csv_sold_input_file, 'r', newline='') as file: 
-            reader = csv.DictReader(file)
-            rows = list(reader)
-            file.seek(0)
-            sold_product_id = bought_product_id.replace('b', 's')
-    except FileNotFoundError:
-        print(f"File '{path_to_csv_sold_input_file}' not found.")
-    except PermissionError:
-        print(f"You don't have permission to access '{path_to_csv_sold_input_file}'.")
-    except UnicodeDecodeError:
-        print(f"Invalid Unicode character found in '{path_to_csv_sold_input_file}'.")
-    except csv.Error as e:
-        print(f"Error while reading CSV file: {e}")
-    try:            
-        with open(path_to_csv_sold_output_file, 'w', newline='') as file: 
-            rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': price, 'sell_date': sell_date}) 
-            writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
-            writer.writeheader()
-            # sort rows by sell_id (== first column in sold.csv):
-            sorted_rows = sorted(rows, key=lambda row: row['sell_id'])
-            writer.writerows(sorted_rows)
-    except PermissionError:
-        print(f"You don't have permission to write to '{path_to_csv_sold_output_file}'.")
-    except csv.Error as e:
-        print(f"Error while writing CSV file: {e}")
 
 
 def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt(buy_id: str, path_to_buy_id_file: str) -> str:
