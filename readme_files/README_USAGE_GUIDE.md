@@ -25,7 +25,7 @@
   - [UC: change the management reports' data by travelling through time](#uc-change-the-management-reports-data-by-travelling-through-time)
   - [UC: show reports in custom time intervals](#uc-show-reports-in-custom-time-intervals)
   - [UC: create mock data and add individual buy and sell transaction](#uc-create-mock-data-and-add-individual-buy-and-sell-transaction)
-  - [UC: sell product violating business rules](#uc-sell-product-violating-business-rules)
+  - [UC: sell product while violating business rules](#uc-sell-product-while-violating-business-rules)
   - [UC: suffer a loss](#uc-suffer-a-loss)
   - [UC: make profit](#uc-make-profit)
 - [INSTALLATION](#installation)
@@ -1310,14 +1310,18 @@ quick links:
     ```     
 
 
-## UC: sell product violating business rules 
+## UC: sell product while violating business rules 
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Use cases](#use-cases)
 <br/><br/>
-- intro: 2 business rules have been implemented in fn sell_product:  
+- intro: 3 business rules have been implemented in fn sell_product:  
+    - 1of3: product does  not exist, so you cannot sell  it.
+    - 2of3: product has already been sold, so you cannot sell it again.
+    - 3of3: product has expired, so you cannot sell it.  
+<br/>
 
-- business rule 1of2: if the product is not in the bought.csv, then the product cannot be sold:
+- Business rule 1of3: if the product is not in the bought.csv, then the product cannot be sold:
 - step 1: create a bit of mock data:    
     ```python
         py super.py create_mock_data -pr 2 -denr 2
@@ -1334,30 +1338,63 @@ quick links:
 - expected result: message in the console: 'ValueError: Buy_id'b_12345' does not exist in bought.csv!!' 
 <br/><br/>
 
-- business rule 2of2: if the product has already been sold, then it cannot be sold again:
+- Business rule 2of3: if the product has already been sold, then it cannot be sold again:
 - step 1: create a bit of mock data:    
     ```python
         py super.py create_mock_data -pr 2 -denr 2
     ```  
-- step 2: look for a product that you can sell:
+- step 2: look for a product that does not violate the 3 rules in this section:
     ```python
         py super.py show_bought_csv
         py super.py show_sold_csv
     ```  
-- step 1: sell  a product 
+- step 3: sell  a product 
     ```python
         py super.py sell b_02 4.34 -s today
     ```  
-- step 2: have a look at bought.csv:
+- step 4: have a look at bought.csv:
     ```python
         py super.py show_sold_csv
     ```  
 
-- step 3: try to sell this exact same product again
+- step 5: try to sell this exact same product again
     ```python
         py super.py sell b_02 4.34 -s tomorrow
     ``` 
 - expected result: message in the console: 'ValueError: Product with buy_id 'b_02' has already been sold!!'
+
+
+- Business rule 3of3: if the product has expired, then it cannot be sold:
+- step 1: create a bit of mock data:    
+    ```python
+        py super.py create_mock_data -pr 2 -lby 2024 -lbm 1 -lbd 1 -ubm 3 -ubw 0 -ubd 0 -mu 0.5 -denr 2 -sl 5 -tt 10
+    ```  
+- step 2: look for a product that has expired, but not yet been sold:
+    ```python
+        py super.py show_expired_products
+    ```  
+- result: b_02, b_04, b_06, b_08
+- info: expiry dates have been randomly created. Take e.g. b_02, look at expiry_date in the table  
+    and add 1 day (e.g. 2024-01-21 plus 1 day == 2024-01-22)  
+
+
+- step 3: try to sell an expired product:
+    ```python
+        py super.py sell b_02 4.34 -s 2024-01-22
+    ```  
+- info: 2024-01-13 is one day after its expiry date.
+  <br/>
+  - expected result: message in the console: 'ValueError: Product has expired, so it cannot be sold!!'
+  
+- step 4: have a look at bought.csv:
+    ```python
+        py super.py show_sold_csv
+    ```  
+
+- step 5: try to sell this exact same product again
+    ```python
+        py super.py sell b_02 4.34 -s tomorrow
+    ``` 
 
 
 
