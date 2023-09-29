@@ -1,7 +1,7 @@
 import filecmp, os, sys
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
-from utils_superpy.utils import calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive, get_path_to_directory_of_file
+from utils.utils import calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive, get_path_to_directory_of_file
 
 directory_of_testcase = "fn_calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive" 
 path_to_directory_of_testcase = get_path_to_directory_of_file(directory_of_testcase)

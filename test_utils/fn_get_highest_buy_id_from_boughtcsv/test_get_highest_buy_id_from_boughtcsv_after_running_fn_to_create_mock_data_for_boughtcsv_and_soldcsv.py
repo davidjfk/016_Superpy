@@ -1,7 +1,7 @@
 import filecmp, os, sys
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
-from utils_superpy.utils import get_highest_buy_id_from_boughtcsv, get_path_to_directory_of_file
+from utils.utils import get_highest_buy_id_from_boughtcsv, get_path_to_directory_of_file
 
 directory_of_testcase = "fn_get_highest_buy_id_from_boughtcsv" 
 path_to_directory_of_testcase = get_path_to_directory_of_file(directory_of_testcase)

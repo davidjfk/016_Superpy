@@ -1,15 +1,16 @@
 
 
-# TABLE OF CONTENTS OF NOTABLE TECHNICAL ELEMENTS:
-### INTRO
-
-### 1_WRITE-DATA-TO-CSV_IN-TESTABLE_MANNER
-### 2_CREATE-PRIMARY-AND-FOREIGN-KEYS-TO-CONNECT-BOUGHT.CSV-AND-SOLD.CSV
-### 3_RUN-PYTEST-WITH-CONTROL-OVER-CWD
 
 
-# INTRO
-[goto Table of Contents at start of markdown file: ](#INTRO) 
+## Table of contents
+<!-- <a name="#table-of-contents" style="visibility: hidden;"></a> -->
+- [Intro](#intro)
+- [Topic 1: Write data to csv in a testable manner](#topic-1-write-data-to-csv-in-a-testable-manner)
+- [Topic 2: Create primary and foreign keys to connect bought.csv and sold.csv](#topic-2-create-primary-and-foreign-keys-to-connect-boughtcsv-and-soldcsv)
+- [Topic 3: Run pytest with control over cwd](#topic-3-run-pytest-with-control-over-cwd)
+
+# Intro
+[Table of contents](#table-of-contents)
 
 Goal: Please include a short, 300-word report that highlights three technical elements   
 of your implementation that you find notable.
@@ -22,9 +23,9 @@ Explain what problem they solve and why you chose to implement them in this way.
     in programming, so it could be a good choice, but it is not required.
 - To assist your explanation you may use code snippets.    
 
-
-# 1_WRITE-DATA-TO-CSV_IN-TESTABLE_MANNER
-[goto Table of Contents at start of markdown file: ](#1_WRITE-DATA-TO-CSV_IN-TESTABLE_MANNER) 
+<br/><br/>
+# Topic 1: Write data to csv in a testable manner
+[Table of contents](#table-of-contents)
 
 - goal: write data to csv
 - scope: fn buy_product and fn sell_product (see (...\superpy\utils_superpy\utils.py))
@@ -67,9 +68,10 @@ Explain what problem they solve and why you chose to implement them in this way.
     But now, with the cwd-issue solved, I will try to use fixtures in my next python project. 
     
 
+<br/><br/>
+# Topic 2: Create primary and foreign keys to connect bought.csv and sold.csv
+[Table of contents](#table-of-contents)
 
-# 2_CREATE-PRIMARY-AND-FOREIGN-KEYS-TO-CONNECT-BOUGHT.CSV-AND-SOLD.CSV
-[goto Table of Contents at start of markdown file: ](#2_CREATE-PRIMARY-AND-FOREIGN-KEYS-TO-CONNECT-BOUGHT.CSV-AND-SOLD.CSV) 
 - goal: connect bought.csv and sold.csv with primary and foreign keys
 - 5 problems to solve: 
 - problem 1: 2 options to create buy-transactions: script-that-creates-mock-data and as-a-user. how to create buy_ids for both options? 
@@ -131,8 +133,8 @@ Solutions:
     ```
 
 - problem-3-solution:
-        The last issued buy_id is persistently stored in file 'id_to_use_in_fn_buy_product.txt'
-        (...\superpy\data_used_in_superpy\id_to_use_in_fn_buy_product.txt)
+        The last issued buy_id is persistently stored in file 'buy_id_counter.txt'
+        (...\superpy\data_used_in_superpy\buy_id_counter.txt)
         The following fn gets the value from this txt-file (e.g. b_163), increments it with 1, and then
         feeds the incremented nr (b_164)  into the buy-fn above as argument 'id_of_row_in_csv_file_bought':
 
@@ -159,12 +161,14 @@ Solutions:
 
 
 - problem-5-solution:
-        connect id-range of script 'create_testdata_for_csv_files_bought_and_sold' with id-range of  
+        connect id-range of fn 'produce_testdata_for_csv_files_bought_and_sold' with id-range of  
         buy-transactions that are manually added.  
+
         Currently id-range id_1 to id_299 are served for this script and range id_300 and beyond are  
         reserved for buy_transactions that are added by super.py-user.  
         If script creates e.g. 167 buy_transactions (b_1 - b_167), and super.py-user then creates a few  
         buy_transactions (starting at b_300), then currently there is a gap between the 2 ranges.  
+
 
         Goal of this task: connect the 2 ranges, nomatter how many buy_transactions the script creates.  
         So in ex above, the super.py-user manually creates a buy_transaction that gets assigned b_168 (intead  
@@ -215,15 +219,15 @@ Solutions:
 
         step 3: call fn:
     ```python
-    def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt_after_running_fn_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id, path_to_buy_id_file):
+    def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt(buy_id, path_to_buy_id_file):
         pass
     ```
         As described above in 'challenge-2-solution':
-        The last issued buy_id is persistently stored in file id_to_use_in_fn_buy_product.txt
-        (...\superpy\data_used_in_superpy\id_to_use_in_fn_buy_product.txt)
+        The last issued buy_id is persistently stored in file buy_id_counter.txt
+        (...\superpy\data_used_in_superpy\buy_id_counter.txt)
 
         fn set_buy_id_after_running_script_to_create_mock_data_for_boughtcsv_and_soldcsv(buy_id, path_to_buy_id_file) 
-        initializes the value in file 'id_to_use_in_fn_buy_product.txt'.
+        initializes the value in file 'buy_id_counter.txt'.
         ex1: if 65 rows of mock buy-transactions have been created, then b_65 is stored in this txt-file.
         ex2: if 18 rows of mock buy-transactions have been created, then b_18 is stored in this txt-file.
 
@@ -234,39 +238,42 @@ Solutions:
         previous buy_id is b_65) or e.g. b_19 (when previous buy_id is b_18).
 
 
+<br/><br/>
+# Topic 3: Run pytest with control over cwd
+[Table of contents](#table-of-contents)
 
-# 3_RUN-PYTEST-WITH-CONTROL-OVER-CWD
-[goto Table of Contents at start of markdown file: ](#3_RUN-PYTEST-WITH-CONTROL-OVER-CWD) 
 - Goal 1: in pytest to run regression tests
-- problem: pytest looks at the cwd to determine where to look for where to read or write
+- problem: pytest looks at the cwd to determine where to look for where to read and/or write
     * test input files
     * actual test result files
-    * expected test result files
-    In addition to that, each fn-to-test has its own directory with these files and its own testscript.
-    Being in the "wrong" directory when you run  pytest, results in storing the actual-test-result-files
-    in a wrong directory.
-    Not only do these testcases fail, but also superpy file structure gets cluttered with actual-result-files  
-    stored in the wrong location.
+    * expected test result files  
+  
+        In addition to that, each fn-to-test has its own directory with these files and its own testscript.  
+        Being in the "wrong" directory when you run  pytest, results in storing the actual-test-result-files  
+        in a wrong directory.  
+        Not only do these testcases fail, but also superpy file structure gets cluttered with  
+        actual-result-files stored in the wrong location.
 
 
 - solution: my 2 fns below solve the problem as follows:
-1of3: when cwd points to following directories and I run pytest:
-a. (...\superpy), 
-b. (...\superpy\test_utils)
-then the actual result is stored in the correct directory of the pytest testcase 
-(ex: (...\superpy\test_utils\fn_buy_product_testcases) ).
+  <br/>
+        1of3: when cwd points to following directories and I run pytest:
+        a. (...\superpy), 
+        b. (...\superpy\test_utils)
+        then the actual result is stored in the correct directory of the pytest testcase 
+        (ex: (...\superpy\test_utils\fn_buy_product_testcases) ).
 
-2of3: when I am in the directory of a fn and  run pytest:
-ex: 
-step 1: goto "cd into"  (...\superpy\test_utils\fn_buy_product_testcases)
-step 2: run pytest
-result: only pytest testcases inside fn_buy_product_testcases are run.
+        2of3: when I am in the directory of a fn and  run pytest:
+        ex: 
+        step 1: goto "cd into"  (...\superpy\test_utils\fn_buy_product_testcases)
+        step 2: run pytest
+        result: only pytest testcases inside fn_buy_product_testcases are run.
 
-3of3: when cwd points to another directory inside superpy, then pytest does not run any testcases.
-ex: 
-step 1: goto "cd into"  (...\superpy\test_utils\data_used_in_superpy)
-step 2: run pytest
-result: no testcases are run.
+        3of3: when cwd points to another directory inside superpy, then pytest does not run any testcases.
+        ex: 
+        step 1: goto "cd into"  (...\superpy\test_utils\data_used_in_superpy)
+        step 2: run pytest
+        result: no testcases are run.
 
 
 ```python

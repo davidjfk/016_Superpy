@@ -15,12 +15,12 @@ file_path_to_directory_superpy =  parent_directory_of_current_directory
 sys.path.append(file_path_to_directory_superpy)
 
 # the following 4 imported fns are arguments in fn create_data_for_csv_files_bought_and_sold() below.
-from utils_superpy.utils import add_days_to_date
-from utils_superpy.utils import generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
-from utils_superpy.utils import create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created
-from utils_superpy.utils import get_path_to_directory_of_file
+from utils.utils import add_days_to_date
+from utils.utils import generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
+from utils.utils import create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created
+from utils.utils import get_path_to_directory_of_file
 
-from utils_superpy.utils import create_data_for_csv_files_bought_and_sold
+from utils.utils import create_data_for_csv_files_bought_and_sold
 
 
 from data_used_in_superpy.product_prices import superpy_product_prices
