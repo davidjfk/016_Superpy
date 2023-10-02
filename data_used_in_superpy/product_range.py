@@ -31,7 +31,7 @@ superpy_product_range = [
     "Canned tuna",
     "Pasta",
     "Rice",
-    "Bread",
+    "Flower",
     "Butter",
     "Sugar",
     "Coffee",

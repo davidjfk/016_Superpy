@@ -583,9 +583,12 @@ def create_data_for_csv_files_bought_and_sold(
     # step 1: check if product_range does not exceed nr of products in supermarket (i.e. imported superpy_product_range):
 
     if product_range > len(superpy_product_range):
-        raise ValueError('''product_range cannot exceed nr of products in supermarket. 
-                         Plz specify a lower value for product_range. 
-                         See README_USAGE_GUIDE.md ffor more information.''')
+        print(f'Problem: product_range', product_range, 'exceeds nr of products in supermarket', len(list((set(superpy_product_range)))))
+        product_range = len(list((set(superpy_product_range))))
+        print(f"Solution: product_range has been set to the maximum amount of products in file"
+              f"product_range.py (...\superpy\superpy\product_range.py). This is {len(list((set(superpy_product_range))))}. " 
+              f"But if you need a higher product_range, then please add more products to product_range.py."
+            )
 
 
     # step 2: create id for each bought product: (e.g. b_1, b_2, b_3, etc):
@@ -936,7 +939,9 @@ def sell_product(bought_product_id: str,
                 if row['buy_id'] == bought_product_id:
                     is_bought_product_id_in_bought_csv = True
             if not is_bought_product_id_in_bought_csv:
-                raise ValueError(f"Wrong buy_id: product with buy_id '{bought_product_id}' does not exist in bought.csv, so you cannot sell it.")
+                print(f"Warning: You are trying to sell a product with a buy_id << {bought_product_id} >> that " 
+                      f"does NOT exist in bought.csv. So this sales transaction is aborted!")
+                return None # this aborts the sales transaction
             
     except FileNotFoundError:
         print(f"File '{path_to_csv_bought_file}' not found.")
@@ -959,9 +964,12 @@ def sell_product(bought_product_id: str,
             reader = csv.DictReader(file)
             rows = list(reader)
             for row in rows:
-                print(row['buy_id'])
+                # print(row['buy_id'])
                 if row['buy_id'] == bought_product_id:
-                    raise ValueError(f"Product with buy_id '{bought_product_id}' has already been sold!!")
+                    print(f"Warning: You are trying to sell product with buy_id << {bought_product_id} >> that " 
+                        f"has already been sold. So this sales transaction is aborted!")
+                    return None # this aborts the sales transaction
+                    # raise ValueError(f"Product with buy_id '{bought_product_id}' has already been sold!!")
             file.seek(0)
             # sold_product_id is used in second try block below
             sold_product_id = bought_product_id.replace('b', 's')
@@ -989,7 +997,9 @@ def sell_product(bought_product_id: str,
                         expiry_date = reader_bought_row['expiry_date']
                     
                         if expiry_date < sell_date:
-                            raise ValueError("Product has expired, so it cannot be sold!!") 
+                            print(f"Warning: You have  just sold an expired product with buy_id << {bought_product_id} >>." 
+                                f"Please check if this is what you want.")
+                            # continue with selling this expired product. 
     except FileNotFoundError:
         print(f"File not found.")
     except PermissionError:

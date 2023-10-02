@@ -659,7 +659,6 @@ def main():
 
     # nr 5of16
     if args.command == "sell":
-        print("sell:")
         '''
         ex with  date in format YYYY-MM-DD: py super.py sell apple 0.79 -sd 2023-09-26
         ex with date as temporal deictic: py super.py sell apple 0.79 -sd today 
