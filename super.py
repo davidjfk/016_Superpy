@@ -749,65 +749,21 @@ def main():
         show_csv_file_in_console_with_module_rich(path_to_file_bought_csv)
 
     # nr 8of16
-        if args.command == "show_cost":
-            # if args.start_date == 'next_monday': 
-            #     args.start_date = NEXT_MONDAY 
-            # if args.start_date == 'next_tuesday': 
-            #     args.start_date = NEXT_TUESDAY
-            # if args.start_date == 'next_wednesday':
-            #     args.start_date = NEXT_WEDNESDAY
-            # if args.start_date == 'next_thursday':
-            #     args.start_date = NEXT_THURSDAY
-            # if args.start_date == 'next_friday':
-            #     args.start_date = NEXT_FRIDAY
-            # if args.start_date == 'next_saturday':
-            #     args.start_date = NEXT_SATURDAY
-            # if args.start_date == 'next_sunday':
-            #     args.start_date = NEXT_SUNDAY
-            # if args.start_date == 'today':
-            #     args.start_date = SYSTEM_DATE
-            # if args.start_date == 'tomorrow':
-            #     args.start_date = TOMORROW
-            # if args.start_date == 'overmorrow':
-            #     args.start_date = OVERMORROW
-            # if args.start_date == 'yesterday':
-            #     args.start_date = YESTERDAY
-            # if args.end_date == 'next_monday': 
-            #     args.end_date = NEXT_MONDAY 
-            # if args.end_date == 'next_tuesday': 
-            #     args.end_date = NEXT_TUESDAY
-            # if args.end_date == 'next_wednesday':
-            #     args.end_date = NEXT_WEDNESDAY
-            # if args.end_date == 'next_thursday':
-            #     args.end_date = NEXT_THURSDAY
-            # if args.end_date == 'next_friday':
-            #     args.end_date = NEXT_FRIDAY
-            # if args.end_date == 'next_saturday':
-            #     args.end_date = NEXT_SATURDAY
-            # if args.end_date == 'next_sunday':
-            #     args.end_date = NEXT_SUNDAY
-            # if args.end_date == 'today':
-            #     args.end_date = SYSTEM_DATE
-            # if args.end_date == 'tomorrow':
-            #     args.end_date = TOMORROW
-            # if args.end_date == 'overmorrow':
-            #     args.end_date = OVERMORROW
-            # if args.end_date == 'yesterday':
-            #     args.end_date = YESTERDAY        
-            path_to_directory_testdata = ''
-            path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
-            path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv') 
-            cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_bought_csv)
-            print('---------------------------------------------------------------------------------------------------')
-            print('                                                                                                   ')        
-            print(f" Current action in Superpy: show_cost                                                            ")
-            print(f" host machine: {socket.gethostname()}                                                            ")     
-            print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
-            print(f" Superpy SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")             
-            print('                                                                                                   ')
-            print(f"Cost from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {cost}")
-            print('                                                                                                   ')
-            print('---------------------------------------------------------------------------------------------------')
+    if args.command == "show_cost":      
+        path_to_directory_testdata = ''
+        path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
+        path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv') 
+        cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_bought_csv)
+        print('---------------------------------------------------------------------------------------------------')
+        print('                                                                                                   ')        
+        print(f" Current action in Superpy: show_cost                                                            ")
+        print(f" host machine: {socket.gethostname()}                                                            ")     
+        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+        print(f" Superpy SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")             
+        print('                                                                                                   ')
+        print(f"Cost from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {cost}")
+        print('                                                                                                   ')
+        print('---------------------------------------------------------------------------------------------------')
 
     # nr 9of16
     if args.command == "show_expired_products":
