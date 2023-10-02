@@ -44,6 +44,9 @@ superpy_product_range = ''
 from data_used_in_superpy.product_prices import superpy_product_prices
 from data_used_in_superpy.product_range import superpy_product_range
 
+
+
+
 def main():
 
     # CONFIGURATION:
@@ -152,6 +155,63 @@ def main():
     '''
     [NEXT_MONDAY, NEXT_TUESDAY, NEXT_WEDNESDAY, NEXT_THURSDAY, NEXT_FRIDAY, NEXT_SATURDAY, NEXT_SUNDAY] = get_dates_of_next_7_days(today)
 
+    '''
+    explanation of the following code:
+    Requirement: all dates must be in format "%Y-%m-%d". This is enforced by argparse.Action class ValidDate below (see its try-except block).
+    But user can also enter date as a word (e.g. 'today', 'tomorrow', etc.) instead of a date in format "%Y-%m-%d".
+    ex: 
+    py super.py buy apple 0.79 -bd today -ed next_monday
+    convert to:
+    py super.py buy apple 0.79 -bd 2023-09-18 -ed 2023-09-25
+    So the following code converts the word 'today' to the date in format "%Y-%m-%d" that corresponds to today. Same for 'tomorrow', etc.
+    '''
+    class ValidDate(argparse.Action):
+        def __call__(self, parser, namespace, values, option_string=None):    
+            if values == 'today':
+                setattr(namespace, self.dest, SYSTEM_DATE)
+                # skip try-except block, because 'today' is in the correct format already.
+                return 
+            if values == 'tomorrow':
+                setattr(namespace, self.dest, TOMORROW)
+                return
+            if values == 'overmorrow':
+                setattr(namespace, self.dest, OVERMORROW)
+                return
+            if values == 'yesterday':
+                setattr(namespace, self.dest, YESTERDAY)
+                return
+            if values == 'next_monday':
+                setattr(namespace, self.dest, NEXT_MONDAY)
+                return
+            if values == 'next_tuesday':
+                setattr(namespace, self.dest, NEXT_TUESDAY)
+                return
+            if values == 'next_wednesday':
+                setattr(namespace, self.dest, NEXT_WEDNESDAY)
+                return
+            if values == 'next_thursday':
+                setattr(namespace, self.dest, NEXT_THURSDAY)
+                return
+            if values == 'next_friday':
+                setattr(namespace, self.dest, NEXT_FRIDAY)
+                return
+            if values == 'next_saturday':
+                setattr(namespace, self.dest, NEXT_SATURDAY)
+                return
+            if values == 'next_sunday':
+                setattr(namespace, self.dest, NEXT_SUNDAY)
+                return
+                       
+            try:
+                datetime.strptime(values, '%Y-%m-%d')
+                setattr(namespace, self.dest, values)
+            except ValueError:
+                parser.error(f"Wrong: format of  date should be YYYY-MM-DD, " \
+                f" e.g. 2024-06-28 instead of 24-06-28." \
+                f" Or use instead of YYYY-MM-DD, one of the following temporal deictics: today, tomorrow, " \
+                f" overmorrow, yesterday, next_monday (...) next_sunday. See help file or"
+                f" the README_USAGE_GUIDE.md.for more info.")
+
     #step: initialize parser:
     parser = argparse.ArgumentParser(prog='super.py',description="Welcome to inventory management tool Superpy.", epilog="The line between disorder and order lies in logistics.", formatter_class=argparse.RawTextHelpFormatter)
     # step: create container for all subparsers. --> 'command' is a container for [and name of] all the subparsers:
@@ -164,8 +224,8 @@ def main():
     subparser_buy_product.add_argument("product_name", type=str, help="e.g. apple, carrot, oats, etc.") 
     subparser_buy_product.add_argument("price", type=float, help="e.g. 1.20 means 1 euro and 20 cents. 0.2 or 0.20 means 20 cents.") 
     # -buy_date gets its default value from file system_date.txt in the DATA_DIRECTORY:
-    subparser_buy_product.add_argument("-buy_date", "-b", default= SYSTEM_DATE, type=str, help="date object with string representation following the format: '%Y-%m-%d'. ex: 2026-10-21 ") 
-    subparser_buy_product.add_argument("-expiry_date", "-e", default="does not expire", type=str, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
+    subparser_buy_product.add_argument("-buy_date", "-b", default= SYSTEM_DATE, type=str, action=ValidDate, help="date object with string representation following the format: '%Y-%m-%d'. ex: 2026-10-21 ") 
+    subparser_buy_product.add_argument("-expiry_date", "-e", default="does not expire", type=str, action=ValidDate, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
 
     # 2_CREATE_MOCK_DATE: Create subparser "create_mock_data" with help text and add it to the container "command":
@@ -207,14 +267,14 @@ def main():
     subparser_sell_product.add_argument("buy_id", type=str, help="e.g. apple, carrot, oats, etc.") 
     subparser_sell_product.add_argument("price", type=float, help="e.g. 1.20 means 1 euro and 20 cents. 0.2 or 0.20 means 20 cents.") 
     # -buy_date gets its default value from file system_date.txt in the DATA_DIRECTORY:
-    subparser_sell_product.add_argument("-sell_date", "-s", default= SYSTEM_DATE, type=str, help="date object with string representation following the format: '%Y-%m-%d'. ex: 2026-10-21 ") 
+    subparser_sell_product.add_argument("-sell_date", "-s", default= SYSTEM_DATE, type=str, action=ValidDate, help="date object with string representation following the format: '%Y-%m-%d'. ex: 2026-10-21 ") 
     # subparser_sell_product.add_argument("-expiry_date", "-ed", default="does not expire", type=str, help="supermarket also trades products that do not expire (e.g. cutlery, household equipment, etc. If product has expiry date, then it has following format: '%Y-%m-%d'. ex: 2026-10-21") 
 
 
     # 6_SET_DATE: create subparser "set_system_date" with help text and add it to the container "command":
     subparser_set_date = subparsers.add_parser("set_system_date", help="goal: set_system_date_to a specific date in the file system_date.txt\n   ex1: py super.py set_date 2025-01-01 \n   system_date: 2025-01-01\n result: 'Superpy system_date is set to date (e.g.) 2028-03-10' \n\n   arg1: positional argument system_date, e.g. 2023-10-11. \n   --> string representation in format 'yyy-mm-dd'\n\n   arg with date value can be entered in format YYYY-MM-DD: e.g. 2029-02-03 , or as a word (exhaustive list):\n   today, tomorrow, overmorrow, yesterday, next_monday (...) next_sunday.\n   Reference point: today == system_date (see definition of system_date) \n\n")
     #step: add the positional and optional arguments to 'subparser_set_date': 
-    subparser_set_date.add_argument("new_system_date", type=str, help="specify the new system date in format YYYY-MM-DD") 
+    subparser_set_date.add_argument("new_system_date", type=str, action=ValidDate, help="specify the new system date in format YYYY-MM-DD") 
 
 
     # 7_SHOW_BOUGHT_CSV: Create subparser "show_bought_csv" with help text and add it to the container "command":
@@ -224,36 +284,36 @@ def main():
     # 8_SHOW_COST: Create subparser "show_cost" with help text and add it to the container "command":
     subparser_show_cost = subparsers.add_parser("show_cost", help="goal: show cost in time range between start_date and end_date inclusive. \n   ex1: py super.py show_cost -sd 2023-09-01 -ed 2023-10-10 \n   start_date: 2023-09-01 \n   end_date: 2023-10-10 \n   result in terminal: \n   'Cost from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_cost -ed 2023-10-05 \n   start_date is start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.\n   end_date: 2023-10-05 \n   result in terminal: \n   'Cost from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'   \n\n   ex3: py super.py show_profit -sd 2023-07-01 \n   start_date: 2023-07-01 \n   end_date is by default system_date \n   result in terminal: \n   'Cost from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date has by default system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the cost of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_cost':
-    subparser_show_cost.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, help="specify the start date in format YYYY-MM-DD")
-    subparser_show_cost.add_argument("-end_date","-ed",default=SYSTEM_DATE, type=str, help="specify the end date in format YYYY-MM-DD")
+    subparser_show_cost.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, action=ValidDate, help="specify the start date in format YYYY-MM-DD")
+    subparser_show_cost.add_argument("-end_date","-ed",default=SYSTEM_DATE, type=str, action=ValidDate, help="specify the end date in format YYYY-MM-DD")
 
     # 9_SHOW_EXPIRED_PRODUCTS: create subparser "show_expired_products" with help text and add it to the container "command":
     subparser_buy_product = subparsers.add_parser("show_expired_products", help="goal: calculate expired products on a day in format 'YYYY-MM-DD' (e.g. 2023-09-28) \n   ex1: py super.py show_expired_products -d 2023-09-28\n   date: 2023-09-28   \n   result is displayed in a table in the terminal. \n\n   ex2: py super.py show_expired_products\n   date: by default system_date\n   results is displayed in a table in the terminal. \n\n   arg1: optional argument date in following format: 'YYYY-MM-DD'. ex: -d 2026-10-21 \n   default value is system_date.\n   reason: often you want to know which products expire today.  \n\n") 
-    subparser_buy_product.add_argument("-date", "-d", default=SYSTEM_DATE, type=str, help="date in following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
+    subparser_buy_product.add_argument("-date", "-d", default=SYSTEM_DATE, type=str, action=ValidDate, help="date in following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
     # 10_SHOW_INVENTORY: create subparser "show_inventory" with help text and add it to the container "command":
     subparser_buy_product = subparsers.add_parser("show_inventory", help="goal: calculate inventory on a day in format 'YYYY-MM-DD' (e.g. 2023-09-28) \n   ex1: py super.py show_inventory -d 2023-09-28\n   date: 2023-09-28   \n   result is displayed in a table in the terminal. \n\n   ex2: py super.py show_inventory\n   date: by default system_date\n   results is displayed in a table in the terminal. \n\n   arg1: optional argument date in following format: 'YYYY-MM-DD'. ex: -d 2026-10-21 \n   default value is system_date.\n   reason: often you want to know which products expire today.  \n\n")  
-    subparser_buy_product.add_argument("-date", "-d", default=SYSTEM_DATE, type=str, help="date in following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
+    subparser_buy_product.add_argument("-date", "-d", default=SYSTEM_DATE, type=str, action=ValidDate, help="date in following format: '%Y-%m-%d'. ex: 2026-10-21 ") 
 
     # 11_SHOW_PROFIT: Create subparser "show_profit" with help text and add it to the container "command":
     subparser_show_cost = subparsers.add_parser("show_profit", help="goal: show profit in time range between start_date and end_date inclusive. \n   ex1: py super.py show_profit -sd 2023-09-01 -ed 2023-10-10 \n   start_date: 2023-09-01 \n   end_date: 2023-10-10 \n   result in terminal: \n   'Profit from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_profit -ed 2023-10-05 \n   start_date is start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.\n   end_date: 2023-10-05 \n   result in terminal: \n   'Profit from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'   \n\n   ex3: py super.py show_profit -sd 2023-07-01 \n   start_date: 2023-07-01 \n   end_date is by default system_date \n   result in terminal: \n   'Profit from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date has by default system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the profit of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_profit':
-    subparser_show_cost.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, help="specify the start date in format YYYY-MM-DD")
-    subparser_show_cost.add_argument("-end_date","-ed",default= SYSTEM_DATE, type=str, help="specify the end date in format YYYY-MM-DD")
+    subparser_show_cost.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, action=ValidDate, help="specify the start date in format YYYY-MM-DD")
+    subparser_show_cost.add_argument("-end_date","-ed",default= SYSTEM_DATE, type=str, action=ValidDate, help="specify the end date in format YYYY-MM-DD")
 
 
     # 12_SHOW_REVENUE: Create subparser "show_revenue" with help text and add it to the container "command":
     subparser_show_revenue = subparsers.add_parser("show_revenue", help="goal: show revenue in time range between start_date and end_date inclusive. \n   ex1: py super.py show_revenue -sd 2023-09-01 -ed 2023-10-10 \n   start_date: 2023-09-01 \n   end_date: 2023-10-10 \n   result in terminal: \n   'Revenue from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_revenue -ed 2023-10-05 \n   start_date is start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.\n   end_date: 2023-10-05 \n   result in terminal: \n   'Revenue from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'   \n\n   ex3: py super.py show_revenue -sd 2023-07-01 \n   start_date: 2023-07-01 \n   end_date is by default system_date \n   result in terminal: \n   'Revenue from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date has by default system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the revenue of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_revenue':
-    subparser_show_revenue.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, help="specify the start date in format YYYY-MM-DD")
-    subparser_show_revenue.add_argument("-end_date","-ed",default=SYSTEM_DATE, type=str, help="specify the end date in format YYYY-MM-DD")
+    subparser_show_revenue.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, action=ValidDate, help="specify the start date in format YYYY-MM-DD")
+    subparser_show_revenue.add_argument("-end_date","-ed",default=SYSTEM_DATE, type=str, action=ValidDate, help="specify the end date in format YYYY-MM-DD")
 
 
     # 13_SHOW_SALES_VOLUME: Create subparser "show_sales_volume" with help text and add it to the container "command":
     subparser_show_revenue = subparsers.add_parser("show_sales_volume", help="goal: show sales volume in time range between start_date and end_date inclusive. \n   ex1: py super.py show_sales_volume -sd 2023-09-01 -ed 2023-10-10 \n   start_date: 2023-09-01 \n   end_date: 2023-10-10 \n   result in terminal: \n   'Sales Volume from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'  \n\n   ex2: py super.py show_sales_volume -ed 2023-10-05 \n   start_date is start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01.\n   end_date: 2023-10-05 \n   result in terminal: \n   'Sales volume from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'   \n\n   ex3: py super.py show_sales_volume -sd 2023-07-01 \n   start_date: 2023-07-01 \n   end_date is by default system_date \n   result in terminal: \n   'Sales volume from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9' \n   end_date has by default system_date.  \n\n   arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01 \n   default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01. \n   reason: often you want to know the sales volume of the current financial year until today inclusive. \n\n   arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15 \n   default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.  \n\n")
     #step: add the positional and optional arguments to 'subparser_show_revenue':
-    subparser_show_revenue.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, help="specify the start date in format YYYY-MM-DD")
-    subparser_show_revenue.add_argument("-end_date","-ed",default=SYSTEM_DATE, type=str, help="specify the end date in format YYYY-MM-DD")
+    subparser_show_revenue.add_argument("-start_date","-sd",default=START_DATE_OF_CURRENT_FINANCIAL_YEAR, type=str, action=ValidDate, help="specify the start date in format YYYY-MM-DD")
+    subparser_show_revenue.add_argument("-end_date","-ed",default=SYSTEM_DATE, type=str, action=ValidDate, help="specify the end date in format YYYY-MM-DD")
 
 
     # 14_SHOW_SOLD_CSV: Create subparser "show_sold_csv" with help text and add it to the container "command":
@@ -273,77 +333,64 @@ def main():
 
     # nr 1of16
     if args.command == "buy":
-        print("buy:")
-        '''
-        explanation of the following code:
-        e.g. NEXT_MONDAY = 2023-09-18, i.e. string in format YYYY-MM-DD. This the output of my fn get_dates_of_next_7_days().
-        problem: 
-        step 1 in argparse cli:     py super.py buy apple 0.79 -bd next_monday -ed 2023-09-30
-        step 2: in bought.csv I get transaction record:
-            actual result: b_43,apple,1.75,NEXT_MONDAY,2023-09-30     --> problem: I do not want "NEXT_MONDAY" in bought.csv, but instead 2023-09-25
-            expected result: b_43,apple,1.75,2023-09-25,2023-09-30
-        The following code solves this problem (there is probably an "official way" hidden inside the enigmatic mystifying argparse docs, but this works kinda nice :-)
-        
-        ex date in format YYYY-MM-DD: py super.py buy apple 0.79 -bd 2023-09-18 -ed 2023-09-25
-        ex with date as 'temporal deictic' (credits to google for this word) py super.py buy apple 0.79 -bd today -ed -ed 2023-09-25
 
-        All temporal deictics: (next_monday, next_tuesday, etc.) are converted to date in format YYYY-MM-DD:
-        '''
-        if args.buy_date == 'next_monday': 
-            args.buy_date = NEXT_MONDAY 
-        if args.buy_date == 'next_tuesday': 
-            args.buy_date = NEXT_TUESDAY
-        if args.buy_date == 'next_wednesday':
-            args.buy_date = NEXT_WEDNESDAY
-        if args.buy_date == 'next_thursday':
-            args.buy_date = NEXT_THURSDAY
-        if args.buy_date == 'next_friday':
-            args.buy_date = NEXT_FRIDAY
-        if args.buy_date == 'next_saturday':
-            args.buy_date = NEXT_SATURDAY
-        if args.buy_date == 'next_sunday':
-            args.buy_date = NEXT_SUNDAY
-        if args.buy_date == 'today':
-            args.buy_date = SYSTEM_DATE
-        if args.buy_date == 'tomorrow':
-            args.buy_date = TOMORROW
-        if args.buy_date == 'overmorrow':
-            args.buy_date = OVERMORROW
-        if args.buy_date == 'yesterday':
-            args.buy_date = YESTERDAY
+        # if args.buy_date == 'next_monday': 
+        #     args.buy_date = NEXT_MONDAY 
+        # if args.buy_date == 'next_tuesday': 
+        #     args.buy_date = NEXT_TUESDAY
+        # if args.buy_date == 'next_wednesday':
+        #     args.buy_date = NEXT_WEDNESDAY
+        # if args.buy_date == 'next_thursday':
+        #     args.buy_date = NEXT_THURSDAY
+        # if args.buy_date == 'next_friday':
+        #     args.buy_date = NEXT_FRIDAY
+        # if args.buy_date == 'next_saturday':
+        #     args.buy_date = NEXT_SATURDAY
+        # if args.buy_date == 'next_sunday':
+        #     args.buy_date = NEXT_SUNDAY
+        # if args.buy_date == 'today':
+        #     args.buy_date = SYSTEM_DATE
+        # if args.buy_date == 'tomorrow':
+        #     args.buy_date = TOMORROW
+        # if args.buy_date == 'overmorrow':
+        #     args.buy_date = OVERMORROW
+        # if args.buy_date == 'yesterday':
+        #     args.buy_date = YESTERDAY
+
         '''
         same recipy for expiry_date: 
         ex with date in format YYYY-MM-DD: py super.py buy apple 0.79 -bd today -ed 2023-09-25
         ex with date as temporal deictic: py super.py buy apple 0.79 -bd today -ed next_monday
         '''
-        if args.expiry_date == 'next_monday': 
-            args.expiry_date = NEXT_MONDAY 
-        if args.expiry_date == 'next_tuesday': 
-            args.expiry_date = NEXT_TUESDAY
-        if args.expiry_date == 'next_wednesday':
-            args.expiry_date = NEXT_WEDNESDAY
-        if args.expiry_date == 'next_thursday':
-            args.expiry_date = NEXT_THURSDAY
-        if args.expiry_date == 'next_friday':
-            args.expiry_date = NEXT_FRIDAY
-        if args.expiry_date == 'next_saturday':
-            args.expiry_date = NEXT_SATURDAY
-        if args.expiry_date == 'next_sunday':
-            args.expiry_date = NEXT_SUNDAY
-        if args.expiry_date == 'today':
-            args.expiry_date = SYSTEM_DATE
-        if args.expiry_date == 'tomorrow':
-            args.expiry_date = TOMORROW
-        if args.expiry_date == 'overmorrow':
-            args.expiry_date = OVERMORROW
-        if args.expiry_date == 'yesterday':
-            args.expiry_date = YESTERDAY
+        # if args.expiry_date == 'next_monday': 
+        #     args.expiry_date = NEXT_MONDAY 
+        # if args.expiry_date == 'next_tuesday': 
+        #     args.expiry_date = NEXT_TUESDAY
+        # if args.expiry_date == 'next_wednesday':
+        #     args.expiry_date = NEXT_WEDNESDAY
+        # if args.expiry_date == 'next_thursday':
+        #     args.expiry_date = NEXT_THURSDAY
+        # if args.expiry_date == 'next_friday':
+        #     args.expiry_date = NEXT_FRIDAY
+        # if args.expiry_date == 'next_saturday':
+        #     args.expiry_date = NEXT_SATURDAY
+        # if args.expiry_date == 'next_sunday':
+        #     args.expiry_date = NEXT_SUNDAY
+        # if args.expiry_date == 'today':
+        #     args.expiry_date = SYSTEM_DATE
+        # if args.expiry_date == 'tomorrow':
+        #     args.expiry_date = TOMORROW
+        # if args.expiry_date == 'overmorrow':
+        #     args.expiry_date = OVERMORROW
+        # if args.expiry_date == 'yesterday':
+        #     args.expiry_date = YESTERDAY
         path_to_id_with_highest_sequence_number = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'buy_id_counter.txt')
         id_of_row_in_csv_file_bought = create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number) 
 
         path_to_csv_bought_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'bought.csv')
         path_to_csv_bought_output_file = path_to_csv_bought_input_file # but not the same in pytest.
-        buy_product(args.product_name, args.price, args.buy_date, args.expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file, path_to_csv_bought_output_file) 
+        fn_execution_status = buy_product(args.product_name, args.price, args.buy_date, args.expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file, path_to_csv_bought_output_file) 
+        # if not fn_execution_status == "date_entered_in_fn_in_wrong_format":
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')        
         print(f" Current action in Superpy: buy_product                                                              ")
@@ -617,28 +664,28 @@ def main():
         ex with  date in format YYYY-MM-DD: py super.py sell apple 0.79 -sd 2023-09-26
         ex with date as temporal deictic: py super.py sell apple 0.79 -sd today 
         '''        
-        if args.sell_date == 'next_monday': 
-            args.sell_date = NEXT_MONDAY 
-        if args.sell_date == 'next_tuesday': 
-            args.sell_date = NEXT_TUESDAY
-        if args.sell_date == 'next_wednesday':
-            args.sell_date = NEXT_WEDNESDAY
-        if args.sell_date == 'next_thursday':
-            args.sell_date = NEXT_THURSDAY
-        if args.sell_date == 'next_friday':
-            args.sell_date = NEXT_FRIDAY
-        if args.sell_date == 'next_saturday':
-            args.sell_date = NEXT_SATURDAY
-        if args.sell_date == 'next_sunday':
-            args.sell_date = NEXT_SUNDAY
-        if args.sell_date == 'today':
-            args.sell_date = SYSTEM_DATE
-        if args.sell_date == 'tomorrow':
-            args.sell_date = TOMORROW
-        if args.sell_date == 'overmorrow':
-            args.sell_date = OVERMORROW
-        if args.sell_date == 'yesterday':
-            args.sell_date = YESTERDAY
+        # if args.sell_date == 'next_monday': 
+        #     args.sell_date = NEXT_MONDAY 
+        # if args.sell_date == 'next_tuesday': 
+        #     args.sell_date = NEXT_TUESDAY
+        # if args.sell_date == 'next_wednesday':
+        #     args.sell_date = NEXT_WEDNESDAY
+        # if args.sell_date == 'next_thursday':
+        #     args.sell_date = NEXT_THURSDAY
+        # if args.sell_date == 'next_friday':
+        #     args.sell_date = NEXT_FRIDAY
+        # if args.sell_date == 'next_saturday':
+        #     args.sell_date = NEXT_SATURDAY
+        # if args.sell_date == 'next_sunday':
+        #     args.sell_date = NEXT_SUNDAY
+        # if args.sell_date == 'today':
+        #     args.sell_date = SYSTEM_DATE
+        # if args.sell_date == 'tomorrow':
+        #     args.sell_date = TOMORROW
+        # if args.sell_date == 'overmorrow':
+        #     args.sell_date = OVERMORROW
+        # if args.sell_date == 'yesterday':
+        #     args.sell_date = YESTERDAY
         path_to_csv_sold_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'sold.csv')
         path_to_csv_sold_output_file = path_to_csv_sold_input_file # but not the same in pytest.
         path_to_csv_bought_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'bought.csv')
@@ -665,29 +712,29 @@ def main():
         ex with date in format YYYY-MM-DD: py super.py set_system_date 2023-09-26
         ex with date as temporal deictic: py super.py set_system_date next_week
         '''
-        if args.new_system_date == 'next_monday': 
-            args.new_system_date = NEXT_MONDAY 
-        if args.new_system_date == 'next_tuesday': 
-            args.new_system_date = NEXT_TUESDAY
-        if args.new_system_date == 'next_wednesday':
-            args.new_system_date = NEXT_WEDNESDAY
-        if args.new_system_date == 'next_thursday':
-            args.new_system_date = NEXT_THURSDAY
-        if args.new_system_date == 'next_friday':
-            args.new_system_date = NEXT_FRIDAY
-        if args.new_system_date == 'next_saturday':
-            args.new_system_date = NEXT_SATURDAY
-        if args.new_system_date == 'next_sunday':
-            args.new_system_date = NEXT_SUNDAY
-        if args.new_system_date == 'today':
-            args.new_system_date = SYSTEM_DATE
-        if args.new_system_date == 'tomorrow':
-            args.new_system_date = TOMORROW
-        if args.new_system_date == 'overmorrow':
-            args.new_system_date = OVERMORROW
-        if args.new_system_date == 'yesterday':
-            args.new_system_date = YESTERDAY
-        print("set_system_date")
+        # if args.new_system_date == 'next_monday': 
+        #     args.new_system_date = NEXT_MONDAY 
+        # if args.new_system_date == 'next_tuesday': 
+        #     args.new_system_date = NEXT_TUESDAY
+        # if args.new_system_date == 'next_wednesday':
+        #     args.new_system_date = NEXT_WEDNESDAY
+        # if args.new_system_date == 'next_thursday':
+        #     args.new_system_date = NEXT_THURSDAY
+        # if args.new_system_date == 'next_friday':
+        #     args.new_system_date = NEXT_FRIDAY
+        # if args.new_system_date == 'next_saturday':
+        #     args.new_system_date = NEXT_SATURDAY
+        # if args.new_system_date == 'next_sunday':
+        #     args.new_system_date = NEXT_SUNDAY
+        # if args.new_system_date == 'today':
+        #     args.new_system_date = SYSTEM_DATE
+        # if args.new_system_date == 'tomorrow':
+        #     args.new_system_date = TOMORROW
+        # if args.new_system_date == 'overmorrow':
+        #     args.new_system_date = OVERMORROW
+        # if args.new_system_date == 'yesterday':
+        #     args.new_system_date = YESTERDAY
+        # print("set_system_date")
         # step: call fn set_system_date_to to update file system__date.txt with following date:
         new_system_date = set_system_date_to(args.new_system_date, PATH_TO_FILE_WITH_SYSTEM_DATE)
         print('---------------------------------------------------------------------------------------------------')
@@ -704,131 +751,134 @@ def main():
 
     # nr 8of16
         if args.command == "show_cost":
-            if args.start_date == 'next_monday': 
-                args.start_date = NEXT_MONDAY 
-            if args.start_date == 'next_tuesday': 
-                args.start_date = NEXT_TUESDAY
-            if args.start_date == 'next_wednesday':
-                args.start_date = NEXT_WEDNESDAY
-            if args.start_date == 'next_thursday':
-                args.start_date = NEXT_THURSDAY
-            if args.start_date == 'next_friday':
-                args.start_date = NEXT_FRIDAY
-            if args.start_date == 'next_saturday':
-                args.start_date = NEXT_SATURDAY
-            if args.start_date == 'next_sunday':
-                args.start_date = NEXT_SUNDAY
-            if args.start_date == 'today':
-                args.start_date = SYSTEM_DATE
-            if args.start_date == 'tomorrow':
-                args.start_date = TOMORROW
-            if args.start_date == 'overmorrow':
-                args.start_date = OVERMORROW
-            if args.start_date == 'yesterday':
-                args.start_date = YESTERDAY
-            if args.end_date == 'next_monday': 
-                args.end_date = NEXT_MONDAY 
-            if args.end_date == 'next_tuesday': 
-                args.end_date = NEXT_TUESDAY
-            if args.end_date == 'next_wednesday':
-                args.end_date = NEXT_WEDNESDAY
-            if args.end_date == 'next_thursday':
-                args.end_date = NEXT_THURSDAY
-            if args.end_date == 'next_friday':
-                args.end_date = NEXT_FRIDAY
-            if args.end_date == 'next_saturday':
-                args.end_date = NEXT_SATURDAY
-            if args.end_date == 'next_sunday':
-                args.end_date = NEXT_SUNDAY
-            if args.end_date == 'today':
-                args.end_date = SYSTEM_DATE
-            if args.end_date == 'tomorrow':
-                args.end_date = TOMORROW
-            if args.end_date == 'overmorrow':
-                args.end_date = OVERMORROW
-            if args.end_date == 'yesterday':
-                args.end_date = YESTERDAY        
-        path_to_directory_testdata = ''
-        path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
-        path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv') 
-        cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_bought_csv)
-        print('---------------------------------------------------------------------------------------------------')
-        print('                                                                                                   ')        
-        print(f" Current action in Superpy: show_cost                                                            ")
-        print(f" host machine: {socket.gethostname()}                                                            ")     
-        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
-        print(f" Superpy SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")             
-        print('                                                                                                   ')
-        print(f"Cost from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {cost}")
-        print('                                                                                                   ')
-        print('---------------------------------------------------------------------------------------------------')
+            # if args.start_date == 'next_monday': 
+            #     args.start_date = NEXT_MONDAY 
+            # if args.start_date == 'next_tuesday': 
+            #     args.start_date = NEXT_TUESDAY
+            # if args.start_date == 'next_wednesday':
+            #     args.start_date = NEXT_WEDNESDAY
+            # if args.start_date == 'next_thursday':
+            #     args.start_date = NEXT_THURSDAY
+            # if args.start_date == 'next_friday':
+            #     args.start_date = NEXT_FRIDAY
+            # if args.start_date == 'next_saturday':
+            #     args.start_date = NEXT_SATURDAY
+            # if args.start_date == 'next_sunday':
+            #     args.start_date = NEXT_SUNDAY
+            # if args.start_date == 'today':
+            #     args.start_date = SYSTEM_DATE
+            # if args.start_date == 'tomorrow':
+            #     args.start_date = TOMORROW
+            # if args.start_date == 'overmorrow':
+            #     args.start_date = OVERMORROW
+            # if args.start_date == 'yesterday':
+            #     args.start_date = YESTERDAY
+            # if args.end_date == 'next_monday': 
+            #     args.end_date = NEXT_MONDAY 
+            # if args.end_date == 'next_tuesday': 
+            #     args.end_date = NEXT_TUESDAY
+            # if args.end_date == 'next_wednesday':
+            #     args.end_date = NEXT_WEDNESDAY
+            # if args.end_date == 'next_thursday':
+            #     args.end_date = NEXT_THURSDAY
+            # if args.end_date == 'next_friday':
+            #     args.end_date = NEXT_FRIDAY
+            # if args.end_date == 'next_saturday':
+            #     args.end_date = NEXT_SATURDAY
+            # if args.end_date == 'next_sunday':
+            #     args.end_date = NEXT_SUNDAY
+            # if args.end_date == 'today':
+            #     args.end_date = SYSTEM_DATE
+            # if args.end_date == 'tomorrow':
+            #     args.end_date = TOMORROW
+            # if args.end_date == 'overmorrow':
+            #     args.end_date = OVERMORROW
+            # if args.end_date == 'yesterday':
+            #     args.end_date = YESTERDAY        
+            path_to_directory_testdata = ''
+            path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
+            path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv') 
+            cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_bought_csv)
+            print('---------------------------------------------------------------------------------------------------')
+            print('                                                                                                   ')        
+            print(f" Current action in Superpy: show_cost                                                            ")
+            print(f" host machine: {socket.gethostname()}                                                            ")     
+            print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+            print(f" Superpy SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")             
+            print('                                                                                                   ')
+            print(f"Cost from start_date: {args.start_date} to end_date: {args.end_date} inclusive: Euro {cost}")
+            print('                                                                                                   ')
+            print('---------------------------------------------------------------------------------------------------')
 
     # nr 9of16
     if args.command == "show_expired_products":
-        if args.date == 'next_monday': 
-            args.date = NEXT_MONDAY 
-        if args.date == 'next_tuesday': 
-            args.date = NEXT_TUESDAY
-        if args.date == 'next_wednesday':
-            args.date = NEXT_WEDNESDAY
-        if args.date == 'next_thursday':
-            args.date = NEXT_THURSDAY
-        if args.date == 'next_friday':
-            args.date = NEXT_FRIDAY
-        if args.date == 'next_saturday':
-            args.date = NEXT_SATURDAY
-        if args.date == 'next_sunday':
-            args.date = NEXT_SUNDAY
-        if args.date == 'today':
-            args.date = SYSTEM_DATE
-        if args.date == 'tomorrow':
-            args.date = TOMORROW
-        if args.date == 'overmorrow':
-            args.date = OVERMORROW
-        if args.date == 'yesterday':
-            args.date = YESTERDAY
+        # if args.date == 'next_monday': 
+        #     args.date = NEXT_MONDAY 
+        # if args.date == 'next_tuesday': 
+        #     args.date = NEXT_TUESDAY
+        # if args.date == 'next_wednesday':
+        #     args.date = NEXT_WEDNESDAY
+        # if args.date == 'next_thursday':
+        #     args.date = NEXT_THURSDAY
+        # if args.date == 'next_friday':
+        #     args.date = NEXT_FRIDAY
+        # if args.date == 'next_saturday':
+        #     args.date = NEXT_SATURDAY
+        # if args.date == 'next_sunday':
+        #     args.date = NEXT_SUNDAY
+        # if args.date == 'today':
+        #     args.date = SYSTEM_DATE
+        # if args.date == 'tomorrow':
+        #     args.date = TOMORROW
+        # if args.date == 'overmorrow':
+        #     args.date = OVERMORROW
+        # if args.date == 'yesterday':
+        #     args.date = YESTERDAY
         path_to_directory_testdata = ''
         path_to_file_bought_csv = ''
         path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', "bought.csv")
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
         expired_products = calculate_expired_products_on_day(args.date, path_to_file_sold_csv, path_to_file_bought_csv)
-        print('---------------------------------------------------------------------------------------------------')
-        print('                                                                                                   ')        
-        print(f" Current action in Superpy: show_expired_products                                                    ")
-        print(f" host machine: {socket.gethostname()}                                                            ")     
-        print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
-        print(f" Superpy SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")             
-        print('                                                                                                   ')
-        print(f" Expired products on Superpy date: {args.date}: ")
-        print('                                                                                                   ')
-        
-        show_list_with_nested_lists_in_console_with_module_rich(expired_products)
+        if not expired_products == "date_entered_in_fn_in_wrong_format":
+            print('---------------------------------------------------------------------------------------------------')
+            print('                                                                                                   ')        
+            print(f" Current action in Superpy: show_expired_products                                                    ")
+            print(f" host machine: {socket.gethostname()}                                                            ")     
+            print(f" host machine date: {datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")                                                                                                                                                                                      
+            print(f" Superpy SYSTEM_DATE: {SYSTEM_DATE} ({show_weekday_from_date(SYSTEM_DATE)})")             
+            print('                                                                                                   ')
+            print(f" Expired products on Superpy date: {args.date}: ")
+            print('                                                                                                   ')
+            show_list_with_nested_lists_in_console_with_module_rich(expired_products)
+
+
+
 
     # nr 10of16
     if args.command == "show_inventory":
-        if args.date == 'next_monday': 
-            args.date = NEXT_MONDAY 
-        if args.date == 'next_tuesday': 
-            args.date = NEXT_TUESDAY
-        if args.date == 'next_wednesday':
-            args.date = NEXT_WEDNESDAY
-        if args.date == 'next_thursday':
-            args.date = NEXT_THURSDAY
-        if args.date == 'next_friday':
-            args.date = NEXT_FRIDAY
-        if args.date == 'next_saturday':
-            args.date = NEXT_SATURDAY
-        if args.date == 'next_sunday':
-            args.date = NEXT_SUNDAY
-        if args.date == 'today':
-            args.date = SYSTEM_DATE
-        if args.date == 'tomorrow':
-            args.date = TOMORROW
-        if args.date == 'overmorrow':
-            args.date = OVERMORROW
-        if args.date == 'yesterday':
-            args.date = YESTERDAY
+        # if args.date == 'next_monday': 
+        #     args.date = NEXT_MONDAY 
+        # if args.date == 'next_tuesday': 
+        #     args.date = NEXT_TUESDAY
+        # if args.date == 'next_wednesday':
+        #     args.date = NEXT_WEDNESDAY
+        # if args.date == 'next_thursday':
+        #     args.date = NEXT_THURSDAY
+        # if args.date == 'next_friday':
+        #     args.date = NEXT_FRIDAY
+        # if args.date == 'next_saturday':
+        #     args.date = NEXT_SATURDAY
+        # if args.date == 'next_sunday':
+        #     args.date = NEXT_SUNDAY
+        # if args.date == 'today':
+        #     args.date = SYSTEM_DATE
+        # if args.date == 'tomorrow':
+        #     args.date = TOMORROW
+        # if args.date == 'overmorrow':
+        #     args.date = OVERMORROW
+        # if args.date == 'yesterday':
+        #     args.date = YESTERDAY
         path_to_directory_testdata = ''
         path_to_file_bought_csv = ''
         path_to_file_bought_csv = get_path_to_file('data_used_in_superpy', "bought.csv")
@@ -849,50 +899,50 @@ def main():
 
     # nr 11of16
     if args.command == "show_profit":
-        if args.start_date == 'next_monday': 
-            args.start_date = NEXT_MONDAY 
-        if args.start_date == 'next_tuesday': 
-            args.start_date = NEXT_TUESDAY
-        if args.start_date == 'next_wednesday':
-            args.start_date = NEXT_WEDNESDAY
-        if args.start_date == 'next_thursday':
-            args.start_date = NEXT_THURSDAY
-        if args.start_date == 'next_friday':
-            args.start_date = NEXT_FRIDAY
-        if args.start_date == 'next_saturday':
-            args.start_date = NEXT_SATURDAY
-        if args.start_date == 'next_sunday':
-            args.start_date = NEXT_SUNDAY
-        if args.start_date == 'today':
-            args.start_date = SYSTEM_DATE
-        if args.start_date == 'tomorrow':
-            args.start_date = TOMORROW
-        if args.start_date == 'overmorrow':
-            args.start_date = OVERMORROW
-        if args.start_date == 'yesterday':
-            args.start_date = YESTERDAY
-        if args.end_date == 'next_monday': 
-            args.end_date = NEXT_MONDAY 
-        if args.end_date == 'next_tuesday': 
-            args.end_date = NEXT_TUESDAY
-        if args.end_date == 'next_wednesday':
-            args.end_date = NEXT_WEDNESDAY
-        if args.end_date == 'next_thursday':
-            args.end_date = NEXT_THURSDAY
-        if args.end_date == 'next_friday':
-            args.end_date = NEXT_FRIDAY
-        if args.end_date == 'next_saturday':
-            args.end_date = NEXT_SATURDAY
-        if args.end_date == 'next_sunday':
-            args.end_date = NEXT_SUNDAY
-        if args.end_date == 'today':
-            args.end_date = SYSTEM_DATE
-        if args.end_date == 'tomorrow':
-            args.end_date = TOMORROW
-        if args.end_date == 'overmorrow':
-            args.end_date = OVERMORROW
-        if args.end_date == 'yesterday':
-            args.end_date = YESTERDAY  
+        # if args.start_date == 'next_monday': 
+        #     args.start_date = NEXT_MONDAY 
+        # if args.start_date == 'next_tuesday': 
+        #     args.start_date = NEXT_TUESDAY
+        # if args.start_date == 'next_wednesday':
+        #     args.start_date = NEXT_WEDNESDAY
+        # if args.start_date == 'next_thursday':
+        #     args.start_date = NEXT_THURSDAY
+        # if args.start_date == 'next_friday':
+        #     args.start_date = NEXT_FRIDAY
+        # if args.start_date == 'next_saturday':
+        #     args.start_date = NEXT_SATURDAY
+        # if args.start_date == 'next_sunday':
+        #     args.start_date = NEXT_SUNDAY
+        # if args.start_date == 'today':
+        #     args.start_date = SYSTEM_DATE
+        # if args.start_date == 'tomorrow':
+        #     args.start_date = TOMORROW
+        # if args.start_date == 'overmorrow':
+        #     args.start_date = OVERMORROW
+        # if args.start_date == 'yesterday':
+        #     args.start_date = YESTERDAY
+        # if args.end_date == 'next_monday': 
+        #     args.end_date = NEXT_MONDAY 
+        # if args.end_date == 'next_tuesday': 
+        #     args.end_date = NEXT_TUESDAY
+        # if args.end_date == 'next_wednesday':
+        #     args.end_date = NEXT_WEDNESDAY
+        # if args.end_date == 'next_thursday':
+        #     args.end_date = NEXT_THURSDAY
+        # if args.end_date == 'next_friday':
+        #     args.end_date = NEXT_FRIDAY
+        # if args.end_date == 'next_saturday':
+        #     args.end_date = NEXT_SATURDAY
+        # if args.end_date == 'next_sunday':
+        #     args.end_date = NEXT_SUNDAY
+        # if args.end_date == 'today':
+        #     args.end_date = SYSTEM_DATE
+        # if args.end_date == 'tomorrow':
+        #     args.end_date = TOMORROW
+        # if args.end_date == 'overmorrow':
+        #     args.end_date = OVERMORROW
+        # if args.end_date == 'yesterday':
+        #     args.end_date = YESTERDAY  
         path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', "sold.csv")
         path_to_csv_bought_file = get_path_to_file('data_used_in_superpy', "bought.csv")
         profit = calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive)
@@ -909,50 +959,50 @@ def main():
 
     # nr 12of16
     if args.command == "show_revenue":
-        if args.start_date == 'next_monday': 
-            args.start_date = NEXT_MONDAY 
-        if args.start_date == 'next_tuesday': 
-            args.start_date = NEXT_TUESDAY
-        if args.start_date == 'next_wednesday':
-            args.start_date = NEXT_WEDNESDAY
-        if args.start_date == 'next_thursday':
-            args.start_date = NEXT_THURSDAY
-        if args.start_date == 'next_friday':
-            args.start_date = NEXT_FRIDAY
-        if args.start_date == 'next_saturday':
-            args.start_date = NEXT_SATURDAY
-        if args.start_date == 'next_sunday':
-            args.start_date = NEXT_SUNDAY
-        if args.start_date == 'today':
-            args.start_date = SYSTEM_DATE
-        if args.start_date == 'tomorrow':
-            args.start_date = TOMORROW
-        if args.start_date == 'overmorrow':
-            args.start_date = OVERMORROW
-        if args.start_date == 'yesterday':
-            args.start_date = YESTERDAY
-        if args.end_date == 'next_monday': 
-            args.end_date = NEXT_MONDAY 
-        if args.end_date == 'next_tuesday': 
-            args.end_date = NEXT_TUESDAY
-        if args.end_date == 'next_wednesday':
-            args.end_date = NEXT_WEDNESDAY
-        if args.end_date == 'next_thursday':
-            args.end_date = NEXT_THURSDAY
-        if args.end_date == 'next_friday':
-            args.end_date = NEXT_FRIDAY
-        if args.end_date == 'next_saturday':
-            args.end_date = NEXT_SATURDAY
-        if args.end_date == 'next_sunday':
-            args.end_date = NEXT_SUNDAY
-        if args.end_date == 'today':
-            args.end_date = SYSTEM_DATE
-        if args.end_date == 'tomorrow':
-            args.end_date = TOMORROW
-        if args.end_date == 'overmorrow':
-            args.end_date = OVERMORROW
-        if args.end_date == 'yesterday':
-            args.end_date = YESTERDAY  
+        # if args.start_date == 'next_monday': 
+        #     args.start_date = NEXT_MONDAY 
+        # if args.start_date == 'next_tuesday': 
+        #     args.start_date = NEXT_TUESDAY
+        # if args.start_date == 'next_wednesday':
+        #     args.start_date = NEXT_WEDNESDAY
+        # if args.start_date == 'next_thursday':
+        #     args.start_date = NEXT_THURSDAY
+        # if args.start_date == 'next_friday':
+        #     args.start_date = NEXT_FRIDAY
+        # if args.start_date == 'next_saturday':
+        #     args.start_date = NEXT_SATURDAY
+        # if args.start_date == 'next_sunday':
+        #     args.start_date = NEXT_SUNDAY
+        # if args.start_date == 'today':
+        #     args.start_date = SYSTEM_DATE
+        # if args.start_date == 'tomorrow':
+        #     args.start_date = TOMORROW
+        # if args.start_date == 'overmorrow':
+        #     args.start_date = OVERMORROW
+        # if args.start_date == 'yesterday':
+        #     args.start_date = YESTERDAY
+        # if args.end_date == 'next_monday': 
+        #     args.end_date = NEXT_MONDAY 
+        # if args.end_date == 'next_tuesday': 
+        #     args.end_date = NEXT_TUESDAY
+        # if args.end_date == 'next_wednesday':
+        #     args.end_date = NEXT_WEDNESDAY
+        # if args.end_date == 'next_thursday':
+        #     args.end_date = NEXT_THURSDAY
+        # if args.end_date == 'next_friday':
+        #     args.end_date = NEXT_FRIDAY
+        # if args.end_date == 'next_saturday':
+        #     args.end_date = NEXT_SATURDAY
+        # if args.end_date == 'next_sunday':
+        #     args.end_date = NEXT_SUNDAY
+        # if args.end_date == 'today':
+        #     args.end_date = SYSTEM_DATE
+        # if args.end_date == 'tomorrow':
+        #     args.end_date = TOMORROW
+        # if args.end_date == 'overmorrow':
+        #     args.end_date = OVERMORROW
+        # if args.end_date == 'yesterday':
+        #     args.end_date = YESTERDAY  
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
@@ -971,50 +1021,50 @@ def main():
 
     # nr 13of16
     if args.command == "show_sales_volume":
-        if args.start_date == 'next_monday': 
-            args.start_date = NEXT_MONDAY 
-        if args.start_date == 'next_tuesday': 
-            args.start_date = NEXT_TUESDAY
-        if args.start_date == 'next_wednesday':
-            args.start_date = NEXT_WEDNESDAY
-        if args.start_date == 'next_thursday':
-            args.start_date = NEXT_THURSDAY
-        if args.start_date == 'next_friday':
-            args.start_date = NEXT_FRIDAY
-        if args.start_date == 'next_saturday':
-            args.start_date = NEXT_SATURDAY
-        if args.start_date == 'next_sunday':
-            args.start_date = NEXT_SUNDAY
-        if args.start_date == 'today':
-            args.start_date = SYSTEM_DATE
-        if args.start_date == 'tomorrow':
-            args.start_date = TOMORROW
-        if args.start_date == 'overmorrow':
-            args.start_date = OVERMORROW
-        if args.start_date == 'yesterday':
-            args.start_date = YESTERDAY
-        if args.end_date == 'next_monday': 
-            args.end_date = NEXT_MONDAY 
-        if args.end_date == 'next_tuesday': 
-            args.end_date = NEXT_TUESDAY
-        if args.end_date == 'next_wednesday':
-            args.end_date = NEXT_WEDNESDAY
-        if args.end_date == 'next_thursday':
-            args.end_date = NEXT_THURSDAY
-        if args.end_date == 'next_friday':
-            args.end_date = NEXT_FRIDAY
-        if args.end_date == 'next_saturday':
-            args.end_date = NEXT_SATURDAY
-        if args.end_date == 'next_sunday':
-            args.end_date = NEXT_SUNDAY
-        if args.end_date == 'today':
-            args.end_date = SYSTEM_DATE
-        if args.end_date == 'tomorrow':
-            args.end_date = TOMORROW
-        if args.end_date == 'overmorrow':
-            args.end_date = OVERMORROW
-        if args.end_date == 'yesterday':
-            args.end_date = YESTERDAY  
+        # if args.start_date == 'next_monday': 
+        #     args.start_date = NEXT_MONDAY 
+        # if args.start_date == 'next_tuesday': 
+        #     args.start_date = NEXT_TUESDAY
+        # if args.start_date == 'next_wednesday':
+        #     args.start_date = NEXT_WEDNESDAY
+        # if args.start_date == 'next_thursday':
+        #     args.start_date = NEXT_THURSDAY
+        # if args.start_date == 'next_friday':
+        #     args.start_date = NEXT_FRIDAY
+        # if args.start_date == 'next_saturday':
+        #     args.start_date = NEXT_SATURDAY
+        # if args.start_date == 'next_sunday':
+        #     args.start_date = NEXT_SUNDAY
+        # if args.start_date == 'today':
+        #     args.start_date = SYSTEM_DATE
+        # if args.start_date == 'tomorrow':
+        #     args.start_date = TOMORROW
+        # if args.start_date == 'overmorrow':
+        #     args.start_date = OVERMORROW
+        # if args.start_date == 'yesterday':
+        #     args.start_date = YESTERDAY
+        # if args.end_date == 'next_monday': 
+        #     args.end_date = NEXT_MONDAY 
+        # if args.end_date == 'next_tuesday': 
+        #     args.end_date = NEXT_TUESDAY
+        # if args.end_date == 'next_wednesday':
+        #     args.end_date = NEXT_WEDNESDAY
+        # if args.end_date == 'next_thursday':
+        #     args.end_date = NEXT_THURSDAY
+        # if args.end_date == 'next_friday':
+        #     args.end_date = NEXT_FRIDAY
+        # if args.end_date == 'next_saturday':
+        #     args.end_date = NEXT_SATURDAY
+        # if args.end_date == 'next_sunday':
+        #     args.end_date = NEXT_SUNDAY
+        # if args.end_date == 'today':
+        #     args.end_date = SYSTEM_DATE
+        # if args.end_date == 'tomorrow':
+        #     args.end_date = TOMORROW
+        # if args.end_date == 'overmorrow':
+        #     args.end_date = OVERMORROW
+        # if args.end_date == 'yesterday':
+        #     args.end_date = YESTERDAY  
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 

@@ -44,17 +44,6 @@
 # Intro
 [Table of contents](#table-of-contents)
 
-- ARGPARSE-COMMANDS-AND-ARGUMENTS
-- USE-CASES
-- INSTALLATION
-- DEFINITIONS
-- LOCATION-OF-IMPORTANT-DIRECTORIES-AND-FILES
-- DATA-MODEL
-- TESTING-THE-APPLICATION-IN-**PYTEST**
-- TROUBLE-SHOOTING
-- FAQ
-- SUPPORT 
-
 <br/>
 
 Application Superpy can be used to buy and sell products. In addition to that  
@@ -70,16 +59,14 @@ and running applications via argparse cli.
 This is a hands-on document to get you, the Superpy user, up to speed with using Superpy  
 as quickly as possible. So the first 2 chapters of this manual are about:
 1. ARGPARSE-COMMANDS-AND-ARGUMENTS. --> the commands and arguments are the building  
-    blocks of the workflows in the second chapter of this user manual.  
+    blocks of the use cases in the second chapter of this user manual.  
     Comprehensive info about all argparse commands and arguments is also available via:
 
 ```python
 py super.py -h
 ```
-2. WORKFLOWS --> workflows in Superpy are the meat of the matter for each
-    Superpy user: workflows support and execute (parts of) business processes.  
-    Business processes create value for the customer and generate return on investment for
-    the supermarket chain using the Superpy-application. 
+2. Use cases --> The use cases give a description of how a user will  interact with the Superpy  
+    application. 
    
 To learn Superpy faster, the following supporting features can be used via the cli:
 1. quickly create mock data for bought.csv and sold.csv 
@@ -947,7 +934,7 @@ quick links:
         ```
         explanation: see next chapter argparse-commands-and-arguments. 
 
-    If you have  any questions about the commands and arguments in the following workflows, then either go to  
+    If you have  any questions about the commands and arguments in the following use cases, then either go to  
     chapter superpy-commands-and-arguments or:  
 
     ```python
@@ -955,7 +942,7 @@ quick links:
     ```
     <br/>
 
-    Before diving into the workflows, plz read the following.  
+    Before diving into the use cases, please read the following.  
     An argparse argument with date value can be entered in format YYYY-MM-DD: e.g.  
     2029-02-14, or as a word (exhaustive list): today, tomorrow, overmorrow, yesterday,  
     next_monday (...) next_sunday.  

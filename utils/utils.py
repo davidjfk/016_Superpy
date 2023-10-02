@@ -91,12 +91,29 @@ def buy_product(
     Only when testing fn buy_product in pytest, input and output csv file are different.
     reason: when testing fn buy_product in pytest, I want to keep the csv-file with testdata intact.
     '''
+ 
+    # try:
+    #     datetime.strptime(buy_date, '%Y-%m-%d')
+    #     datetime.strptime(expiry_date, '%Y-%m-%d')
+    # except: 
+    #     print(f"Wrong: format of  buy date should be YYYY-MM-DD, " \
+    #           f" e.g. 2024-06-28 instead of 24-06-28." \
+    #           f" Or use temporal deictic (e.g. monday, today, yesterday...)" \
+    #           f" instead of YYYY-MM-DD. See comprensive list in help file or README_USAGE_GUIDE.md."
+    #           )
+    #     return "date_entered_in_fn_in_wrong_format"  
+    
+    # else: 
+
+    if datetime.strptime(buy_date, '%Y-%m-%d') > datetime.strptime(expiry_date, '%Y-%m-%d'):
+        print(f"Warning: you have just bought a product with buy_date << {buy_date} >> greater than its expiry_date << {expiry_date} >>." 
+                      f"Normally it is the other way around. Are  you sure?")
+      
+
     try:
         with open(path_to_csv_bought_input_file, 'r', newline='') as file: 
             reader = csv.DictReader(file)
             rows = list(reader)
-            print('type of rows:')
-            print(type(rows))
             file.seek(0)
     except FileNotFoundError:
         print(f"File '{path_to_csv_bought_input_file}' not found.")
@@ -117,6 +134,8 @@ def buy_product(
         print(f"You don't have permission to write to '{path_to_csv_bought_output_file}'.")
     except csv.Error as e:
         print(f"Error while writing CSV file: {e}")   
+    
+    return "fn_buy_product_has_run_successfully"
 
 
 def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(
@@ -133,6 +152,13 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(
     ex of start_date: '2023-09-01'
     ex of end_date: '2023-12-21'
     '''
+    try:
+        datetime.strptime(start_date, '%Y-%m-%d')
+        datetime.strptime(end_date, '%Y-%m-%d')
+    except: 
+        print("Wrong: format of start date and end date should be YYYY-MM-DD, e.g. 2024-06-28")
+        return None   
+
     start_date = datetime.strptime(str(start_date), '%Y-%m-%d')
     end_date = datetime.strptime(str(end_date), '%Y-%m-%d')
     cost = 0
@@ -163,6 +189,18 @@ def calculate_expired_products_on_day(
         path_to_csv_sold_file: str, 
         path_to_csv_bought_file: str
 ) -> list:
+    # try:
+    #     datetime.strptime(date_on_which_to_calculate_expired_products, '%Y-%m-%d')
+    # except: 
+    #     print(f"Wrong: format of date on which to calculate expired products " \
+    #           f"should be YYYY-MM-DD, e.g. 2024-06-28 instead of 24-06-28." \
+    #           f" Or use temporal deictic (e.g. monday, today, yesterday...)" \
+    #           f" instead of YYYY-MM-DD. See comprensive list in help file or README_USAGE_GUIDE.md."
+    #           )
+    #     return "date_entered_in_fn_in_wrong_format"  
+    
+    # else: 
+
     # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' has datatype <class 'str'>
     date_on_which_to_calculate_expired_products = datetime.strptime(date_on_which_to_calculate_expired_products, '%Y-%m-%d').date()
     # print(type(date_on_which_to_calculate_expired_products)) # e.g. '2023-10-01' now has datatype <class 'datetime.date'> and that is what I neeed. 
@@ -459,8 +497,6 @@ def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_hi
     in directory create_new_testdata_for_csv_files.
 
     '''
-    print('path_to_id_with_highest_sequence_number')
-    print(path_to_id_with_highest_sequence_number)
     # new_buy_id_counter = ''
     try:
         with open(path_to_id_with_highest_sequence_number, 'r', newline='') as file:
@@ -493,7 +529,7 @@ def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_hi
 
     try:
         with open(path_to_id_with_highest_sequence_number, 'w', newline='') as file: 
-            print(new_buy_id_counter)  
+            # print(new_buy_id_counter)  
             file.write(new_buy_id_counter)
     except PermissionError:
         print(f"You don't have permission to write to '{path_to_id_with_highest_sequence_number}'.")
@@ -873,6 +909,14 @@ def sell_product(bought_product_id: str,
     If no error is raised, then sell-transacion is created in sold.csv. So imho do not 
     try to merge the try-catch-blocks below. 
     '''
+
+    # try:
+    #     datetime.strptime(sell_date, '%Y-%m-%d')
+    #     datetime.strptime(expiry_date, '%Y-%m-%d')
+    # except: 
+    #     print("Wrong: format of sell date should be YYYY-MM-DD, e.g. 2024-06-28")
+    #     return None 
+
     # 1of3: check if product exists in bought.csv:
     try: 
         with open(path_to_csv_bought_file, 'r', newline='') as file: 
@@ -941,9 +985,7 @@ def sell_product(bought_product_id: str,
             '''
             reader_bought_csv = csv.DictReader(file)
             for reader_bought_row in reader_bought_csv:
-                    print('bla_foo')
                     if reader_bought_row['buy_id'] == bought_product_id:
-                        print('jojojoj')
                         expiry_date = reader_bought_row['expiry_date']
                     
                         if expiry_date < sell_date:
