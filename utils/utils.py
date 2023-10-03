@@ -64,6 +64,7 @@ from typing import Callable
 
 # show_weekday_from_date(date: str) -> str:
 
+
 def add_days_to_date(date_string: str, days_to_add: int) -> str:
     date = datetime.strptime(date_string, '%Y-%m-%d')
     new_date = date + timedelta(days= days_to_add)
@@ -92,6 +93,7 @@ def buy_product(
     reason: when testing fn buy_product in pytest, I want to keep the csv-file with testdata intact.
     '''
  
+    product = product.lower() # input can be e.g. APPLE, apple aPPle, etc., but internally in Superpy only lowercase ('apple') is used.
     # try:
     #     datetime.strptime(buy_date, '%Y-%m-%d')
     #     datetime.strptime(expiry_date, '%Y-%m-%d')
@@ -106,8 +108,8 @@ def buy_product(
     # else: 
 
     if datetime.strptime(buy_date, '%Y-%m-%d') > datetime.strptime(expiry_date, '%Y-%m-%d'):
-        print(f"Warning: you have just bought a product with buy_date << {buy_date} >> greater than its expiry_date << {expiry_date} >>." 
-                      f"Normally it is the other way around. Are  you sure?")
+        print(f"Warning: you have just bought a product with buy_date << {buy_date} >> greater than its expiry_date << {expiry_date} >>. " 
+                      f"Are you sure about this?")
       
 
     try:
@@ -134,8 +136,8 @@ def buy_product(
         print(f"You don't have permission to write to '{path_to_csv_bought_output_file}'.")
     except csv.Error as e:
         print(f"Error while writing CSV file: {e}")   
-    
-    return "fn_buy_product_has_run_successfully"
+    buy_transaction_status = "fn_buy_product_has_run_successfully"
+    return buy_transaction_status
 
 
 def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(
@@ -265,7 +267,6 @@ def calculate_expired_products_on_day(
     except csv.Error as e:
         print(f"Error while reading CSV file: {e}")
     return expired_products
-
 
 
 def calculate_inventory_on_day(
@@ -586,7 +587,7 @@ def create_data_for_csv_files_bought_and_sold(
         print(f'Problem: product_range', product_range, 'exceeds nr of products in supermarket', len(list((set(superpy_product_range)))))
         product_range = len(list((set(superpy_product_range))))
         print(f"Solution: product_range has been set to the maximum amount of products in file"
-              f"product_range.py (...\superpy\superpy\product_range.py). This is {len(list((set(superpy_product_range))))}. " 
+              f"product_range.py (...\\superpy\\superpy\\product_range.py). This is {len(list((set(superpy_product_range))))}. " 
               f"But if you need a higher product_range, then please add more products to product_range.py."
             )
 
@@ -733,6 +734,7 @@ def generate_random_buy_date_for_buy_transaction_in_future_in_time_interval(
     random_date = start_date + timedelta(days=random_number_of_days)
     return random_date.strftime('%Y-%m-%d')
 
+
 def get_dates_of_next_7_days(today: str) -> list:
     '''
     uc: as a Superpy user I want to have intuitive 
@@ -817,6 +819,7 @@ def get_dates_of_next_7_days(today: str) -> list:
 
     return dates_of_next_7_days_as_strings
 
+
 def get_highest_buy_id_from_boughtcsv(path_to_csv_bought_file: str) -> str:
     '''
     Goal: use output of this fn to create a buy_id for the next buy-transaction.
@@ -872,6 +875,7 @@ def get_path_to_file(directory_of_file: str, file_name_of_which_you_want_to_know
     path_to_file = os.path.join(path_to_directory_of_this_file, file_name_of_which_you_want_to_know_the_path ) # path to file 
     return path_to_file
 
+
 def get_system_date(path_to_system_date: str) -> str:
     # fn-output: system_date is datetime object, ex: '2020-01-01'
     try:
@@ -887,15 +891,16 @@ def get_system_date(path_to_system_date: str) -> str:
         print(f"Error while reading file: {e}")
     return system_date
 
-def sell_product(bought_product_id: str, 
-                 price: float, 
-                 sell_date: str, 
-                 path_to_csv_sold_input_file: str, 
-                 path_to_csv_sold_output_file: str,
-                 path_to_csv_bought_file: str
+
+def sell_product_by_buy_id(bought_product_id: str, 
+                sell_price: float, 
+                sell_date: str, 
+                path_to_csv_sold_input_file: str, 
+                path_to_csv_sold_output_file: str,
+                path_to_csv_bought_file: str
 ) -> None:
     '''
-    In this fn 3 checks are performed:
+    In this fn 3 error checks are performed:
     1. check if product exists in bought.csv before creating a sell-transaction in sold.csv
     2. check if product has already been sold before creating a sell-transaction in sold.csv
     3. check if product has expired before creating a sell-transaction in sold.csv
@@ -913,14 +918,9 @@ def sell_product(bought_product_id: str,
     try to merge the try-catch-blocks below. 
     '''
 
-    # try:
-    #     datetime.strptime(sell_date, '%Y-%m-%d')
-    #     datetime.strptime(expiry_date, '%Y-%m-%d')
-    # except: 
-    #     print("Wrong: format of sell date should be YYYY-MM-DD, e.g. 2024-06-28")
-    #     return None 
+    bought_product_id = bought_product_id.lower() # input can be e.g. B_01 or b_01, but internally in Superpy only b_01 is used.
 
-    # 1of3: check if product exists in bought.csv:
+    # error check 1of3: check if product exists in bought.csv:
     try: 
         with open(path_to_csv_bought_file, 'r', newline='') as file: 
             '''
@@ -940,8 +940,19 @@ def sell_product(bought_product_id: str,
                     is_bought_product_id_in_bought_csv = True
             if not is_bought_product_id_in_bought_csv:
                 print(f"Warning: You are trying to sell a product with a buy_id << {bought_product_id} >> that " 
-                      f"does NOT exist in bought.csv. So this sales transaction is aborted!")
+                    f"does NOT exist in bought.csv. So this sales transaction is aborted!")
                 return None # this aborts the sales transaction
+            
+            # option 2of2:
+            # is_bought_product_id_in_bought_csv = False
+            # reader = csv.reader(file)
+            # for row in reader:
+            #     if row[0] == bought_product_id:
+            #         is_bought_product_id_in_bought_csv = True
+            # if not is_bought_product_id_in_bought_csv:
+            #   print(f"Warning: You are trying to sell a product with a buy_id << {bought_product_id} >> that " 
+            #       f"does NOT exist in bought.csv. So this sales transaction is aborted!")
+            #   return None # this aborts the sales transaction          
             
     except FileNotFoundError:
         print(f"File '{path_to_csv_bought_file}' not found.")
@@ -952,7 +963,7 @@ def sell_product(bought_product_id: str,
     except csv.Error as e:
         print(f"Error while reading CSV file: {e}")
 
-    # 2of3: check if product has already been sold:
+    # error check 2of3: check if product has already been sold:
     try: 
         with open(path_to_csv_sold_input_file, 'r', newline='') as file: 
             '''
@@ -983,7 +994,7 @@ def sell_product(bought_product_id: str,
         print(f"Error while reading CSV file: {e}")
 
 
-    # 3of3: check if product has expired: 
+    # error check 3of3: check if product has expired: 
     try:
         with open(path_to_csv_bought_file, 'r', newline='') as file:
             '''
@@ -1012,7 +1023,7 @@ def sell_product(bought_product_id: str,
     # create sell transaction in sold.csv:
     try:            
         with open(path_to_csv_sold_output_file, 'w', newline='') as file: 
-            rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': price, 'sell_date': sell_date}) 
+            rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': sell_price, 'sell_date': sell_date}) 
             writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
             writer.writeheader()
             # sort rows by sell_id (== first column in sold.csv):
@@ -1024,99 +1035,107 @@ def sell_product(bought_product_id: str,
         print(f"Error while writing CSV file: {e}")
 
 
-def sell_product_OLD_OLD_without_checking_expired_products(bought_product_id: str, 
-                 price: float, 
-                 sell_date: str, 
-                 path_to_csv_sold_input_file: str, 
-                 path_to_csv_sold_output_file: str,
-                 path_to_csv_bought_file: str
-) -> None:
+
+def sell_product_by_product_name(product_name, sell_price,  sell_date, path_to_csv_sold_input_file, path_to_csv_sold_output_file, path_to_csv_bought_file):
+
     '''
-    About the input_file and output_file:
-    when using superpy as user, input and output csv file are the same.
-    Only when testing fn buy_product in pytest, input and output csv file are different.
-    reason: when testing fn buy_product in pytest, I want to keep the csv-file with testdata intact.
-    '''
-
-    try: 
-        with open(path_to_csv_bought_file, 'r', newline='') as file: 
-            '''
-            Goal: check if product exists in bought.csv:
-            Business rule: each product has a unique buy_id (e.g. b_01, b_02, ...).
-            Business rule: each product is sold by its buy_id.
-            So, if bought_product_id does not exist in bought.csv, then it cannot
-            be sold in sold.csv. 
-
-            Both options below work. I prefer the  first option, because it is more consistent 
-            with the try-catch-blocks further below.
-            '''
-            
-            # option 1of2:
-            is_bought_product_id_in_bought_csv = False
-            reader = csv.DictReader(file)
-            rows = list(reader)
-            for row in rows:
-                if row['buy_id'] == bought_product_id:
-                    is_bought_product_id_in_bought_csv = True
-            if not is_bought_product_id_in_bought_csv:
-                raise ValueError(f"Buy_id'{bought_product_id}' does not exist in bought.csv!!")
-            
-            # option 2of2:
-            # is_bought_product_id_in_bought_csv = False
-            # reader = csv.reader(file)
-            # for row in reader:
-            #     if row[0] == bought_product_id:
-            #         is_bought_product_id_in_bought_csv = True
-            # if not is_bought_product_id_in_bought_csv:
-            #     raise ValueError(f"Buy_id'{bought_product_id}' does not exist in bought.csv!!")
-    except FileNotFoundError:
-        print(f"File '{path_to_csv_bought_file}' not found.")
-    except PermissionError:
-        print(f"You don't have permission to access '{path_to_csv_bought_file}'.")
-    except UnicodeDecodeError:
-        print(f"Invalid Unicode character found in '{path_to_csv_bought_file}'.")
-    except csv.Error as e:
-        print(f"Error while reading CSV file: {e}")
-
-
-    try: 
-        with open(path_to_csv_sold_input_file, 'r', newline='') as file: 
-            '''
-            Goal: check if product has already been sold: 
-            Business rule: each product has a unique buy_id (e.g. b_01, b_02, ...).
-            Business rule: each product is sold by its buy_id.
-            So, if bought_product_id is already in sold.csv, then raise error:
-            '''
-            reader = csv.DictReader(file)
-            rows = list(reader)
-            for row in rows:
-                print(row['buy_id'])
-                if row['buy_id'] == bought_product_id:
-                    raise ValueError(f"Product with buy_id '{bought_product_id}' has already been sold!!")
-            file.seek(0)
-            sold_product_id = bought_product_id.replace('b', 's')
-    except FileNotFoundError:
-        print(f"File '{path_to_csv_sold_input_file}' not found.")
-    except PermissionError:
-        print(f"You don't have permission to access '{path_to_csv_sold_input_file}'.")
-    except UnicodeDecodeError:
-        print(f"Invalid Unicode character found in '{path_to_csv_sold_input_file}'.")
-    except csv.Error as e:
-        print(f"Error while reading CSV file: {e}")
+    starting point: in super.py with all arguments of subparser sell_product() at my disposal:
     
-  
-    try:            
-        with open(path_to_csv_sold_output_file, 'w', newline='') as file: 
-            rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': price, 'sell_date': sell_date}) 
-            writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
-            writer.writeheader()
-            # sort rows by sell_id (== first column in sold.csv):
-            sorted_rows = sorted(rows, key=lambda row: row['sell_id'])
-            writer.writerows(sorted_rows)
-    except PermissionError:
-        print(f"You don't have permission to write to '{path_to_csv_sold_output_file}'.")
-    except csv.Error as e:
-        print(f"Error while writing CSV file: {e}")
+
+    parse product descriptor: can be product name of product id
+        def is_product_name_or_product_id(product_descriptor: str) -> str:
+
+    if buy_id, then excute fn sell_product_by_buy_id()
+
+    else if product name, then execute fn sell_product_by_product_name()
+        business logic:
+        1. calculate inventory on sell_date
+        2. check if product (e.g. apple) is in inventory (on that specific sell_date!)
+        3. if product is not in inventory, then print error message: 'product with exact name {product_name} not in inventory on sell date {sell_date}'
+        4. if product is in inventory, then sell the first apple in the list of 1 or more apples in inventory. Reuse last bit from
+            fn sell_product_by_buy_id().
+
+    else: print error message('product descriptor not recognized (should be product name 'e.g.' apple, or product id 'e.g.' b_01)')
+    '''
+
+    inventory_on_specified_date = calculate_inventory_on_day(sell_date, path_to_csv_sold_input_file, path_to_csv_bought_file)
+    # print(inventory_on_specified_date) #list with lists
+    # ex: 
+    '''
+    inventory_on_specified_date = [
+    ['b_16', 'Chips', '1.1', '2024-02-09', '2024-02-24'],
+    ['b_18', 'Onions', '2.5', '2024-02-10', '2024-02-25'],
+    ['b_22', 'Tea bags', '4.99', '2024-02-11', '2024-02-26'],
+    ['b_24', 'Chips', '0.39', '2024-02-15', '2024-03-01'],
+    ['b_26', 'Onions', '0.79', '2024-02-17', '2024-03-03'],
+    ['b_28', 'Tea bags', '0.79', '2024-02-22', '2024-03-08']
+    ]   
+    '''
+    # step: check if product (e.g. apple) is in inventory (on that specific sell_date!)
+    def find_product(inventory, product_name):
+        for item in inventory:
+            if item[1] == product_name: # selecting the FIRST product (e.g. apple) in the list of 1 or more apples in inventory on that date.
+                '''
+                backlog idea: if 2 apples are available in inventory on that date, then select the apple with the earliest expiry_date.
+                '''
+                return item
+        return 'No such product in inventory on this date.'  # 2do: get out of fn here. 
+
+
+    product_in_inventory = find_product(inventory_on_specified_date, product_name)
+
+    if product_in_inventory == 'No such product in inventory on this date.':
+        print(f"Query result: This product << {product_name} >> is not "
+        f"in the inventory on date {sell_date}.")
+        return None # this aborts the sales transaction
+    else:
+        # ex of product_in_inventory: ['b_22', 'Tea bags', '4.99', '2024-02-11', '2024-02-26'] # always a list with 5 elements.
+        bought_product_id = product_in_inventory[0]
+        product_name_in_inventory = product_in_inventory[1]
+        buy_price = product_in_inventory[2]
+        buy_date = product_in_inventory[3]
+        expiry_date = product_in_inventory[4]
+
+        # step: sell the first apple in the list of 1 or more apples in inventory. Re-use last bit from fn sell_product_by_buy_id().
+        # create sell transaction in sold.csv:
+        try: 
+            with open(path_to_csv_sold_input_file, 'r', newline='') as file: 
+                reader = csv.DictReader(file)
+                rows = list(reader)
+                file.seek(0)
+                # sold_product_id is used in second try block below
+                sold_product_id = bought_product_id.replace('b', 's')
+        except FileNotFoundError:
+            print(f"File '{path_to_csv_sold_input_file}' not found.")
+        except PermissionError:
+            print(f"You don't have permission to access '{path_to_csv_sold_input_file}'.")
+        except UnicodeDecodeError:
+            print(f"Invalid Unicode character found in '{path_to_csv_sold_input_file}'.")
+        except csv.Error as e:
+            print(f"Error while reading CSV file: {e}")
+
+        try:            
+            with open(path_to_csv_sold_output_file, 'w', newline='') as file: 
+                rows.append({'sell_id': sold_product_id, 'buy_id': bought_product_id, 'sell_price': sell_price, 'sell_date': sell_date}) 
+                writer = csv.DictWriter(file, fieldnames= reader.fieldnames)
+                writer.writeheader()
+                # sort rows by sell_id (== first column in sold.csv):
+                sorted_rows = sorted(rows, key=lambda row: row['sell_id'])
+                writer.writerows(sorted_rows)
+        except PermissionError:
+            print(f"You don't have permission to write to '{path_to_csv_sold_output_file}'.")
+        except csv.Error as e:
+            print(f"Error while writing CSV file: {e}")
+
+        # step: check if product has expired:
+        if datetime.strptime(sell_date, '%Y-%m-%d') > datetime.strptime(expiry_date, '%Y-%m-%d'):
+            print(f"Warning: you have just sold product << {product_name} >> with buy_date << {buy_date} >> greater than its expiry_date << {expiry_date} >>. " 
+                        f"Are  you sure about this?")
+
+        # step: check if you are making a profit or a loss on the transaction:
+        if sell_price < float(buy_price):
+            print(f"Warning: you have just sold product << {product_name} >> with buy_date << {buy_date} >> at a loss of E << {round(float(buy_price) - sell_price,2)} >>."
+                        f"Are  you sure about this?")
 
 
 
@@ -1232,6 +1251,7 @@ def time_travel_system_date_with_nr_of_days(
         print(f"Error while writing file: {e}")
     # returning new_system_date for testing purposes only (returned value is not used in the code)    
     return new_system_date
+
 
 def show_weekday_from_date(date: str) -> str:
     date_object = datetime.strptime(date, '%Y-%m-%d')

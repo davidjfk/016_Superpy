@@ -170,16 +170,16 @@ Goal: buy product and add to file bought.csv
 - ex1: 
 
 ```
-    py super.py buy apple 1.75 -b 23-09-15 -e 23-09-27 
+    py super.py buy apple 1.75 -b 2023-09-15 -e 2023-09-27 
 ```
 
--   product: apple,  price: &euro; 1.75, buy_date: 23-09-15, expiry_date: 23-09-27     
+-   product: apple,  price: &euro; 1.75, buy_date: 2023-09-15, expiry_date: 2023-09-27     
 
 - ex2: 
 ```
-    py super.py buy linseed 3.00 -e 23-09-28 
+    py super.py buy linseed 3.00 -e 2023-09-28 
 ```
--   product: linseed, price: &euro; 3.00, buy_date: system_date as default, expiry_date: 23-09-28   
+-   product: linseed, price: &euro; 3.00, buy_date: system_date as default, expiry_date: 2023-09-28   
 
 - ex3: 
 ```
@@ -467,7 +467,7 @@ Goal: sell product and add to file sold.csv
     py super.py b_15 3.75 -s 2023-11-15 
 ```
 
--   product: row with id b_15 in bought.csv is sold, price: &euro; 3.75, sell_date: 23-11-15
+-   product: row with id b_15 in bought.csv is sold, price: &euro; 3.75, sell_date: 2023-11-15
 
 - ex2: 
 ```
