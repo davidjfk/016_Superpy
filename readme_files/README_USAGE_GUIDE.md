@@ -21,6 +21,7 @@
   - [UC: get familiar with the data](#uc-get-familiar-with-the-data)
   - [UC: buy and sell a few products](#uc-buy-and-sell-a-few-products)
   - [UC: enter system date (e.g. 2031-04-21, tomorrow, etc.)](#uc-enter-system-date-eg-2031-04-21-tomorrow-etc)
+  - [UC: calculate cost, revenue and profit + time travel](#uc-calculate-cost-revenue-and-profit--time-travel)
   - [UC: show all management reports](#uc-show-all-management-reports)
   - [UC: change the management reports' data by travelling through time](#uc-change-the-management-reports-data-by-travelling-through-time)
   - [UC: show reports in custom time intervals](#uc-show-reports-in-custom-time-intervals)
@@ -1137,6 +1138,75 @@ quick links:
     ```python
         py super.py set_system_date today
     ```
+
+## UC: calculate cost, revenue and profit + time travel
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Use cases](#use-cases)
+<br/><br/>
+    - info: by default: if mock data is created in time interval between  
+        e.g. 2024-03-01 and 2024-07-01, then the system_date is automatically  
+        set to the middle of the interval: 2024-05-01. 
+    - step 1: reset system date:
+    ```python
+        py super.py reset_system_date
+    ``` 
+    - step 2: create_mock_data:
+    - more info: Chapter 'Argparse commands and arguments' explains exactly the following options.  
+        Alternatively, look them  up in the help file:
+    ```python
+        py super.py -h
+    ```        
+    ```python
+        py super.py create_mock_data -pr 15 -lby 2024 -lbm 3 -lbd 1 -ubm 4 -ubw 0 -ubd 0 -mu 4 -denr 2 -sl 5 -tt 3
+    ```
+    - step 2: calculate cost:
+    ```python
+        py super.py show_cost
+    ``` 
+    
+    - step 3: show_revenue
+    ```python
+        py super.py show_revenue
+    ```   
+
+    - step 4: show_profit
+    ```python
+        py super.py show_profit
+    ```    
+
+    - info: the following commands all require a time interval consisting of a start date and an end date  
+        If you do not specify them, then the following default values apply:  
+
+        * start date: January 1st of the year that contains the system_date. Ex: if system_date is 2024-05-01,  
+        then start of financial year: 2024-01-01.  
+
+        * end date: system_date (e.g. 2024-05-01)  
+
+    - step 2: show_cost:
+    ```python
+        py super.py show_cost
+    ```   
+    - step 5: show_profit:
+    ```python
+        py super.py show_profit
+    ```     
+    - step 6: show_revenue:
+    ```python
+        py super.py show_revenue
+    ```     
+    - step 7: show_sales_volume:
+    ```python
+        py super.py show_sales_volume
+    ```  
+    - step 8: the next uc is a continuation of this uc.
+
+    - step 9: now time travel to past and future and see what it does with cost, revenue and profit:
+      ```python
+        py super.py time_travel -21
+        py super.py time_travel 50
+    ```  
+
 
 ## UC: show all management reports
 quick links: 

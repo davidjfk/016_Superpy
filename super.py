@@ -38,6 +38,7 @@ from utils.utils import calculate_inventory_on_day, calculate_middle_of_time_int
 from utils.utils import get_system_date, get_dates_of_next_7_days
 from utils.utils import show_weekday_from_date, is_product_bought_with_product_name
 from utils.utils import sell_product_by_product_name, show_last_added_sales_transaction_in_console_with_module_rich
+from utils.utils import calculate_amount_in_interval
 
 superpy_product_prices = ''
 superpy_product_range = ''
@@ -173,7 +174,6 @@ def main():
         def __call__(self, parser, namespace, values, option_string=None):    
             if values == 'today':
                 setattr(namespace, self.dest, SYSTEM_DATE)
-                # skip try-except block, because 'today' is in the correct format already.
                 return 
             if values == 'tomorrow':
                 setattr(namespace, self.dest, TOMORROW)
@@ -778,7 +778,7 @@ def main():
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_bought_csv = os.path.join(path_to_directory_testdata, 'bought.csv') 
-        cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_bought_csv)
+        cost = calculate_amount_in_interval(args.start_date, args.end_date, 'buy_date', 'buy_price', path_to_file_bought_csv)
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')        
         print(f" Current action in Superpy: show_cost                                                            ")
@@ -925,7 +925,7 @@ def main():
         #     args.end_date = YESTERDAY  
         path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', "sold.csv")
         path_to_csv_bought_file = get_path_to_file('data_used_in_superpy', "bought.csv")
-        profit = calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive)
+        profit = calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_amount_in_interval, calculate_amount_in_interval)
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')        
         print(f" Current action in Superpy: show_profit                                                             ")
@@ -986,7 +986,7 @@ def main():
         path_to_directory_testdata = ''
         path_to_directory_testdata = get_path_to_directory_of_file('data_used_in_superpy')
         path_to_file_sold_csv = os.path.join(path_to_directory_testdata, 'sold.csv') 
-        revenue = calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(args.start_date, args.end_date, path_to_file_sold_csv)
+        revenue = calculate_amount_in_interval(args.start_date, args.end_date, "sell_date", "sell_price", path_to_file_sold_csv)
         print('---------------------------------------------------------------------------------------------------')
         print('                                                                                                   ')        
         print(f" Current action in Superpy: show_revenue                                                            ")

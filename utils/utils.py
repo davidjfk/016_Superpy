@@ -144,6 +144,41 @@ def buy_product(
     return buy_transaction_status
 
 
+def calculate_amount_in_interval(
+        # goal: this is 1 generic fn to calculate cost or revenue.
+        # out of scope: sales volume, because it requires a slightly different calculation in its fn body.
+        start_date: str, 
+        end_date: str, 
+        date_field_from_csv: str, # different field to calculate cost or revenue
+        price_field_from_csv: str, # different field to calculate cost or revenue
+        path_to_csv_file: str,
+
+) -> float:
+    start_date = datetime.strptime(str(start_date), '%Y-%m-%d')
+    end_date = datetime.strptime(str(end_date), '%Y-%m-%d')
+    amount = 0
+    financial_amount_rounded = 0
+
+    try:
+        with open(path_to_csv_file, 'r', newline='') as file_object: 
+            reader = csv.DictReader(file_object)
+            for row in reader:
+                date = row[date_field_from_csv]
+                date = datetime.strptime(date, '%Y-%m-%d')
+                if start_date <= date <= end_date:
+                    amount += float(row[price_field_from_csv])
+                    financial_amount_rounded = round(amount, 2)
+        return financial_amount_rounded
+    except FileNotFoundError:
+        print(f"File '{path_to_csv_file}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_csv_file}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_csv_file}'.")
+    except csv.Error as e:
+        print(f"Error while reading CSV file: {e}")
+
+
 def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(
         start_date: str, 
         end_date: str, 
@@ -158,12 +193,12 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(
     ex of start_date: '2023-09-01'
     ex of end_date: '2023-12-21'
     '''
-    try:
-        datetime.strptime(start_date, '%Y-%m-%d')
-        datetime.strptime(end_date, '%Y-%m-%d')
-    except: 
-        print("Wrong: format of start date and end date should be YYYY-MM-DD, e.g. 2024-06-28")
-        return None   
+    # try:
+    #     datetime.strptime(start_date, '%Y-%m-%d')
+    #     datetime.strptime(end_date, '%Y-%m-%d')
+    # except: 
+    #     print("Wrong: format of start date and end date should be YYYY-MM-DD, e.g. 2024-06-28")
+    #     return None   
 
     start_date = datetime.strptime(str(start_date), '%Y-%m-%d')
     end_date = datetime.strptime(str(end_date), '%Y-%m-%d')
@@ -375,11 +410,13 @@ def calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(
         end_date: str, 
         path_to_csv_sold_file: str, 
         path_to_csv_bought_file: str, 
-        calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive: Callable[[str, str, str], float], 
-        calculate_cost_in_time_range_between_start_date_and_end_date_inclusive: Callable[[str, str, str], float]
+        calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive: Callable[[str, str, str, str, str], float], 
+        calculate_cost_in_time_range_between_start_date_and_end_date_inclusive: Callable[[str, str, str, str, str], float]
 ) -> float:
-    cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_bought_file)
-    revenue = calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file)
+    # So fn calculate_amount_in_interval is used to calculate cost and revenue.
+    cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, "buy_date", "buy_price", path_to_csv_bought_file)
+    revenue = calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, "sell_date", "sell_price", path_to_csv_sold_file)
+    
     profit = round(revenue - cost,2)
     return profit
 
@@ -898,7 +935,7 @@ def get_system_date(path_to_system_date: str) -> str:
 
 
 def is_product_bought_with_product_name(product_descriptor: str) -> bool:  
-    pattern = r'^b_\d{2,}$' 
+    pattern = r'^b_\d{2,}$'
     '''
         e.g. b_01, b_02, b_03, (...) b_1079, etc....all return True
         e.g. apple, quinoa, bulgur, etc...all return False
@@ -1223,6 +1260,7 @@ def show_list_with_nested_lists_in_console_with_module_rich(list: list) -> Table
     console = Console()
     console.print(rich_table)
     return rich_table
+
 
 def show_last_added_sales_transaction_in_console_with_module_rich(list: list) -> Table: # more precise: input is list with lists.
     rich_table = Table(show_header=True, header_style="bold magenta")
