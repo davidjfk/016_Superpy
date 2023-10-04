@@ -417,7 +417,7 @@ quick links:
 -  [Table of contents](#table-of-contents)
 -  [Argparse commands and arguments](#argparse-commands-and-arguments)
 <br/><br/>
-Goal: delete all data in bought.csv and sold.csv
+Goal: delete all transaction records in bought.csv and sold.csv
 
 - ex1: 
 
@@ -460,28 +460,41 @@ quick links:
 <br/><br/>
 
 Goal: sell product and add to file sold.csv 
+Preparation:  Check the producs and their buy_ids in the inventory: e.g. 
+
+```python
+'py super.py show_inventory -d 2024-03-15' 
+```
 
 - ex1: 
 
 ```
-    py super.py b_15 3.75 -s 2023-11-15 
+    py super.py sell fig 3.75 -s 2023-11-15
+    py super.py sell b_492 3.75 -s 2023-11-15 
 ```
 
--   product: row with id b_15 in bought.csv is sold, price: &euro; 3.75, sell_date: 2023-11-15
+-   product 'fig' with buy_id b_492 in bought.csv is sold, price: &euro; 3.75, sell_date: 2023-11-15  
+
+    Remark: quicker to sell with product name.
 
 - ex2: 
 ```
-    py super.py b_16 5.15
+    py super.py sell Cold_Pressed_Extra_Virgin_Olive_Oil_with_Lemon_and_Garlic 5.15
+    py super.py sell b_16 5.15
 ```
--   product: row with id b_15 in bought.csv is sold, price: &euro; 5.15, sell_date: system_date as default     
+-   product Cold_Pressed_Extra_Virgin_Olive_Oil_with_Lemon_and_Garlic with buy_id b_15 in bought.csv is sold,  
+     price: &euro; 5.15, sell_date: system_date as default.  
+
+     Remark: quicker to sell with buy_id
 
 - ex3: 
 ```
+    py super.py Non_GMO_Gluten_Free_Dairy_Free_Organic_Protein_Powder 2.42 
     py super.py b_128 2.42 
 ```
 -   product: row with id b_128 in bought.csv is sold, price: &euro; 2.42, sell_date: system_date as default
 <br/>
-- arg1: positional argument buy_id: e.g. b_7, b_18, etc. See bought.csv for buy_ids
+- arg1: positional argument product_name_or_buy_id: Ex of product name: apple, quinoa, bulgur, linseed, soft cheeese, etc. Ex of product buy_id: b_01, b_02 (...), b_103, etc.   
 - arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35  
 - arg3: optional argument -sell_date, -s (ex: -sd 2023-09-15) with default value system_date 
 <br/>

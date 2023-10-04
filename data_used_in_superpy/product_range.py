@@ -43,5 +43,19 @@ superpy_product_range = [
     "Cookies",
     "Toilet paper",
     "Paper towels",
-    "Laundry detergent"
+    "Laundry detergent",
+    "Organic Cage-Free Pasture-Raised Eggs",
+    "Whole Wheat Reduced Fat Multigrain Bread",
+    "Wild-Caught Alaskan Salmon",
+    "Grass-Fed Beef Patties",
+    "Organic Quinoa Pasta with Kale and Pesto",
+    "Fair Trade Dark Chocolate Coconut Coffee",
+    "Cold-Brewed Unsweetened Nitro Coffee",
+    "Non-GMO Gluten-Free Dairy-Free Organic Protein Powder",
+    "Plant-Based Meatless Burger Patties",
+    "Sustainable Seafood Breaded Fish Sticks",
+    "Whole Food Plant-Based Meal Replacement Shake",
+    "Keto-Friendly Low-Carb High-Protein Snack Bar",
+    "Prebiotic Probiotic Organic Greek Yogurt",
+    "Cold-Pressed Extra Virgin Olive Oil with Lemon and Garlic"
 ]
