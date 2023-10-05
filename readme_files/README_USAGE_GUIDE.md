@@ -207,9 +207,16 @@ quick links:
 -  [Argparse commands and arguments](#argparse-commands-and-arguments)
 <br/><br/>
 
-
 Goal: create mock data for bought.csv and sold.csv
-- Of 8 arguments the default values can be changed in (...\superpy\super.py --> goto section 'CONFIGURATION' at start of main.py())
+- Of 8 arguments the default values can be changed in (...\superpy\super.py --> goto section 'CONFIGURATION' at start of main.py()):
+    - product_range
+    - delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling
+    - shelf_life
+    - turnover_time
+    - markup
+    - lower_boundary_year_of_time_interval_in_which_to_create_random_testdata
+    - lower_boundary_month_of_time_interval_in_which_to_create_random_testdata
+    - lower_boundary_week_of_time_interval_in_which_to_create_random_testdata
 - Quick summary: 
 - Mock data are created in a time interval (e.g. 2024-02-03 until 2024-04-03 inclusive). The system_date is automatically  
     set to the middle of the time interval: this is handy and practical when creating the reports: show_inventory, show_expired_products,    
@@ -1736,39 +1743,17 @@ Option 2of2: run only the testcase(s) that test a specific function:
 ## 2of2: create testdata for additional testcases:
 [Table of contents](#table-of-contents)
 
-Creating testdata involves creating testdata for bought.csv and sold.csv.
+Create testdata involves creating testdata for bought.csv and sold.csv.
 
-1. navigate into (...\superpy\pytest_testdata_factory)
-2. run the following script:
+1. run the following command:
 ```python
-    py produce_testdata_for_csv_files_bought_and_sold.py
+    py super.py create_mock_data
 ```
-3. bought.csv and sold.csv have now been created. You can find them in the same location
-    as the script: (...\superpy\pytest_testdata_factory)
-
-- Inside this script at the beginning of main() in section 'CONFIGURATION', the following variables  
-    (actually fn-arguments) can be assigned another value to your liking:
-    - product_range
-    - delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling
-    - shelf_life
-    - turnover_time
-    - markup
-    - lower_boundary_year_of_time_interval_in_which_to_create_random_testdata
-    - lower_boundary_month_of_time_interval_in_which_to_create_random_testdata
-    - lower_boundary_week_of_time_interval_in_which_to_create_random_testdata
-    - upper_boundary_nr_of_months_to_add_to_calculate
-    - upper_boundary_nr_of_weeks_to_add_to_calculate
-    - upper_boundary_nr_of_days_to_add_to_calculate 
-
-     - Chapter USAGE --> paragraph create_mock_data explains exactly what these variables mean and  
-        how they can be used to create testdata.
-     - Chapter EXAMPLES shows them "in action".  
-        ex: if you create 10 rows in bought.csv (these are automatically copied into 10 rows in sold.csv) and then  
-        delete every 2nd row in sold.csv AND THEN time travel to the future, then more products will expire, compared  
-        to when you only let every tenth row in sold.csv expire.  
-        Setting the shelf_life (e.g. 4 days or 25 days) also make a difference in how many products will expire, or
-        or still  be part of the inventory, etc.
-
+2. For more info about the command  flags, see ch Argparse commands and  arguments. To see this command  
+    in action,  see ch Use Cases.
+3. bought.csv and sold.csv have now been created. 
+4. Copy-paste the created bought.csv and sold.csv into test_utils (...\superpy\test_utils )  
+    into the folder where a fn is tested (e.g. folder fn_buy_product_testcases )
 
 <br/>
 <br/>

@@ -933,7 +933,6 @@ def get_system_date(path_to_system_date: str) -> str:
     return system_date
 
 
-
 def is_product_bought_with_product_name(product_descriptor: str) -> bool:  
     pattern = r'^b_\d{2,}$'
     '''
@@ -949,7 +948,6 @@ def is_product_bought_with_product_name(product_descriptor: str) -> bool:
         $ asserts the end of a line.
     '''
     return not bool(re.match(pattern, product_descriptor))
-
 
 
 def sell_product_by_buy_id(bought_product_id: str, 
@@ -1246,13 +1244,11 @@ def set_system_date_to(system_date: str, path_to_system_date: str) -> str:
     return system_date
 
 
-def show_list_with_nested_lists_in_console_with_module_rich(list: list) -> Table: # more precise: input is list with lists.
+def show_selected_buy_transactions_in_console_with_module_rich(list: list) -> Table: # input is list with lists.
     rich_table = Table(show_header=True, header_style="bold magenta")
-    # (future reference: column names hardcoded. Currently no need
-    # to make dynamic).
     rich_table.add_column('buy_id', style="dim", width=12)
-    rich_table.add_column('product', style="dim", width=12)
-    rich_table.add_column('buy_price (Euro)', style="dim", width=12)
+    rich_table.add_column('product', style="dim", width=24)
+    rich_table.add_column('buy_price €', style="dim", width=12)
     rich_table.add_column('buy_date', style="dim", width=12)
     rich_table.add_column('expiry_date', style="dim", width=12)
     for row in list:
@@ -1262,19 +1258,18 @@ def show_list_with_nested_lists_in_console_with_module_rich(list: list) -> Table
     return rich_table
 
 
-def show_last_added_sales_transaction_in_console_with_module_rich(list: list) -> Table: # more precise: input is list with lists.
+def show_last_added_sales_transaction_in_console_with_module_rich(list: list) -> Table: # input is list with lists.
     rich_table = Table(show_header=True, header_style="bold magenta")
-    # (future reference: column names hardcoded. Currently no need
-    # to make dynamic).
     rich_table.add_column('sell_id', style="dim", width=12)
     rich_table.add_column('buy_id', style="dim", width=12)
-    rich_table.add_column('sell_price (Euro)', style="dim", width=12)
+    rich_table.add_column('sell_price €', style="dim", width=12)
     rich_table.add_column('sell_date', style="dim", width=12)
     for row in list:
         rich_table.add_row(*row)
     console = Console()
     console.print(rich_table)
     return rich_table
+
 
 def show_csv_file_in_console_with_module_rich(path_to_csv_file: str) -> None:
     console = Console()
