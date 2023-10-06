@@ -1,6 +1,6 @@
 
 # list of imports:
-import os, sys, csv, re
+import os, sys, csv, re, socket
 import datetime
 import random
 from datetime import date, datetime, timedelta
@@ -34,10 +34,12 @@ from typing import Callable
 # sell_product_by_product_name():
 # set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt():
 # set_system_date_to():
-# show_list_with_nested_lists_in_console_with_module_rich():
 # show_csv_file_in_console_with_module_rich():
-# time_travel():
+# show_extra_system_information():
+# show_selected_buy_transactions_in_console_with_module_rich():
 # show_weekday_from_date():
+# time_travel():
+
 
 
 def add_days_to_date(date_string: str, days_to_add: int) -> str:
@@ -362,6 +364,29 @@ def calculate_middle_of_time_interval(
         upper_boundary_nr_of_weeks_to_add_to_calculate: int,
         upper_boundary_nr_of_days_to_add_to_calculate: int  
 ) -> str:
+    
+    '''
+    GOAL: set system_date to the middle of the time interval in which to create random mock data for bought.csv
+    and sold.csv.
+    ex of expected / desired result: if lower boundary is 2023-09-01 and upper boundary is 2023-10-10, then system_date is set to 2023-09-15.
+    reason: as a superpy-user after just having created mock data via argparse cli interface with just default values (== py super.py create_mock_data), 
+    I want to be able to create a(ny) report using JUST the default arguments. This makes it easier to learn superpy-app.
+    
+    ex1: how NOT to do it: create_mock_data does not control the value of system_date. As a result system_date can have any value, based on
+    what the superpy-user has set it to (can be any date for any possible reason ) before invoking create_mock_data.  
+    Suppose mock data is created in interval 2023-09-01 to 2023-10-10, but system_date happens to be set to 2023-07-01 (which is outside the interval)),
+    then ALL the subparsers that "show stuff" (show_sales_volume, show_cost, show inventory, show_profit, etc.). show an empty  table
+    in the terminal ! Work-around: 
+    a. check system date
+    b. check lower boundary of time interval in which to create random mock data for bought.csv and sold.csv
+    c. check upper boundary of time interval in which to create random mock data for bought.csv and sold.csv
+    d. if system_date is not in the interval, then set system_date to the middle of the interval.
+    e. ...very cumbersome and tedious for a prospect superpy-user having to do this...
+
+    ex2: how to do it: mock data is created in interval 2023-09-01 to 2023-10-10, and system_date is automatically set to 2023-09-15.
+    As a superpy-user after creating mock data via argparse cli interface with just default values (== py super.py create_mock_data), I
+    can immediately create a(ny) report using JUST the default arguments. This makes it easier to learn and play around with the superpy-app.
+    ''' 
 
     system_date_as_object = datetime.strptime(SYSTEM_DATE, '%Y-%m-%d')
     lower_boundary_date_object = system_date_as_object # default value
@@ -456,68 +481,6 @@ def create_buy_id_for_each_row_in_mock_data(
     return counter
 
 
-def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number: str) -> str:
-    '''
-    Goal: use output of this fn to create a buy_id as input for fn buy_product, so fn buy_product can create a next buy-transaction.
-    Context: this fn is  only used in super.py.
-    More info about how this fn fits into  the bigger picture, see: README_REPORT.md --> '# Technical element 2: create primary 
-    and foreign keys to connect bought.csv and sold.csv 
-
-    I run superpy via the command line in argparse.
-    So state of last id that was used in fn buy_product() is unknown (e.g. b_323), given
-    that I buy products and delete products (records) from bought.csv. 
-    I do not want to reuse an id that was used before (e.g. that belonged to a product
-    that was deleted).
-    So I save the state of the id (e.g. b_351) that was used last in fn buy_product() in a txt-file.
-
-    The products that are bought by superpy-user and/or pytest-"testengine" user  start
-    at id b_300 and count up from there.
-    The range id_1 to id_299 is reserved for script 'produce_testdata_for_csv_files_bought_and_sold'
-    in directory create_new_testdata_for_csv_files.
-
-    '''
-    # new_buy_id_counter = ''
-    try:
-        with open(path_to_id_with_highest_sequence_number, 'r', newline='') as file:
-            last_id_used_in_fn_buy_product =file.read()
-
-            id_parts = last_id_used_in_fn_buy_product.split("_") # e.g. ['b', '323']
-            new_buy_id_counter = int(id_parts[1]) + 1
-            '''
-            b_1 (...) b_9 must be created as b_01 (...) b_09.
-            reason: 
-            In this the ids of the transactions in sold.csv are created by replacing the 'b' in the buy_id with an 's'.
-            So the ids of the transactions in sold.csv are s_1 (...) s_9, and s_10 (...) s_99, and s_100 (...) s_999, etc.
-            But this is a problem, because the ids of the transactions in sold.csv are sorted alphabetically, not numerically.
-            So s_10 is sorted before s_2, and s_100 is sorted before s_3, etc.
-            So I need to create b_01 (...) b_09, so that s_01 (...) s_09 can be created.
-            '''
-            if new_buy_id_counter < 10:
-                new_buy_id_counter = "b_0" + str(new_buy_id_counter)
-            else:
-                new_buy_id_counter = "b_" + str(new_buy_id_counter)
-            file.seek(0)
-    except FileNotFoundError:
-        print(f"File '{path_to_id_with_highest_sequence_number}' not found.")
-    except PermissionError:
-        print(f"You don't have permission to access '{path_to_id_with_highest_sequence_number}'.")
-    except UnicodeDecodeError:
-        print(f"Invalid Unicode character found in '{path_to_id_with_highest_sequence_number}'.")
-    except IOError as e:
-        print(f"Error while reading file: {e}")
-
-    try:
-        with open(path_to_id_with_highest_sequence_number, 'w', newline='') as file: 
-            # print(new_buy_id_counter)  
-            file.write(new_buy_id_counter)
-    except PermissionError:
-        print(f"You don't have permission to write to '{path_to_id_with_highest_sequence_number}'.")
-    except IOError as e:
-        print(f"Error while writing file: {e}")
-
-    return new_buy_id_counter
-
-
 def create_data_for_csv_files_bought_and_sold(
         product_range: int, 
         delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling: int,
@@ -531,7 +494,7 @@ def create_data_for_csv_files_bought_and_sold(
         upper_boundary_nr_of_weeks_to_add_to_calculate: int,
         upper_boundary_nr_of_days_to_add_to_calculate: int,
         superpy_product_prices: list,
-        superpy_product_range: list,
+        product_list_to_create_product_range: list,
         path_to_file_bought_csv: str,
         path_to_file_sold_csv: str,
         add_days_to_date: int,
@@ -559,13 +522,13 @@ def create_data_for_csv_files_bought_and_sold(
     '''
     # PART 1 OF 2: create testdata for bought.csv: 
 
-    # step 1: check if product_range does not exceed nr of products in supermarket (i.e. imported superpy_product_range):
+    # step 1: check if product_range does not exceed nr of products in supermarket (i.e. imported product_list_to_create_product_range):
 
-    if product_range > len(superpy_product_range):
-        print(f'Problem: product_range', product_range, 'exceeds nr of products in supermarket', len(list((set(superpy_product_range)))))
-        product_range = len(list((set(superpy_product_range))))
+    if product_range > len(product_list_to_create_product_range):
+        print(f'Problem: product_range', product_range, 'exceeds nr of products in supermarket', len(list((set(product_list_to_create_product_range)))))
+        product_range = len(list((set(product_list_to_create_product_range))))
         print(f"Solution: product_range has been set to the maximum amount of products in file"
-              f"product_range.py (...\\superpy\\superpy\\product_range.py). This is {len(list((set(superpy_product_range))))}. " 
+              f"product_range.py (...\\superpy\\superpy\\product_range.py). This is {len(list((set(product_list_to_create_product_range))))}. " 
               f"But if you need a higher product_range, then please add more products to product_range.py."
             )
 
@@ -574,10 +537,10 @@ def create_data_for_csv_files_bought_and_sold(
     csv_file_bought_id = ''
     csv_file_bought_id = create_buy_id_for_each_row_in_mock_data('b', 1) 
 
-    superpy_product_range = list(set(superpy_product_range))
+    product_list_to_create_product_range = list(set(product_list_to_create_product_range))
     # step 3: create random list with products that are sold in supermarket:
     # product = '' # prevent UnboundLocalError: local variable 'product' referenced before assignment
-    products = random.sample(superpy_product_range, product_range)
+    products = random.sample(product_list_to_create_product_range, product_range)
 
     '''
     Convert all products to lowercase.
@@ -734,10 +697,6 @@ def get_dates_of_next_7_days(today: str) -> list:
     day_of_week = (today_as_date_object.weekday() + 1 ) 
     # Monday is 0, Sunday is 6, so add 1 for easier reading.
     # print(f'day_of_week: {day_of_week}')
-    '''
-    My code below is bit of a long stretch, but I do not
-    know how to make it shorter. 
-    '''
     if day_of_week == 1:  # Monday
         monday = today_as_date_object + timedelta(days= 7)
         tuesday = today_as_date_object + timedelta(days= 1)
@@ -875,6 +834,49 @@ def get_system_date(path_to_system_date: str) -> str:
     except IOError as e:
         print(f"Error while reading file: {e}")
     return system_date
+
+
+def increment_buy_id_counter_txt(path_to_id_with_highest_sequence_number: str) -> str:
+    # new_buy_id_counter = ''
+    try:
+        with open(path_to_id_with_highest_sequence_number, 'r', newline='') as file:
+            last_id_used_in_fn_buy_product =file.read()
+
+            id_parts = last_id_used_in_fn_buy_product.split("_") # e.g. ['b', '323']
+            new_buy_id_counter = int(id_parts[1]) + 1
+            '''
+            b_1 (...) b_9 must be created as b_01 (...) b_09.
+            reason: 
+            In this the ids of the transactions in sold.csv are created by replacing the 'b' in the buy_id with an 's'.
+            So the ids of the transactions in sold.csv are s_1 (...) s_9, and s_10 (...) s_99, and s_100 (...) s_999, etc.
+            But this is a problem, because the ids of the transactions in sold.csv are sorted alphabetically, not numerically.
+            So s_10 is sorted before s_2, and s_100 is sorted before s_3, etc.
+            So I need to create b_01 (...) b_09, so that s_01 (...) s_09 can be created.
+            '''
+            if new_buy_id_counter < 10:
+                new_buy_id_counter = "b_0" + str(new_buy_id_counter)
+            else:
+                new_buy_id_counter = "b_" + str(new_buy_id_counter)
+            file.seek(0)
+    except FileNotFoundError:
+        print(f"File '{path_to_id_with_highest_sequence_number}' not found.")
+    except PermissionError:
+        print(f"You don't have permission to access '{path_to_id_with_highest_sequence_number}'.")
+    except UnicodeDecodeError:
+        print(f"Invalid Unicode character found in '{path_to_id_with_highest_sequence_number}'.")
+    except IOError as e:
+        print(f"Error while reading file: {e}")
+
+    try:
+        with open(path_to_id_with_highest_sequence_number, 'w', newline='') as file: 
+            # print(new_buy_id_counter)  
+            file.write(new_buy_id_counter)
+    except PermissionError:
+        print(f"You don't have permission to write to '{path_to_id_with_highest_sequence_number}'.")
+    except IOError as e:
+        print(f"Error while writing file: {e}")
+
+    return new_buy_id_counter
 
 
 def is_product_bought_with_product_name(product_descriptor: str) -> bool:  
@@ -1260,20 +1262,6 @@ def set_system_date_to(system_date: str, path_to_system_date: str) -> str:
     return system_date
 
 
-def show_selected_buy_transactions_in_console_with_module_rich(list: list) -> Table: # input is list with lists.
-    rich_table = Table(show_header=True, header_style="bold magenta")
-    rich_table.add_column('buy_id', style="dim", width=12)
-    rich_table.add_column('product', style="dim", width=24)
-    rich_table.add_column('buy_price €', style="dim", width=12)
-    rich_table.add_column('buy_date', style="dim", width=12)
-    rich_table.add_column('expiry_date', style="dim", width=12)
-    for row in list:
-        rich_table.add_row(*row)
-    console = Console()
-    console.print(rich_table)
-    return rich_table
-
-
 def show_last_added_sales_transaction_in_console_with_module_rich(list: list) -> Table: # input is list with lists.
     rich_table = Table(show_header=True, header_style="bold magenta")
     rich_table.add_column('sell_id', style="dim", width=12)
@@ -1309,6 +1297,38 @@ def show_csv_file_in_console_with_module_rich(path_to_csv_file: str) -> None:
     console.print(table)
 
 
+def show_extra_system_information(current_action_in_superpy, system_date, show_weekday_from_date):
+    console = Console() # no need to garbage collect after usage.
+    table = Table(show_header=True, header_style="bold magenta")
+    table.add_column("Description")
+    table.add_column("Value")
+    table.add_row("Superpy SYSTEM_DATE", f"{system_date} ({show_weekday_from_date(system_date)})")
+    table.add_row("Host machine date", f"{datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")
+    table.add_row("Current action", current_action_in_superpy)
+    table.add_row("Host machine", socket.gethostname())
+    console.print(table)
+
+
+def show_selected_buy_transactions_in_console_with_module_rich(list: list) -> Table: # input is list with lists.
+    rich_table = Table(show_header=True, header_style="bold magenta")
+    rich_table.add_column('buy_id', style="dim", width=12)
+    rich_table.add_column('product', style="dim", width=24)
+    rich_table.add_column('buy_price €', style="dim", width=12)
+    rich_table.add_column('buy_date', style="dim", width=12)
+    rich_table.add_column('expiry_date', style="dim", width=12)
+    for row in list:
+        rich_table.add_row(*row)
+    console = Console()
+    console.print(rich_table)
+    return rich_table
+
+
+def show_weekday_from_date(date: str) -> str:
+    date_object = datetime.strptime(date, '%Y-%m-%d')
+    day_of_week = date_object.strftime('%A')
+    return day_of_week
+
+
 def time_travel(
         nr_of_days_to_travel: int, 
         path_to_input_file: str, 
@@ -1342,8 +1362,3 @@ def time_travel(
     # returning new_system_date for testing purposes only (returned value is not used in the code)    
     return new_system_date
 
-
-def show_weekday_from_date(date: str) -> str:
-    date_object = datetime.strptime(date, '%Y-%m-%d')
-    day_of_week = date_object.strftime('%A')
-    return day_of_week

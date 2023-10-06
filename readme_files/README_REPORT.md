@@ -239,7 +239,7 @@ into the script.
         feeds the incremented nr (b_164)  into the buy-fn above as argument 'id_of_row_in_csv_file_bought':
 
     ```python
-    def create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number):
+    def increment_buy_id_counter_txt(path_to_id_with_highest_sequence_number):
         pass
     ```
 

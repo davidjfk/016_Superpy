@@ -33,6 +33,7 @@ Please read this document in Open Preview: Ctrl+Shift+V, or Right-click
   - [UC: sell product while violating business rules](#uc-sell-product-while-violating-business-rules)
   - [UC: suffer a loss](#uc-suffer-a-loss)
   - [UC: make profit](#uc-make-profit)
+  - [UC: Change default values of argparse command 'create\_mock\_data'](#uc-change-default-values-of-argparse-command-create_mock_data)
 - [INSTALLATION](#installation)
 - [DEFINITIONS](#definitions)
 - [LOCATION OF IMPORTANT DIRECTORIES AND FILES](#location-of-important-directories-and-files)
@@ -1526,6 +1527,28 @@ quick links:
         py super.py show_profit
     ``` 
 
+## UC: Change default values of argparse command 'create_mock_data'
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Use cases](#use-cases)
+<br/><br/>
+    - As a superpy user you want to e.g. create mock data with a product range of 5 products very often.
+    - step 1: goto super.py (...\superpy\super.py) to the beginning of main().
+    - step 2: set PRODUCT_RANGE = 5
+    - step 3: Now you can do this:
+    ```python
+        py super.py create_mock_data 
+    ```        
+
+    instead of having to do this:
+    - step 2: check the financial position:
+    ```python
+        py super.py create_mock_data -pr 5
+        or e.g.:
+    ```
+    ```python
+        py super.py create_mock_data -pr 5 -del_row 3 -sl 10 -tt 3 -mu 3 -lby 2024 -lbm 10 -lbd 15 -ubmnr 3 -ubwnr 8 -ubdnr 3
+    ```  
 
 
 <br/><br/><br/>
@@ -1659,6 +1682,12 @@ quick links:
         23-09-12     23-09-20         8
         (used in fn create_data_for_csv_files_bought_and_sold() )
 
+    START_DATE_OF_CURRENT_FINANCIAL_YEAR
+    - If system_date is 2023-10-11, then start date of current financial year is 2023-01-01.
+    - If system_date is 2024-06-24, then start date of current financial year is 2024-01-01.
+    - If system_date is 2025-09-06, then start date of current financial year is 2025-01-01.
+    * relevance: 
+
 
     system_date is a date (see def of date above) that is perceived as "today" in the system. system_date is saved
         in file 'system_date.txt' in directory data_directory. 
@@ -1668,7 +1697,7 @@ quick links:
 
 
     time_interval == amount of time (e.g. 3 days, or 4 months and 2 weeks, etc.) between lower boundary and  
-        higher boundary.
+        UPPER_BOUNDARY.
         (used in fn create_data_for_csv_files_bought_and_sold() )   
 
 
@@ -1678,6 +1707,10 @@ quick links:
         23-09-12     23-09-14         2
         23-09-12     23-09-15         3
         (used in fn create_data_for_csv_files_bought_and_sold() )
+
+    - UPPER_BOUNDARY_NR_OF_DAYS_TO_ADD_TO_CALCULATE --> see time_interval
+    - UPPER_BOUNDARY_NR_OF_MONTHS_TO_ADD_TO_CALCULATE --> see time_interval
+    - UPPER_BOUNDARY_NR_OF_WEEKS_TO_ADD_TO_CALCULATE --> see time_interval
 
 # LOCATION OF IMPORTANT DIRECTORIES AND FILES
 [goto Table of Contents at start of this markdown file: ](#LOCATION-OF-IMPORTANT-DIRECTORIES-AND-FILES)

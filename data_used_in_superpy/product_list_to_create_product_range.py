@@ -1,4 +1,4 @@
-superpy_product_range = [
+product_list_to_create_product_range = [
     'Fish', 
     'Quinoa', 
     'Brown beans',
