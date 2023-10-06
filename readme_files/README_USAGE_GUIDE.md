@@ -1,3 +1,7 @@
+Important !!  
+Please read this document in Open Preview: Ctrl+Shift+V, or Right-click  
+'README_USAGE_GUIDE.md' in the vsCode Explorer and then select the first option 'Open Preview'.
+
 ## Table of contents
 - [Intro](#intro)
 - [Argparse commands and arguments](#argparse-commands-and-arguments)

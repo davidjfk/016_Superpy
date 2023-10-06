@@ -1,37 +1,37 @@
 buy_id,product,buy_price,buy_date,expiry_date
-b_01,Plant-Based Meatless Burger Patties,0.5,2023-10-05,2023-10-15
-b_02,Plant-Based Meatless Burger Patties,3.1,2023-10-05,2023-10-15
-b_03,Whole Wheat Reduced Fat Multigrain Bread,0.79,2023-10-07,2023-10-17
-b_04,Rice,2.5,2023-10-07,2023-10-17
-b_05,Plant-Based Meatless Burger Patties,0.69,2023-10-07,2023-10-17
-b_06,Plant-Based Meatless Burger Patties,1.1,2023-10-07,2023-10-17
-b_07,Plant-Based Meatless Burger Patties,1.4,2023-10-07,2023-10-17
-b_08,Whole Wheat Reduced Fat Multigrain Bread,2.5,2023-10-09,2023-10-19
-b_09,Rice,4.99,2023-10-11,2023-10-21
-b_10,Whole Wheat Reduced Fat Multigrain Bread,1.4,2023-10-13,2023-10-23
-b_11,Whole Wheat Reduced Fat Multigrain Bread,4.0,2023-10-13,2023-10-23
-b_12,Rice,1.1,2023-10-13,2023-10-23
-b_13,Rice,0.19,2023-10-14,2023-10-24
-b_14,Whole Wheat Reduced Fat Multigrain Bread,0.39,2023-10-15,2023-10-25
-b_15,Whole Wheat Reduced Fat Multigrain Bread,1.1,2023-10-15,2023-10-25
-b_16,Plant-Based Meatless Burger Patties,2.5,2023-10-15,2023-10-25
-b_17,Plant-Based Meatless Burger Patties,0.19,2023-10-17,2023-10-27
-b_18,Plant-Based Meatless Burger Patties,4.0,2023-10-17,2023-10-27
-b_19,Rice,0.39,2023-10-19,2023-10-29
-b_20,Rice,0.69,2023-10-20,2023-10-30
-b_21,Rice,1.4,2023-10-22,2023-11-01
-b_22,Rice,0.5,2023-10-23,2023-11-02
-b_23,Whole Wheat Reduced Fat Multigrain Bread,0.29,2023-10-24,2023-11-03
-b_24,Whole Wheat Reduced Fat Multigrain Bread,3.1,2023-10-24,2023-11-03
-b_25,Plant-Based Meatless Burger Patties,0.79,2023-10-24,2023-11-03
-b_26,Whole Wheat Reduced Fat Multigrain Bread,0.19,2023-10-25,2023-11-04
-b_27,Plant-Based Meatless Burger Patties,4.99,2023-10-25,2023-11-04
-b_28,Whole Wheat Reduced Fat Multigrain Bread,0.69,2023-10-26,2023-11-05
-b_29,Rice,4.0,2023-10-26,2023-11-05
-b_30,Plant-Based Meatless Burger Patties,0.39,2023-10-27,2023-11-06
-b_31,Plant-Based Meatless Burger Patties,0.29,2023-10-28,2023-11-07
-b_32,Rice,0.79,2023-10-29,2023-11-08
-b_33,Rice,3.1,2023-10-30,2023-11-09
-b_34,Whole Wheat Reduced Fat Multigrain Bread,0.5,2023-10-31,2023-11-10
-b_35,Whole Wheat Reduced Fat Multigrain Bread,4.99,2023-10-31,2023-11-10
-b_36,Rice,0.29,2023-10-31,2023-11-10
+b_01,keto-friendly low-carb high-protein snack bar,0.19,2024-03-08,2024-03-18
+b_02,keto-friendly low-carb high-protein snack bar,0.29,2024-03-09,2024-03-19
+b_03,canned tuna,4.0,2024-03-09,2024-03-19
+b_04,keto-friendly low-carb high-protein snack bar,0.5,2024-03-11,2024-03-21
+b_05,keto-friendly low-carb high-protein snack bar,2.5,2024-03-11,2024-03-21
+b_06,eggs,0.79,2024-03-12,2024-03-22
+b_07,keto-friendly low-carb high-protein snack bar,0.39,2024-03-13,2024-03-23
+b_08,eggs,3.1,2024-03-18,2024-03-28
+b_09,canned tuna,0.69,2024-03-19,2024-03-29
+b_10,eggs,1.1,2024-03-21,2024-03-31
+b_11,eggs,4.0,2024-03-21,2024-03-31
+b_12,keto-friendly low-carb high-protein snack bar,4.0,2024-03-22,2024-04-01
+b_13,canned tuna,0.5,2024-03-22,2024-04-01
+b_14,keto-friendly low-carb high-protein snack bar,0.79,2024-03-23,2024-04-02
+b_15,canned tuna,4.99,2024-03-23,2024-04-02
+b_16,eggs,1.4,2024-03-23,2024-04-02
+b_17,keto-friendly low-carb high-protein snack bar,1.4,2024-03-25,2024-04-04
+b_18,canned tuna,1.1,2024-03-25,2024-04-04
+b_19,keto-friendly low-carb high-protein snack bar,1.1,2024-03-26,2024-04-05
+b_20,eggs,0.5,2024-03-26,2024-04-05
+b_21,canned tuna,0.19,2024-03-27,2024-04-06
+b_22,canned tuna,0.29,2024-03-27,2024-04-06
+b_23,eggs,0.39,2024-03-28,2024-04-07
+b_24,canned tuna,0.39,2024-03-29,2024-04-08
+b_25,keto-friendly low-carb high-protein snack bar,3.1,2024-03-30,2024-04-09
+b_26,canned tuna,3.1,2024-03-30,2024-04-09
+b_27,canned tuna,1.4,2024-03-31,2024-04-10
+b_28,eggs,0.69,2024-03-31,2024-04-10
+b_29,canned tuna,2.5,2024-04-01,2024-04-11
+b_30,keto-friendly low-carb high-protein snack bar,0.69,2024-04-02,2024-04-12
+b_31,keto-friendly low-carb high-protein snack bar,4.99,2024-04-03,2024-04-13
+b_32,canned tuna,0.79,2024-04-03,2024-04-13
+b_33,eggs,0.19,2024-04-03,2024-04-13
+b_34,eggs,4.99,2024-04-03,2024-04-13
+b_35,eggs,0.29,2024-04-04,2024-04-14
+b_36,eggs,2.5,2024-04-04,2024-04-14

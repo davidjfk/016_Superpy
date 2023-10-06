@@ -1,13 +1,14 @@
-
-
-
+Important !!  
+Please read this document in Open Preview: Ctrl+Shift+V, or Right-click  
+'README_REPORT.md' in the vsCode Explorer and then select the first option 'Open Preview'.
 
 ## Table of contents
 
 - [Intro](#intro)
 - [Topic 1: Write data to csv in a testable manner](#topic-1-write-data-to-csv-in-a-testable-manner)
 - [Topic 2: Run pytest with control over cwd](#topic-2-run-pytest-with-control-over-cwd)
-- [Topic 3: Connect bought.csv and sold.csv with primary and foreign keys](#topic-3-connect-boughtcsv-and-soldcsv-with-primary-and-foreign-keys)
+- [Topic 3: Add path to directory 'superpy' to PYTHONPATH environment variable](#topic-3-add-path-to-directory-superpy-to-pythonpath-environment-variable)
+- [Topic 4: Connect bought.csv and sold.csv with primary and foreign keys](#topic-4-connect-boughtcsv-and-soldcsv-with-primary-and-foreign-keys)
 
 # Intro
 [Table of contents](#table-of-contents)
@@ -24,8 +25,8 @@ Explain what problem they solve and why you chose to implement them in this way.
 - To assist your explanation you may use code snippets.    
 
 <br/><br/>
-# Topic 1: Write data to csv in a testable manner
 
+# Topic 1: Write data to csv in a testable manner
 [Table of contents](#table-of-contents)
 
 - Problem: how can fn buy_product and fn sell_product  
@@ -55,9 +56,11 @@ Explain what problem they solve and why you chose to implement them in this way.
         writer.writerows(rows)
 ```
 
-- Advantage: in pytest the actual testresult from the previous testrun is completely overwritten.   
+-  In pytest the actual testresult from the previous testrun is completely overwritten.   
     At the ame time in Superpy a transaction (buy or sell) still gets appended to csv file (bought.csv or sold.csv).  
-- Alternative solution: next time I will try a fixture instead.
+
+- Alternative solution 1: prior to testrun, empty data file with actual result (that still contains output from previous testrun) 
+- Alternative solution 2: use a fixture instead.
     
 
 # Topic 2: Run pytest with control over cwd
@@ -70,19 +73,20 @@ Explain what problem they solve and why you chose to implement them in this way.
 
 - solution: create 2 fns that help to point to the correct location to store the actual test results.
   <br/>
-    1of3: when cwd points to following directories and I run pytest:
+  This works as follows:  
+  * 1of3: when cwd points to following directories and I run pytest:
     1. (...\superpy), 
     2. (...\superpy\test_utils)  
     then the actual result is stored in the correct directory of the pytest testcase 
     (ex: (...\superpy\test_utils\fn_buy_product_testcases) ).
 
-    2of3: when I am in the directory of a fn and  run pytest:
+  * 2of3: when I am in the directory of a fn and  run pytest:
     ex:  
     step 1: goto "cd into"  (...\superpy\test_utils\fn_buy_product_testcases)
     step 2: run pytest  
     result: only pytest testcases inside fn_buy_product_testcases are run.
 
-    3of3: when cwd points to another directory inside superpy, then pytest does not run any testcases.  
+  * 3of3: when cwd points to another directory inside superpy, then pytest does not run any testcases.  
     ex: 
     step 1: goto "cd into"  (...\superpy\test_utils\data_used_in_superpy)
     step 2: run pytest
@@ -114,32 +118,86 @@ def get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_
     return path_to_file
 
 ```
-I let both fns start with os.getcwd(). Otherwise, python will start looking everywhere on the filesystem and performance
-becomes a bottleneck.
-
+    I let both fns start with os.getcwd(). Otherwise, python will start looking everywhere  
+    on the filesystem and performance becomes a bottleneck.
 
 <br/><br/>
 
-# Topic 3: Connect bought.csv and sold.csv with primary and foreign keys
+# Topic 3: Add path to directory 'superpy' to PYTHONPATH environment variable 
+
 [Table of contents](#table-of-contents)
+
+During development inside directory Superpy, I had a subdirectory 'pytest_testdata_factory'.  
+Inside this subdirectory there was a script 'produce_testdata_for_csv_files_bought_and_sold.py'. This script called fn 'create_data_for_csv_files_bought_and_sold()' from ...\superpy\utils.utils.py.
+
+
+step: to get this script  to work, add path to directory 'superpy' to the PYTHONPATH environment variable:
+```
+sys.path.append('c:\\dev\\pytWinc\\superpy') 
+```
+* problem: this code will break on another machine: absolute file path and backslashes.
+
+Chicken-and-egg problem while trying to solve this problem: 
+- To make path to directory 'superpy' relative, I need to import fn  
+  get_path_to_directory_of_file from utils.py.
+- To import fn get_path_to_directory_of_file from utils.py, I need to add path to  
+  directory 'superpy' to the PYTHONPATH environment variable.
+
+Solution:
+```
+current_dir  = (os.getcwd()) # e.g. C:\dev\pytWinc\superpy\testdata
+
+parent_directory_of_current_directory = os.path.abspath(os.path.join(current_dir, os.pardir)) # e.g. C:\dev\pytWinc\superpy
+```
+- On every machine that runs Superpy, the parent directory of current directory is the project directory superpy
+```
+file_path_to_directory_superpy =  parent_directory_of_current_directory
+sys.path.append(file_path_to_directory_superpy)
+```
+So now I can import everything I need:  
+```
+from utils.utils import add_days_to_date
+from utils.utils import generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
+from utils.utils import create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created
+from utils.utils import get_path_to_directory_of_file
+from utils.utils import create_data_for_csv_files_bought_and_sold
+
+```
+Alternative solution: copy-past the code from fn get_path_to_directory_of_file
+into the script. 
+
+<br/><br/>
+
+# Topic 4: Connect bought.csv and sold.csv with primary and foreign keys
+[Table of contents](#table-of-contents)
+
+* (only if previous 3 topics are not enough, then plz read this topic 4)
 
 - General problem: how to connect bought.csv and sold.csv, as if they are a relational database together?
 - Multiple subproblems need to be addressed:
-- problem 1: 2 ways to create buy-transactions: in a script-that-creates-mock-data and as-a-user that creates buy-transactions, 1 at a time.  
-    how to create buy_ids for both options? 
-- problem 2: how 2 automatically assign a buy_id to each created MOCK buy-transaction? If script creates  150 buy-transactions, then  
+- problem 1: There are 2 ways to create buy-transactions:  
+  1. fn create_data_for_csv_files_bought_and_sold() that creates mock data (1 up to a 1000 or more buy transactions at a time),
+  2. fn buy_product that buys 1 product at a time.   
+    How to create buy_ids for both options? 
+- problem 2: how 2 automatically assign a buy_id to each created MOCK buy-transaction? If script creates  358 buy-transactions, then  
     each buy-transaction in the mock data must get a unique buy_id (b_1, b_2, b_3, etc.)
 - problem 3: how 2 automatically assign a buy_id to each buy-transaction (not mock data)that is added 1 at a time, while the Superpy-user  
     does other stuff in the mean time: e.g. sell products, show reports of costs, revenue, sales volume, profit, etc.
-- problem 4: how does the option to delete all data in bought.csv and sold.csv have effect on which buy_id to issue next for the  
-    next buy-transaction?
+- problem 4: how does the option to delete all data in bought.csv and sold.csv (i.e. 'py super.py delete') have effect  
+    on which buy_id to issue next for the next buy-transaction?
 - problem 5: how to make sure that the buy_ids of a script creating mock-buy-transactions and users creating buy-transactions still  
     connect to each other? ex: script creates 131 buy-transactions (b_1, b_2, ... b_131), then user creates buy-transaction and  
     superpy creates and assigns b_132 to this transaction.
 - problem 6: in fn sell_product implement following rules:
-    - 1of3: product does  not exist, so you cannot sell  it.
-    - 2of3: product has already been sold, so you cannot sell it again.
-    - 3of3: product has expired, so you cannot sell it. 
+    - 1: product does  not exist, so you cannot sell  it.
+    - 2: product has already been sold, so you cannot sell it again.
+    - 3: product has expired, then sell product and notify user.  
+        (just for fun I have implemented also the following rules:)
+    - 4: if product is sold at a loss (i.e. sell_price < buy_price), then sell the product and notify user.
+    - 5: By default product is sold by its name: e.g. 'py super.py apple 0.49 -s 2403-06-07'. But if product name is very long  
+    e.g. "Cold-Pressed Extra Virgin Olive Oil with Lemon and Garlic", then Superpy user also has the option to sell the product  
+    by its buy_id (before selling anything first check the inventory: py super.py show_inventory 2403-06-07'):  
+    e.g. 'py super.py b_45' (assuming that this product has buy_id b_45 and it is sold on system_date)
 
  
 <br/><br/>

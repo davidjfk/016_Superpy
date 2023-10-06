@@ -7,66 +7,37 @@ from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from rich.table import Table
 from rich.console import Console
-
-# only used in fn create_data_for_csv_files_bought_and_sold():
 from itertools import product
 from copy import deepcopy
 from typing import Callable
 
-# LIST OF FUNCTIONS:
-# add_days_to_date(date_string, days_to_add)
-
-# buy_product(product, price, buy_date, expiry_date, id_of_row_in_csv_file_bought, path_to_csv_bought_input_file, path_to_csv_bought_output_file):
-
-# calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_bought_file):
-
-# calculate_expired_products_on_day(date_on_which_to_calculate_expired_products, path_to_csv_sold_file, path_to_csv_bought_file):
-
-# calculate_inventory_on_day(date_on_which_to_calculate_products_in_inventory, path_to_csv_sold_file, path_to_csv_bought_file):
-
-# calculate_middle_of_time_interval(SYSTEM_DATE: str, upper_boundary_nr_of_months_to_add_to_calculate: int, upper_boundary_nr_of_weeks_to_add_to_calculate: int,upper_boundary_nr_of_days_to_add_to_calculate: int  ) -> str:
-
-# calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive, calculate_cost_in_time_range_between_start_date_and_end_date_inclusive):
-
-# calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
-
-# calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, path_to_csv_sold_file):
-
-# create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created(csv_file_name_first_letter, first_nr_in_range):
-
-# create_buy_id_that_increments_highest_buy_id_in_boughtcsv(path_to_id_with_highest_sequence_number):
-
-# create_data_for_csv_files_bought_and_sold(product_range, delete_every_nth_row_in_soldcsv_so_every_nth_row_in_boughtcsv_can_expire_when_time_travelling, shelf_life, turnover_time, markup, lower_boundary_year_of_time_interval_in_which_to_create_random_testdata, lower_boundary_month_of_time_interval_in_which_to_create_random_testdata, lower_boundary_week_of_time_interval_in_which_to_create_random_testdata, upper_boundary_nr_of_months_to_add_to_calculate, upper_boundary_nr_of_weeks_to_add_to_calculate, upper_boundary_nr_of_days_to_add_to_calculate, path_to_file_bought_csv, path_to_file_sold_csv, add_days_to_date, create_id_for_each_row_in_boughtcsv_while_script_generates_this_boughtcsv, generate_random_buy_date_for_buy_transaction_in_future_in_time_interval):
-
-# generate_random_buy_date_for_buy_transaction_in_future_in_time_interval(interval_lower_boundary_year,            interval_lower_boundary_month, interval_lower_boundary_day, nr_of_months_added_to_calculate_upper_boundary,            nr_of_weeks_added_to_calculate_upper_boundary, nr_of_days_added_to_calculate_upper_boundary):
-
-# get_dates_of_next_7_days(today: str) -> list:
-
+# LIST OF FUNCTIONS: (Ctrl+C, Ctrl+F to find the fn you are looking for):
+# add_days_to_date()
+# buy_product():
+# calculate_expired_products():
+# calculate_inventory():
+# calculate_middle_of_time_interval():
+# calculate_profit():
+# calculate_revenue():
+# calculate_sales_volume():
+# create_buy_id_for_each_row_in_mock_data():
+# create_buy_id_that_increments_highest_buy_id_in_boughtcsv():
+# create_data_for_csv_files_bought_and_sold():
+# generate_random_buy_date_for_buy_transaction_in_future_in_time_interval():
+# get_dates_of_next_7_days():
 # get_highest_buy_id_from_boughtcsv(path_to_csv_bought_file):
-
 # get_path_to_directory_of_file(directory_of_file):
-
 # get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_path):
-
-# get_system_date(path_to_system_date):
-
-# is_product_buy_id(product_descriptor: str) -> bool:  
-
-# sell_product_by_buy_id(bought_product_id, price, sell_date, path_to_csv_bought_input_file, path_to_csv_bought_output_file):
-
-# sell_product_by_product_name(product_name, price, sell_date, path_to_csv_bought_input_file, path_to_csv_bought_output_file):
-
-# set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt(buy_id, path_to_buy_id_file):
-
-# set_system_date_to(system_date, path_to_system_date):
-
-# show_list_with_nested_lists_in_console_with_module_rich(list):
-
-# show_csv_file_in_console_with_module_rich(path_to_csv_file):
-
-# time_travel_system_date_with_nr_of_days(nr_of_days_to_travel, path_to_input_file, path_to_output_file):
-
-# show_weekday_from_date(date: str) -> str:
+# get_system_date():
+# is_product_buy_id():  
+# sell_product_by_buy_id():
+# sell_product_by_product_name():
+# set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt():
+# set_system_date_to():
+# show_list_with_nested_lists_in_console_with_module_rich():
+# show_csv_file_in_console_with_module_rich():
+# time_travel():
+# show_weekday_from_date():
 
 
 def add_days_to_date(date_string: str, days_to_add: int) -> str:
@@ -75,7 +46,7 @@ def add_days_to_date(date_string: str, days_to_add: int) -> str:
     '''
     This is a helper fn used as fn-argument in following fns:
     - create_data_for_csv_files_bought_and_sold()
-    - time_travel_system_date_with_nr_of_days()
+    - time_travel()
     
     '''
     return new_date.strftime('%Y-%m-%d')
@@ -97,7 +68,12 @@ def buy_product(
     reason: when testing fn buy_product in pytest, I want to keep the csv-file with testdata intact.
     '''
  
-    product = product.lower() # input can be e.g. APPLE, apple aPPle, etc., but internally in Superpy only lowercase ('apple') is used.
+    '''
+    Convert a bought product to lowercase.
+    reason: products can be sold on product name, but python is case-sensitive. 
+    So Milk and milk would otherwise be seen as 2 different products.
+    '''
+    product = product.lower() 
     # try:
     #     datetime.strptime(buy_date, '%Y-%m-%d')
     #     datetime.strptime(expiry_date, '%Y-%m-%d')
@@ -179,7 +155,7 @@ def calculate_amount_in_interval(
         print(f"Error while reading CSV file: {e}")
 
 
-def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(
+def calculate_cost(
         start_date: str, 
         end_date: str, 
         path_to_csv_bought_file: str
@@ -225,7 +201,7 @@ def calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(
         print(f"Error while reading CSV file: {e}")
 
 
-def calculate_expired_products_on_day(
+def calculate_expired_products(
         date_on_which_to_calculate_expired_products: str, 
         path_to_csv_sold_file: str, 
         path_to_csv_bought_file: str
@@ -288,7 +264,7 @@ def calculate_expired_products_on_day(
                     if date_on_which_to_calculate_expired_products > buy_date and date_on_which_to_calculate_expired_products > expiry_date and sell_data.get(buy_id) is None:
                         expired_products.append(row)             
                 '''
-                there is only 1 difference between  this fn and fn calculate_expired_products_on_day: 
+                there is only 1 difference between  this fn and fn calculate_expired_products: 
                 "<" in "date_on_which_to_calculate_products_in_inventory < expiry_date" above.
 
                 in bought.csv: (by convention) buy_date is always set with either an expiry_date or 'does not expire'.
@@ -308,7 +284,7 @@ def calculate_expired_products_on_day(
     return expired_products
 
 
-def calculate_inventory_on_day(
+def calculate_inventory(
         date_on_which_to_calculate_products_in_inventory: str, 
         path_to_csv_sold_file: str, 
         path_to_csv_bought_file: str
@@ -360,7 +336,7 @@ def calculate_inventory_on_day(
                     if date_on_which_to_calculate_products_in_inventory > buy_date and date_on_which_to_calculate_products_in_inventory < expiry_date and sell_data.get(buy_id) is None:
                         products_in_inventory.append(row) 
                 '''
-                there is only 1 difference between  this fn and fn calculate_expired_products_on_day: 
+                there is only 1 difference between  this fn and fn calculate_expired_products: 
                 "<" in "date_on_which_to_calculate_products_in_inventory < expiry_date" above.
 
                 in bought.csv: (by convention) buy_date is always set with either an expiry_date or 'does not expire'.
@@ -405,23 +381,23 @@ def calculate_middle_of_time_interval(
     return SYSTEM_DATE
 
 
-def calculate_profit_in_time_range_between_start_date_and_end_date_inclusive(
+def calculate_profit(
         start_date: str, 
         end_date: str, 
         path_to_csv_sold_file: str, 
         path_to_csv_bought_file: str, 
-        calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive: Callable[[str, str, str, str, str], float], 
-        calculate_cost_in_time_range_between_start_date_and_end_date_inclusive: Callable[[str, str, str, str, str], float]
+        calculate_revenue: Callable[[str, str, str, str, str], float], 
+        calculate_cost: Callable[[str, str, str, str, str], float]
 ) -> float:
     # So fn calculate_amount_in_interval is used to calculate cost and revenue.
-    cost = calculate_cost_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, "buy_date", "buy_price", path_to_csv_bought_file)
-    revenue = calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(start_date, end_date, "sell_date", "sell_price", path_to_csv_sold_file)
+    cost = calculate_cost(start_date, end_date, "buy_date", "buy_price", path_to_csv_bought_file)
+    revenue = calculate_revenue(start_date, end_date, "sell_date", "sell_price", path_to_csv_sold_file)
     
     profit = round(revenue - cost,2)
     return profit
 
 
-def calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusive(
+def calculate_sales_volume(
         start_date: str, 
         end_date: str, 
         path_to_csv_sold_file: str
@@ -458,46 +434,7 @@ def calculate_sales_volume_in_time_range_between_start_date_and_end_date_inclusi
     return sales_volume
 
 
-def calculate_revenue_in_time_range_between_start_date_and_end_date_inclusive(
-        start_date: str, 
-        end_date: str, 
-        path_to_csv_sold_file: str
-) -> float:
-    '''
-    Goal of fn: calculate revenue in time range between start_date and end_date inclusive.
-    hardcoded variables in fn: sell_date, sell_price .
-    These variables refer to column names in sold.csv. 
-    (for now no need to make them dynamic, i.e. no need to turn them into fn-parameters)
-    
-    ex of start_date: '2023-09-01'
-    ex of end_date: '2023-12-21'
-    '''
-    start_date = datetime.strptime(str(start_date), '%Y-%m-%d')
-    end_date = datetime.strptime(str(end_date), '%Y-%m-%d')
-
-    revenue = 0
-    revenue_rounded = 0
-    try:
-        with open(path_to_csv_sold_file, 'r', newline='') as file: 
-            reader = csv.DictReader(file)
-            for row in reader:
-                sell_date = row['sell_date']
-                sell_date = datetime.strptime(sell_date, '%Y-%m-%d')
-                if start_date <= sell_date <= end_date:
-                    revenue += float(row['sell_price'])
-                    revenue_rounded = round(revenue, 2)
-        return revenue_rounded
-    except FileNotFoundError:
-        print(f"File '{path_to_csv_sold_file}' not found.")
-    except PermissionError:
-        print(f"You don't have permission to access '{path_to_csv_sold_file}'.")
-    except UnicodeDecodeError:
-        print(f"Invalid Unicode character found in '{path_to_csv_sold_file}'.")
-    except csv.Error as e:
-        print(f"Error while reading CSV file: {e}")
-
-
-def create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created(
+def create_buy_id_for_each_row_in_mock_data(
         csv_file_name_first_letter: str, 
         first_nr_in_range: int
 ) -> Callable[[], int]:
@@ -598,7 +535,7 @@ def create_data_for_csv_files_bought_and_sold(
         path_to_file_bought_csv: str,
         path_to_file_sold_csv: str,
         add_days_to_date: int,
-        create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created: Callable[[str, int], Callable[[], int]], 
+        create_buy_id_for_each_row_in_mock_data: Callable[[str, int], Callable[[], int]], 
         # reason: fn A is fn-argument in fn B == fn B(fn A). And B(fn A) is argument in fn C == fn C(B(fn A))
         generate_random_buy_date_for_buy_transaction_in_future_in_time_interval: Callable[[int, int, int, int, int, int], str]
 ) -> None:
@@ -635,12 +572,19 @@ def create_data_for_csv_files_bought_and_sold(
 
     # step 2: create id for each bought product: (e.g. b_1, b_2, b_3, etc):
     csv_file_bought_id = ''
-    csv_file_bought_id = create_buy_id_for_each_row_in_boughtcsv_as_part_of_mockdata_that_is_being_created('b', 1) 
+    csv_file_bought_id = create_buy_id_for_each_row_in_mock_data('b', 1) 
 
     superpy_product_range = list(set(superpy_product_range))
     # step 3: create random list with products that are sold in supermarket:
     # product = '' # prevent UnboundLocalError: local variable 'product' referenced before assignment
     products = random.sample(superpy_product_range, product_range)
+
+    '''
+    Convert all products to lowercase.
+    Reason: products can be sold on product name, but python is case-sensitive. 
+    So Milk and milk would otherwise be seen as 2 different products.
+    '''
+    products = [product.lower() for product in products]
     
     # step 4: generate all possible combinations of products and price_per_unit:
     bought_products = (list(product(products, superpy_product_prices)))
@@ -956,7 +900,13 @@ def sell_product_by_buy_id(bought_product_id: str,
                 path_to_csv_sold_input_file: str, 
                 path_to_csv_sold_output_file: str,
                 path_to_csv_bought_file: str
-) -> None:
+) -> str:
+    '''
+    Convention: if product is not sold, then None must be returned. This also applies to sibling fn 
+    sell_product_by_product_id() below in utils.py. If None is returned, then there is no sales transaction 
+    that can and will be shown with module rich in code section "args.command == "sell":" in file super.py.
+    '''
+    
     '''
     In this fn 3 error checks are performed:
     1. check if product exists in bought.csv before creating a sell-transaction in sold.csv
@@ -999,7 +949,7 @@ def sell_product_by_buy_id(bought_product_id: str,
             if not is_bought_product_id_in_bought_csv:
                 print(f"Warning: You are trying to sell a product with a buy_id << {bought_product_id} >> that " 
                     f"does NOT exist in bought.csv. So this sales transaction is aborted!")
-                return None # this aborts the sales transaction
+                return 'product_is_not_sold' # this aborts the sales transaction
             
             # option 2of2:
             # is_bought_product_id_in_bought_csv = False
@@ -1037,7 +987,7 @@ def sell_product_by_buy_id(bought_product_id: str,
                 if row['buy_id'] == bought_product_id:
                     print(f"Warning: You are trying to sell product with buy_id << {bought_product_id} >> that " 
                         f"has already been sold. So this sales transaction is aborted!")
-                    return None # this aborts the sales transaction
+                    return 'product_is_not_sold' # this aborts the sales transaction
                     # raise ValueError(f"Product with buy_id '{bought_product_id}' has already been sold!!")
             file.seek(0)
             # sold_product_id is used in second try block below
@@ -1099,7 +1049,13 @@ def sell_product_by_buy_id(bought_product_id: str,
     return [sold_product_id, bought_product_id, sell_price, sell_date] # used to show data in console in table with module rich (see fn sell_product() in super.py)
 
 
-def sell_product_by_product_name(product_name, sell_price,  sell_date, path_to_csv_sold_input_file, path_to_csv_sold_output_file, path_to_csv_bought_file):
+def sell_product_by_product_name(product_name, sell_price,  sell_date, calculate_inventory, path_to_csv_sold_input_file, path_to_csv_sold_output_file, path_to_csv_bought_file):
+
+    '''
+    Convention: if product is not sold, then None must be returned. This also applies to sibling fn 
+    sell_product_by_product_name() above in utils.py. If None is returned, then there is no sales transaction 
+    that can and will be shown with module rich in code section "args.command == "sell":" in file super.py. 
+    '''
 
     '''
     starting point: in super.py with all arguments of subparser sell_product() at my disposal:
@@ -1121,8 +1077,9 @@ def sell_product_by_product_name(product_name, sell_price,  sell_date, path_to_c
     else: print error message('product descriptor not recognized (should be product name 'e.g.' apple, or product id 'e.g.' b_01)')
     '''
 
-    inventory_on_specified_date = calculate_inventory_on_day(sell_date, path_to_csv_sold_input_file, path_to_csv_bought_file)
-    # print(inventory_on_specified_date) #list with lists
+    inventory_on_specified_date = calculate_inventory(sell_date, path_to_csv_sold_input_file, path_to_csv_bought_file)
+    print('inventory_on_specified_date: ')
+    print(inventory_on_specified_date) #list with lists
     # ex: 
     '''
     inventory_on_specified_date = [
@@ -1134,30 +1091,91 @@ def sell_product_by_product_name(product_name, sell_price,  sell_date, path_to_c
     ['b_28', 'Tea bags', '0.79', '2024-02-22', '2024-03-08']
     ]   
     '''
+    products_inventory_on_specified_date = [] # prevent UnboundLocalError
+    # Create list with just the products: 
+    products_inventory_on_specified_date = [sublist[1] for sublist in inventory_on_specified_date]
+    products_inventory_on_specified_date = list(set(products_inventory_on_specified_date))
+
     # step: check if product (e.g. apple) is in inventory (on that specific sell_date!)
     def find_product(inventory, product_name):
-        for item in inventory:
-            if item[1] == product_name: # selecting the FIRST product (e.g. apple) in the list of 1 or more apples in inventory on that date.
+        print(inventory)
+        for buy_transaction_record in inventory:
+            print(buy_transaction_record)
+            print(buy_transaction_record[1])
+            print(type(buy_transaction_record[1]))
+            print(product_name)
+            print(type(product_name))
+            if buy_transaction_record[1] == product_name: # selecting the FIRST product (e.g. apple) in the list of 1 or more apples in inventory on that date.
+                print('I am here:')
+                print(buy_transaction_record)
                 '''
-                backlog idea: if 2 apples are available in inventory on that date, then select the apple with the earliest expiry_date.
+                Current implementation: if 2 apples are available in inventory on that date, then select the apple with the earliest expiry_date.
                 '''
-                return item
+                return buy_transaction_record
         return 'No such product in inventory on this date.'  # 2do: get out of fn here. 
 
 
-    product_in_inventory = find_product(inventory_on_specified_date, product_name)
+    buy_transaction_record_in_inventory = find_product(inventory_on_specified_date, product_name)
+    
 
-    if product_in_inventory == 'No such product in inventory on this date.':
-        print(f"Query result: This product << {product_name} >> is not "
-        f"in the inventory on date {sell_date}.")
-        return None # this aborts the sales transaction
-    else:
-        # ex of product_in_inventory: ['b_22', 'Tea bags', '4.99', '2024-02-11', '2024-02-26'] # always a list with 5 elements.
-        bought_product_id = product_in_inventory[0]
-        product_name_in_inventory = product_in_inventory[1]
-        buy_price = product_in_inventory[2]
-        buy_date = product_in_inventory[3]
-        expiry_date = product_in_inventory[4]
+
+    if buy_transaction_record_in_inventory == 'No such product in inventory on this date.':
+        # print("---------------------------------------------------------------------------------------------------")
+        print("                                                                                                   ")
+        print(f"Product << {product_name} >> is not in the inventory on date {sell_date}. \n"
+              f"Product(s) in inventory on {sell_date}: {products_inventory_on_specified_date}.")
+        print("                                                                                                   ")
+        '''
+        Now check if product is in the product range altogether: 
+        E.g. product foobar won't be in inventory on any date, but it is not in the product range of Superpy at all.
+        So it is nice to know as a Superpy user that there is no point in trying to sell foobar on any other date either.
+        '''
+        # creat list with all unique products in bought.csv: 
+        products_in_bought_csv = []
+        try: 
+            with open(path_to_csv_bought_file, 'r', newline='') as file: 
+                reader = csv.DictReader(file)
+                rows = list(reader)
+                for row in rows:
+                    products_in_bought_csv.append(row['product'])
+                file.seek(0)
+        except FileNotFoundError:
+            print(f"File '{path_to_csv_bought_file}' not found.")
+        except PermissionError:
+            print(f"You don't have permission to access '{path_to_csv_bought_file}'.")
+        except UnicodeDecodeError:
+            print(f"Invalid Unicode character found in '{path_to_csv_bought_file}'.")
+        except csv.Error as e:
+            print(f"Error while reading CSV file: {e}")
+        unique_products_in_bought_csv = list(set(products_in_bought_csv))
+        # print(f"Unique products in bought.csv: {products_in_bought_csv}")
+
+
+        if product_name in unique_products_in_bought_csv:
+            print(f"Product << {product_name} >> is in the Superpy product range, but not in the inventory on date {sell_date}. \n" 
+                f"To provide a quick alternative to the client, check if there is a similar product in the \n"
+                f" Superpy product range that could be available on a nearby date: \n"
+                f"{unique_products_in_bought_csv}.")
+            print("                                                                                                   ")
+            # print("---------------------------------------------------------------------------------------------------")
+
+        if product_name not in unique_products_in_bought_csv:
+            print(f"Product << {product_name} >> is not in the product range of Superpy at all. \n"
+                f"To provide a quick alternative to the client, check if there is a similar product in the \n"
+                f"Superpy product range that could be available on a nearby date: \n"
+                f"{unique_products_in_bought_csv}.")
+            print("                                                                                                   ")
+            # print("---------------------------------------------------------------------------------------------------")
+
+        return 'product_is_not_sold' # this aborts the sales transaction
+    
+    else: # product is in inventory on that date (happy flow for the customer)
+        # ex of buy_transaction_record_in_inventory: ['b_22', 'Tea bags', '4.99', '2024-02-11', '2024-02-26'] # always a list with 5 elements.
+        bought_product_id = buy_transaction_record_in_inventory[0]
+        product_name_in_inventory = buy_transaction_record_in_inventory[1]
+        buy_price = buy_transaction_record_in_inventory[2]
+        buy_date = buy_transaction_record_in_inventory[3]
+        expiry_date = buy_transaction_record_in_inventory[4]
 
         # step: sell the first apple in the list of 1 or more apples in inventory. Re-use last bit from fn sell_product_by_buy_id().
         # create sell transaction in sold.csv:
@@ -1219,8 +1237,6 @@ def set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt(buy_id: str, path_to_b
         # pitfall: at this point in the code you can fill out b_00 or b_0. It does not matter.
         Later, in fn create_buy_id_that_increments_highest_buy_id_in_boughtcsv(), b_00 will be converted to b_1.
         '''
-        
-
 
     try:
         with open(path_to_buy_id_file, 'w', newline='') as file:
@@ -1293,7 +1309,7 @@ def show_csv_file_in_console_with_module_rich(path_to_csv_file: str) -> None:
     console.print(table)
 
 
-def time_travel_system_date_with_nr_of_days(
+def time_travel(
         nr_of_days_to_travel: int, 
         path_to_input_file: str, 
         path_to_output_file: str
