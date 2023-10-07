@@ -238,7 +238,7 @@ Goal: create mock data for bought.csv and sold.csv
     - flags: -pr, -product_range
     - product_range == product_assortment == the amount of different products in Superpy.
     - minimum value: 1 (generates 8 transactions in bought.csv) 
-    - maximum value: 40 (generates 280 transactions in bought.csv)
+    - maximum value: 50 (generates 280 transactions in bought.csv)
     - ex1:
     ```
     py super.py create_mock_data -pr 3
@@ -450,8 +450,7 @@ quick links:
 -  [Table of contents](#table-of-contents)
 -  [Argparse commands and arguments](#argparse-commands-and-arguments)
 <br/><br/>
-Goal: reset system_date in system_date.txt (...\superpy\data_used_in_superpy\system_date.txt) to   
-    current date on the device Superpy is running on.
+Goal: reset SYSTEM_DATE to current date of hosting device.
 
 - ex1: 
 
@@ -459,8 +458,7 @@ Goal: reset system_date in system_date.txt (...\superpy\data_used_in_superpy\sys
     py super.py reset_system_date 
 ```
 
-- result: system_date.txt now contains current system_date from the  device Superpy is running on.
-
+- result: e.g. 2024-06-12 (from e.g. laptop on which superpy is running).
 
 <br /> 
 <br /> 
@@ -507,7 +505,7 @@ Preparation:  Check the producs and their buy_ids in the inventory: e.g.
 ```
 -   product: row with id b_128 in bought.csv is sold, price: &euro; 2.42, sell_date: system_date as default
 <br/>
-- arg1: positional argument product_name_or_buy_id: Ex of product name: apple, quinoa, bulgur, linseed, soft cheeese, etc. Ex of product buy_id: b_01, b_02 (...), b_103, etc.   
+- arg1: positional argument product_name_or_buy_id: E.g. of product name: apple, quinoa, bulgur, linseed, soft cheeese, etc. E.g. of product buy_id: b_01, b_02 (...), b_103, etc.   
 - arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35  
 - arg3: optional argument -sell_date, -s (ex: -sd 2023-09-15) with default value system_date 
 <br/>
@@ -1713,7 +1711,7 @@ quick links:
     - UPPER_BOUNDARY_NR_OF_WEEKS_TO_ADD_TO_CALCULATE --> see time_interval
 
 # LOCATION OF IMPORTANT DIRECTORIES AND FILES
-[goto Table of Contents at start of this markdown file: ](#LOCATION-OF-IMPORTANT-DIRECTORIES-AND-FILES)
+[Table of contents](#table-of-contents)
 <br/>
 
 - bought.csv      :  ...\superpy\date_used_in_superpy\bought.csv

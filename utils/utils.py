@@ -29,16 +29,16 @@ from typing import Callable
 # get_path_to_directory_of_file(directory_of_file):
 # get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_path):
 # get_system_date():
+# get_weekday_from_date():
 # is_product_buy_id():  
 # sell_product_by_buy_id():
 # sell_product_by_product_name():
 # set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt():
 # set_system_date_to():
-# show_csv_file_in_console_with_module_rich():
-# show_extra_system_information():
-# show_selected_buy_transactions_in_console_with_module_rich():
-# show_weekday_from_date():
-# time_travel():
+# show_csv_file():
+# show_superpy_system_info():
+# show_selected_buy_transactions():
+# travel_time():
 
 
 
@@ -48,7 +48,7 @@ def add_days_to_date(date_string: str, days_to_add: int) -> str:
     '''
     This is a helper fn used as fn-argument in following fns:
     - create_data_for_csv_files_bought_and_sold()
-    - time_travel()
+    - travel_time()
     
     '''
     return new_date.strftime('%Y-%m-%d')
@@ -836,6 +836,12 @@ def get_system_date(path_to_system_date: str) -> str:
     return system_date
 
 
+def get_weekday_from_date(date: str) -> str:
+    date_object = datetime.strptime(date, '%Y-%m-%d')
+    day_of_week = date_object.strftime('%A')
+    return day_of_week
+
+
 def increment_buy_id_counter_txt(path_to_id_with_highest_sequence_number: str) -> str:
     # new_buy_id_counter = ''
     try:
@@ -1262,7 +1268,15 @@ def set_system_date_to(system_date: str, path_to_system_date: str) -> str:
     return system_date
 
 
-def show_last_added_sales_transaction_in_console_with_module_rich(list: list) -> Table: # input is list with lists.
+def show_header(list: list):
+    console = Console()
+    table = Table(show_header=False)
+    for information in list:
+        table.add_row(str(information))
+    console.print(table)
+
+
+def show_last_added_sales_transaction(list: list) -> Table: # input is list with lists.
     rich_table = Table(show_header=True, header_style="bold magenta")
     rich_table.add_column('sell_id', style="dim", width=12)
     rich_table.add_column('buy_id', style="dim", width=12)
@@ -1275,7 +1289,7 @@ def show_last_added_sales_transaction_in_console_with_module_rich(list: list) ->
     return rich_table
 
 
-def show_csv_file_in_console_with_module_rich(path_to_csv_file: str) -> None:
+def show_csv_file(path_to_csv_file: str) -> None:
     console = Console()
     table = Table(show_header=True, header_style="bold magenta")
     try:
@@ -1297,19 +1311,29 @@ def show_csv_file_in_console_with_module_rich(path_to_csv_file: str) -> None:
     console.print(table)
 
 
-def show_extra_system_information(current_action_in_superpy, system_date, show_weekday_from_date):
+def show_superpy_logistic_info(description, list_of_lists: list):
+    console = Console()
+    table = Table(show_header=True, header_style="bold magenta")
+    table.add_column(description)
+    table.add_column("Value")
+    for list in list_of_lists:
+        table.add_row(str(list[0]), str(list[1])) # "unable to render int"
+    console.print(table)
+
+
+def show_superpy_system_info(current_action_in_superpy, system_date, get_weekday_from_date):
     console = Console() # no need to garbage collect after usage.
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("Description")
     table.add_column("Value")
-    table.add_row("Superpy SYSTEM_DATE", f"{system_date} ({show_weekday_from_date(system_date)})")
-    table.add_row("Host machine date", f"{datetime.now().date()} ({show_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")
+    table.add_row("Superpy SYSTEM_DATE", f"{system_date} ({get_weekday_from_date(system_date)})")
+    table.add_row("Host machine date", f"{datetime.now().date()} ({get_weekday_from_date(datetime.now().date().strftime('%Y-%m-%d'))})")
     table.add_row("Current action", current_action_in_superpy)
     table.add_row("Host machine", socket.gethostname())
     console.print(table)
 
 
-def show_selected_buy_transactions_in_console_with_module_rich(list: list) -> Table: # input is list with lists.
+def show_selected_buy_transactions(list: list) -> Table: # input is list with lists.
     rich_table = Table(show_header=True, header_style="bold magenta")
     rich_table.add_column('buy_id', style="dim", width=12)
     rich_table.add_column('product', style="dim", width=24)
@@ -1323,13 +1347,7 @@ def show_selected_buy_transactions_in_console_with_module_rich(list: list) -> Ta
     return rich_table
 
 
-def show_weekday_from_date(date: str) -> str:
-    date_object = datetime.strptime(date, '%Y-%m-%d')
-    day_of_week = date_object.strftime('%A')
-    return day_of_week
-
-
-def time_travel(
+def travel_time(
         nr_of_days_to_travel: int, 
         path_to_input_file: str, 
         path_to_output_file: str

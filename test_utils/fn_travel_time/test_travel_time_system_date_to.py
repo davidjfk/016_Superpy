@@ -1,9 +1,9 @@
 import filecmp, os, sys
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
-from utils.utils import get_path_to_directory_of_file, time_travel
+from utils.utils import get_path_to_directory_of_file, travel_time
 
-directory_of_testcase = "fn_time_travel" 
+directory_of_testcase = "fn_travel_time" 
 path_to_directory_of_testcase = get_path_to_directory_of_file(directory_of_testcase)
 
 # input test files:
@@ -24,18 +24,18 @@ path_to_file_with_expected_result_02 = os.path.join(path_to_directory_of_testcas
 path_to_file_with_expected_result_03 = os.path.join(path_to_directory_of_testcase, "expected_testresults", 'expected_result_test_03.txt') 
 
 
-def test_01_time_travel_to_the_future():
+def test_01_travel_time_to_the_future():
     filecmp.clear_cache()
-    time_travel(5, path_to_input_file_test_01, path_to_file_with_actual_result_test_01)
+    travel_time(5, path_to_input_file_test_01, path_to_file_with_actual_result_test_01)
     assert filecmp.cmp(path_to_file_with_actual_result_test_01, path_to_file_with_expected_result_01, shallow=False)
 
-def test_02_time_travel_to_the_future_actual_result_not_same_as_expected_result():
+def test_02_travel_time_to_the_future_actual_result_not_same_as_expected_result():
     filecmp.clear_cache()
-    time_travel(4, path_to_input_file_test_02, path_to_file_with_actual_result_test_02)
+    travel_time(4, path_to_input_file_test_02, path_to_file_with_actual_result_test_02)
     assert not filecmp.cmp(path_to_file_with_actual_result_test_02, path_to_file_with_expected_result_02, shallow=False)
 
 
-def test_03_time_travel_to_the_future_actual_result_not_same_as_expected_result():
+def test_03_travel_time_to_the_future_actual_result_not_same_as_expected_result():
     filecmp.clear_cache()
-    time_travel(7, path_to_input_file_test_03, path_to_file_with_actual_result_test_03)
+    travel_time(7, path_to_input_file_test_03, path_to_file_with_actual_result_test_03)
     assert filecmp.cmp(path_to_file_with_actual_result_test_03, path_to_file_with_expected_result_03, shallow=False)
