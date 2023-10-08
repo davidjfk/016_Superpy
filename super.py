@@ -196,15 +196,15 @@ def main():
         show_header(HEADER_2of2_SOLD_CSV)  
         show_csv_file(PATH_TO_FILE_SOLD_CSV)
     if args.command == "create_mock_data": 
-        system_date_year = int(args.lower_boundary_year_of_time_interval_in_which_to_create_random_testdata)
-        system_date_month = int(args.lower_boundary_month_of_time_interval_in_which_to_create_random_testdata)
-        system_date_day = int(args.lower_boundary_day_of_time_interval_in_which_to_create_random_testdata)
+        system_date_year = int(args.lower_boundary_year)
+        system_date_month = int(args.lower_boundary_month)
+        system_date_day = int(args.lower_boundary_day)
         SYSTEM_DATE = date(system_date_year, system_date_month, system_date_day).strftime("%Y-%m-%d")
         system_date_in_the_middle_of_time_interval = calculate_middle_of_time_interval(
             SYSTEM_DATE, 
-            args.upper_boundary_nr_of_months_to_add_to_calculate, 
-            args.upper_boundary_nr_of_weeks_to_add_to_calculate, 
-            args.upper_boundary_nr_of_days_to_add_to_calculate)
+            args.upper_boundary_month, 
+            args.upper_boundary_week, 
+            args.upper_boundary_day)
         path_to_file_system_datetxt = get_path_to_file('data_used_in_superpy', 'system_date.txt')
         set_system_date_to(system_date_in_the_middle_of_time_interval, path_to_file_system_datetxt)
         create_data_for_csv_files_bought_and_sold(
@@ -213,12 +213,12 @@ def main():
             args.shelf_life,
             args.turnover_time,
             args.markup,
-            args.lower_boundary_year_of_time_interval_in_which_to_create_random_testdata,
-            args.lower_boundary_month_of_time_interval_in_which_to_create_random_testdata,
-            args.lower_boundary_day_of_time_interval_in_which_to_create_random_testdata,
-            args.upper_boundary_nr_of_months_to_add_to_calculate,
-            args.upper_boundary_nr_of_weeks_to_add_to_calculate,
-            args.upper_boundary_nr_of_days_to_add_to_calculate,
+            args.lower_boundary_year,
+            args.lower_boundary_month,
+            args.lower_boundary_day,
+            args.upper_boundary_month,
+            args.upper_boundary_week,
+            args.upper_boundary_day,
             SUPERPY_PRODUCT_PRICES,
             PRODUCT_LIST_TO_CREATE_PRODUCT_RANGE,
             PATH_TO_FILE_BOUGHT_CSV,
@@ -266,17 +266,15 @@ def main():
         path_to_csv_bought_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'bought.csv')
         show_superpy_system_info(args.command, SYSTEM_DATE, get_weekday_from_date)  
         if is_product_bought_with_product_name(args.product_name_or_buy_id):
-            new_transaction_record = sell_product_by_product_name(args.product_name_or_buy_id, args.price, args.sell_date, calculate_inventory, path_to_csv_sold_input_file, path_to_csv_sold_output_file, path_to_csv_bought_input_file)
+            new_transaction_record = sell_product_by_product_name(args.product_name_or_buy_id, args.price, args.sell_date, calculate_inventory, calculate_expired_products, path_to_csv_sold_input_file, path_to_csv_sold_output_file, path_to_csv_bought_input_file)
         else:
             new_transaction_record = sell_product_by_buy_id(args.product_name_or_buy_id, args.price, args.sell_date, path_to_csv_sold_input_file, path_to_csv_sold_output_file, path_to_csv_bought_input_file)
         if new_transaction_record == 'product_is_not_sold':
-            show_header(["Status of SOLD.CSV: the following transaction has NOT been added to SOLD.CSV:"])
-            sell_abort_details = [["Product name", args.product_name_or_buy_id],["Price:  ", args.price],[ "Sell date", args.sell_date]]
+            sell_abort_details = [["Product name", args.product_name_or_buy_id],["Price:  ", args.price],[ "Attempted sell date", args.sell_date]]
             show_superpy_logistic_info('Aborted sales transaction:', sell_abort_details)   
         else:         
-            print(f" Status: the following transaction has been added to SOLD.CSV below:                              ")
-            show_last_added_sales_transaction([[new_transaction_record[0], new_transaction_record[1], str(round(args.price,2)), args.sell_date]])    
-            # left 2do: simplify nested list into list.
+            latest_sales_transaction_in_sold_csv_info = [["sell_id", new_transaction_record[0]],['buy_id', new_transaction_record[1]],[ 'sell_price €', str(round(args.price,2)),[ 'sell_date', args.sell_date]]]
+            show_superpy_logistic_info("Status: the following\ntransaction has been added\nto SOLD.CSV below: ", latest_sales_transaction_in_sold_csv_info) 
             show_header(HEADER_1OF2_SOLD_CSV)                   
             show_csv_file(PATH_TO_FILE_SOLD_CSV)
             show_header(HEADER_2of2_BOUGHT_CSV)                                                                                 

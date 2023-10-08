@@ -8,7 +8,8 @@ Please read this document in Open Preview: Ctrl+Shift+V, or Right-click
 - [Topic 1: Write data to csv in a testable manner](#topic-1-write-data-to-csv-in-a-testable-manner)
 - [Topic 2: Run pytest with control over cwd](#topic-2-run-pytest-with-control-over-cwd)
 - [Topic 3: Add path to directory 'superpy' to PYTHONPATH environment variable](#topic-3-add-path-to-directory-superpy-to-pythonpath-environment-variable)
-- [Topic 4: Connect bought.csv and sold.csv with primary and foreign keys](#topic-4-connect-boughtcsv-and-soldcsv-with-primary-and-foreign-keys)
+- [Topic 4: Create fn that also takes files as input and output and is testable in pytest](#topic-4-create-fn-that-also-takes-files-as-input-and-output-and-is-testable-in-pytest)
+- [Topic 5: Connect bought.csv and sold.csv with primary and foreign keys](#topic-5-connect-boughtcsv-and-soldcsv-with-primary-and-foreign-keys)
 
 # Intro
 [Table of contents](#table-of-contents)
@@ -166,12 +167,43 @@ from utils.utils import create_data_for_csv_files_bought_and_sold
 Alternative solution: copy-past the code from fn get_path_to_directory_of_file
 into the script. 
 
+
 <br/><br/>
 
-# Topic 4: Connect bought.csv and sold.csv with primary and foreign keys
+# Topic 4: Create fn that also takes files as input and output and is testable in pytest
 [Table of contents](#table-of-contents)
 
-* (only if previous 3 topics are not enough, then plz read this topic 4)
+* I was struggling to create fns in utils.py in such  way that they are testable and Superpy user can call them. 
+
+* solution: I described what both "use cases" of a fn require:
+
+
+| "Use cases" of a fn in utils.py |  | Input | Actual Output | Expected Output |
+|----------|-----------|-------|---------------|-----------------|
+| 1of2: Run pytest testcase ( pytest ) | | | | |
+| | | value | file | file |
+| | | file |  |  |
+| 2of2: As Superpy user call fn  (e.g. py super.py buy apple 1.11 ) | | |  file  | NA |
+| | | value | file  |
+
+- This helped me realize that to test 1 fn I need a folder with (up to) 3 "buckets" / subfolders: 
+  1. test_input
+  2. actual_testresults
+  3. expected_testresults
+* e.g. in test_utils (...\superpy\test_utils) directory 'fn_buy_product_testcases' and  its subfolders.
+
+
+- Also each fn  (e.g. buy_product) must have a fn-argument to target each of these "buckets", in order
+    to make the  fn testable in a pytest regression testset.
+
+- In addition to that, adding a filepath  (e.g. to bought.csv) as fn-argument, simplified the code. Before that I inserted a partial path,  
+    a directory name and file name into a fn and connected the pieces inside the fn. This both violated single responsibility principle and
+    as well as made the code more difficult to read.  
+
+<br/><br/>
+
+# Topic 5: Connect bought.csv and sold.csv with primary and foreign keys
+[Table of contents](#table-of-contents)
 
 - General problem: how to connect bought.csv and sold.csv, as if they are a relational database together?
 - Multiple subproblems need to be addressed:

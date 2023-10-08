@@ -910,7 +910,7 @@ def sell_product_by_buy_id(bought_product_id: str,
                 path_to_csv_bought_file: str
 ) -> str:
     '''
-    Convention: if product is not sold, then None must be returned. This also applies to sibling fn 
+    Convention: if product is not sold, then 'product_is_not_sold' must be returned. This also applies to sibling fn 
     sell_product_by_product_id() below in utils.py. If None is returned, then there is no sales transaction 
     that can and will be shown with module rich in code section "args.command == "sell":" in file super.py.
     '''
@@ -940,13 +940,11 @@ def sell_product_by_buy_id(bought_product_id: str,
     try: 
         with open(path_to_csv_bought_file, 'r', newline='') as file: 
             '''
-            Goal: check if product exists in bought.csv:
+            Goal: check if product exists in bought.csv with its unique required buy_id:
             Business rule: each product has a unique buy_id (e.g. b_01, b_02, ...).
-            Business rule: each product is sold by its buy_id.
-            So, if bought_product_id does not exist in bought.csv, then it cannot
-            be sold in sold.csv. 
+            Business rule: product can be sold by its name or buy_id.
+            So, if buy_id does not exist in bought.csv, then it cannot be sold. 
             '''
-            
             # option 1of2:
             is_bought_product_id_in_bought_csv = False
             reader = csv.DictReader(file)
@@ -955,8 +953,9 @@ def sell_product_by_buy_id(bought_product_id: str,
                 if row['buy_id'] == bought_product_id:
                     is_bought_product_id_in_bought_csv = True
             if not is_bought_product_id_in_bought_csv:
-                print(f"Warning: You are trying to sell a product with a buy_id << {bought_product_id} >> that " 
-                    f"does NOT exist in bought.csv. So this sales transaction is aborted!")
+                console = Console()
+                console.print(f"Warning: You are trying to sell a product with a buy_id << {bought_product_id} >> that " 
+                    f"does NOT exist in bought.csv. So this sales transaction is aborted.",style="bold red")
                 return 'product_is_not_sold' # this aborts the sales transaction
             
             # option 2of2:
@@ -968,7 +967,7 @@ def sell_product_by_buy_id(bought_product_id: str,
             # if not is_bought_product_id_in_bought_csv:
             #   print(f"Warning: You are trying to sell a product with a buy_id << {bought_product_id} >> that " 
             #       f"does NOT exist in bought.csv. So this sales transaction is aborted!")
-            #   return None # this aborts the sales transaction          
+            #   return 'product_is_not_sold' # this aborts the sales transaction          
             
     except FileNotFoundError:
         print(f"File '{path_to_csv_bought_file}' not found.")
@@ -993,10 +992,10 @@ def sell_product_by_buy_id(bought_product_id: str,
             for row in rows:
                 # print(row['buy_id'])
                 if row['buy_id'] == bought_product_id:
-                    print(f"Warning: You are trying to sell product with buy_id << {bought_product_id} >> that " 
-                        f"has already been sold. So this sales transaction is aborted!")
+                    console = Console()
+                    console.print(f"Warning: You are trying to sell product with buy_id << {bought_product_id} >> that " 
+                        f"has already been sold. So this sales transaction is aborted!",style="bold red")
                     return 'product_is_not_sold' # this aborts the sales transaction
-                    # raise ValueError(f"Product with buy_id '{bought_product_id}' has already been sold!!")
             file.seek(0)
             # sold_product_id is used in second try block below
             sold_product_id = bought_product_id.replace('b', 's')
@@ -1028,8 +1027,9 @@ def sell_product_by_buy_id(bought_product_id: str,
                             'does not expire' is default value for expiry_date when user does not set expiry_date as a flag when calling fn buy_product
                             '''
                             if expiry_date < sell_date:
-                                print(f"Warning: You have  just sold an expired product with buy_id << {bought_product_id} >>." 
-                                    f"Please check if this is what you want.")
+                                console = Console()
+                                console.print(f"Warning: You have  just sold an expired product with buy_id << {bought_product_id} >>." 
+                                    f" Please check if this is what you want.",style="bold yellow")
                                 # continue with selling this expired product. 
     except FileNotFoundError:
         print(f"File not found.")
@@ -1057,37 +1057,28 @@ def sell_product_by_buy_id(bought_product_id: str,
     return [sold_product_id, bought_product_id, sell_price, sell_date] # used to show data in console in table with module rich (see fn sell_product() in super.py)
 
 
-def sell_product_by_product_name(product_name, sell_price,  sell_date, calculate_inventory, path_to_csv_sold_input_file, path_to_csv_sold_output_file, path_to_csv_bought_file):
-
+def sell_product_by_product_name(product_name, sell_price,  sell_date, calculate_inventory, calculate_expired_products, path_to_csv_sold_input_file, path_to_csv_sold_output_file, path_to_csv_bought_file):
     '''
-    Convention: if product is not sold, then None must be returned. This also applies to sibling fn 
-    sell_product_by_product_name() above in utils.py. If None is returned, then there is no sales transaction 
-    that can and will be shown with module rich in code section "args.command == "sell":" in file super.py. 
+    Convention: if product is not sold, then 'product_is_not_sold' must be returned. This also applies to sibling fn 
+    sell_product_by_product_name() above in utils.py. 
     '''
-
-    '''
-    starting point: in super.py with all arguments of subparser sell_product() at my disposal:
+    def find_product(list_with_transactions, product_name):
+        # print(inventory)
+        for buy_transaction_record in list_with_transactions:
+            # print(buy_transaction_record)
+            # print(buy_transaction_record[1])
+            # print(type(buy_transaction_record[1]))
+            # print(product_name)
+            # print(type(product_name))
+            if buy_transaction_record[1] == product_name: 
+                # selecting the FIRST product (e.g. apple) in the list of 1 or more apples in list_with_transactions on that date.
+                # print(buy_transaction_record)
+                return buy_transaction_record
+        return 'product_not_found' 
     
-
-    parse product descriptor: can be product name of product id
-        def is_product_name_or_product_id(product_descriptor: str) -> str:
-
-    if buy_id, then excute fn sell_product_by_buy_id()
-
-    else if product name, then execute fn sell_product_by_product_name()
-        business logic:
-        1. calculate inventory on sell_date
-        2. check if product (e.g. apple) is in inventory (on that specific sell_date!)
-        3. if product is not in inventory, then print error message: 'product with exact name {product_name} not in inventory on sell date {sell_date}'
-        4. if product is in inventory, then sell the first apple in the list of 1 or more apples in inventory. Reuse last bit from
-            fn sell_product_by_buy_id().
-
-    else: print error message('product descriptor not recognized (should be product name 'e.g.' apple, or product id 'e.g.' b_01)')
-    '''
-
-    inventory_on_specified_date = calculate_inventory(sell_date, path_to_csv_sold_input_file, path_to_csv_bought_file)
-    print('inventory_on_specified_date: ')
-    print(inventory_on_specified_date) #list with lists
+    inventory = calculate_inventory(sell_date, path_to_csv_sold_input_file, path_to_csv_bought_file) #list with transactions as lists
+    # print('inventory_on_specified_date: ')
+    # print(inventory_on_specified_date) 
     # ex: 
     '''
     inventory_on_specified_date = [
@@ -1099,46 +1090,46 @@ def sell_product_by_product_name(product_name, sell_price,  sell_date, calculate
     ['b_28', 'Tea bags', '0.79', '2024-02-22', '2024-03-08']
     ]   
     '''
-    products_inventory_on_specified_date = [] # prevent UnboundLocalError
-    # Create list with just the products: 
-    products_inventory_on_specified_date = [sublist[1] for sublist in inventory_on_specified_date]
-    products_inventory_on_specified_date = list(set(products_inventory_on_specified_date))
+    buy_transaction_record_in_inventory = None
+    buy_transaction_record_in_inventory = find_product(inventory, product_name) # returns buy_transaction or 'product_not_found'
+    inventory_product_list = [] # prevent UnboundLocalError
+    inventory_product_list = [sublist[1] for sublist in inventory]
+    inventory_product_list = list(set(inventory_product_list))
 
-    # step: check if product (e.g. apple) is in inventory (on that specific sell_date!)
-    def find_product(inventory, product_name):
-        print(inventory)
-        for buy_transaction_record in inventory:
-            print(buy_transaction_record)
-            print(buy_transaction_record[1])
-            print(type(buy_transaction_record[1]))
-            print(product_name)
-            print(type(product_name))
-            if buy_transaction_record[1] == product_name: # selecting the FIRST product (e.g. apple) in the list of 1 or more apples in inventory on that date.
-                print('I am here:')
-                print(buy_transaction_record)
-                '''
-                Current implementation: if 2 apples are available in inventory on that date, then select the apple with the earliest expiry_date.
-                '''
-                return buy_transaction_record
-        return 'No such product in inventory on this date.'  # 2do: get out of fn here. 
+    expired_products = calculate_expired_products(sell_date, path_to_csv_sold_input_file, path_to_csv_bought_file) #list with transactions as lists
+    buy_transaction_record_in_expired_products = None
+    buy_transaction_record_in_expired_products = find_product(expired_products, product_name) # returns buy_transaction or 'product_not_found'
+    expired_products_list = [] # prevent UnboundLocalError
+    expired_products_list = [sublist[1] for sublist in expired_products]
+    expired_products_list = list(set(expired_products_list))
 
+    sold_product_id = '' # prevent UnboundLocalError
+    bought_product_id = '' # prevent UnboundLocalError
 
-    buy_transaction_record_in_inventory = find_product(inventory_on_specified_date, product_name)
-    
+    if buy_transaction_record_in_inventory == 'product_not_found':
+        console = Console()
+        console.print(f"Product < {product_name} > is not in the inventory on sell_date: {sell_date}.",style="bold red")
+        console.print(f"Inventory on {sell_date}: {inventory_product_list}.",style="bold green")
+        console.print() 
+    else:
+        console = Console()
+        console.print(f"Product < {product_name} > is in the inventory on sell_date: {sell_date}.",style="bold green")
+        console.print(f"Inventory on {sell_date}: {inventory_product_list}.",style="bold green")  
+        console.print()                                                                                 
 
+    if buy_transaction_record_in_expired_products == 'product_not_found':
+        console = Console()
+        console.print(f"Product < {product_name} > is not in the list with expired products on sell_date: {sell_date}.",style="bold red")
+        console.print(f"Expired products on {sell_date}: {expired_products_list}.",style="bold green")  
+        console.print() 
+    else:
+        console = Console()
+        console.print(f"Product < {product_name} > is in the list with expired products on sell_date: {sell_date}.",style="bold green")
+        console.print(f"Expired products on {sell_date}: {expired_products_list}.",style="bold green") 
+        console.print() 
 
-    if buy_transaction_record_in_inventory == 'No such product in inventory on this date.':
-        # print("---------------------------------------------------------------------------------------------------")
-        print("                                                                                                   ")
-        print(f"Product << {product_name} >> is not in the inventory on date {sell_date}. \n"
-              f"Product(s) in inventory on {sell_date}: {products_inventory_on_specified_date}.")
-        print("                                                                                                   ")
-        '''
-        Now check if product is in the product range altogether: 
-        E.g. product foobar won't be in inventory on any date, but it is not in the product range of Superpy at all.
-        So it is nice to know as a Superpy user that there is no point in trying to sell foobar on any other date either.
-        '''
-        # creat list with all unique products in bought.csv: 
+    if buy_transaction_record_in_inventory == 'product_not_found' and buy_transaction_record_in_expired_products == 'product_not_found':
+        # Now check if product is in the product range altogether, just to supply more info to the Superpy-user: 
         products_in_bought_csv = []
         try: 
             with open(path_to_csv_bought_file, 'r', newline='') as file: 
@@ -1156,43 +1147,58 @@ def sell_product_by_product_name(product_name, sell_price,  sell_date, calculate
         except csv.Error as e:
             print(f"Error while reading CSV file: {e}")
         unique_products_in_bought_csv = list(set(products_in_bought_csv))
-        # print(f"Unique products in bought.csv: {products_in_bought_csv}")
-
 
         if product_name in unique_products_in_bought_csv:
-            print(f"Product << {product_name} >> is in the Superpy product range, but not in the inventory on date {sell_date}. \n" 
-                f"To provide a quick alternative to the client, check if there is a similar product in the \n"
-                f" Superpy product range that could be available on a nearby date: \n"
-                f"{unique_products_in_bought_csv}.")
-            print("                                                                                                   ")
-            # print("---------------------------------------------------------------------------------------------------")
+            console = Console()
+            console.print()
+            console.print(f"* Product < {product_name} > is in the Superpy product range.",style="bold green") 
+            console.print(f"To provide a quick alternative to the client, check if there is a similar product in the\n"
+                f" Superpy product range:",style="bold green")
+            console.print(f"{unique_products_in_bought_csv}.", style="bold green")
 
         if product_name not in unique_products_in_bought_csv:
-            print(f"Product << {product_name} >> is not in the product range of Superpy at all. \n"
-                f"To provide a quick alternative to the client, check if there is a similar product in the \n"
-                f"Superpy product range that could be available on a nearby date: \n"
-                f"{unique_products_in_bought_csv}.")
-            print("                                                                                                   ")
-            # print("---------------------------------------------------------------------------------------------------")
+            console = Console()
+            console.print()
+            console.print(f"Product < {product_name} > is not in the product range of Superpy at all. ",style="bold red")
+            console.print(f"To provide a quick alternative to the client, check if there is a similar product in the \n"
+                f"Superpy product range: \n",style="bold green")
+            console.print(f"{unique_products_in_bought_csv}.", style="bold green")
 
-        return 'product_is_not_sold' # this aborts the sales transaction
-    
-    else: # product is in inventory on that date (happy flow for the customer)
-        # ex of buy_transaction_record_in_inventory: ['b_22', 'Tea bags', '4.99', '2024-02-11', '2024-02-26'] # always a list with 5 elements.
-        bought_product_id = buy_transaction_record_in_inventory[0]
-        product_name_in_inventory = buy_transaction_record_in_inventory[1]
-        buy_price = buy_transaction_record_in_inventory[2]
-        buy_date = buy_transaction_record_in_inventory[3]
-        expiry_date = buy_transaction_record_in_inventory[4]
+        if buy_transaction_record_in_inventory == 'product_not_found' and buy_transaction_record_in_expired_products == 'product_not_found':
+            console = Console()
+            console.print()
+            console.print("The following transaction has NOT been added to SOLD.CSV:", style="bold red")
 
-        # step: sell the first apple in the list of 1 or more apples in inventory. Re-use last bit from fn sell_product_by_buy_id().
+        if buy_transaction_record_in_inventory == 'product_not_found' or buy_transaction_record_in_expired_products == 'product_not_found':
+            return 'product_is_not_sold' # this aborts the sales transaction
+        
+    else: # product is in inventory or list with expired_products on that date (happy flow for Superpy-user and customer, because product can be sold)
+            # E.g. of buy_transaction_record in inventory or expired_products: ['b_22', 'Tea bags', '4.99', '2024-02-11', '2024-02-26'] # always a list with 5 elements.   
+        if buy_transaction_record_in_inventory != 'product_not_found':
+            bought_product_id = buy_transaction_record_in_inventory[0]
+            product_name_in_inventory = buy_transaction_record_in_inventory[1]
+            buy_price = buy_transaction_record_in_inventory[2]
+            buy_date = buy_transaction_record_in_inventory[3]
+            expiry_date = buy_transaction_record_in_inventory[4]
+            
+        elif buy_transaction_record_in_expired_products != 'product_not_found':
+            bought_product_id = buy_transaction_record_in_expired_products[0]
+            product_name_in_inventory = buy_transaction_record_in_expired_products[1]
+            buy_price = buy_transaction_record_in_expired_products[2]
+            buy_date = buy_transaction_record_in_expired_products[3]
+            expiry_date = buy_transaction_record_in_expired_products[4]
+        else :
+            console = Console()
+            console.print('Error: Cannot find transaction_record that can be sold inside fn sell_product_by_product_name() in utils.py.', style="bold red")
+        
+        sold_product_id = '' # prevent UnboundLocalError
+        
         # create sell transaction in sold.csv:
         try: 
             with open(path_to_csv_sold_input_file, 'r', newline='') as file: 
                 reader = csv.DictReader(file)
                 rows = list(reader)
-                file.seek(0)
-                # sold_product_id is used in second try block below
+                file.seek(0)           
                 sold_product_id = bought_product_id.replace('b', 's')
         except FileNotFoundError:
             print(f"File '{path_to_csv_sold_input_file}' not found.")
@@ -1219,13 +1225,17 @@ def sell_product_by_product_name(product_name, sell_price,  sell_date, calculate
         # step: check if product has expired:
         if expiry_date != 'does not expire': # 'does not expire' is default value for expiry_date when user does not set expiry_date as a flag when calling fn buy_product
             if datetime.strptime(sell_date, '%Y-%m-%d') > datetime.strptime(expiry_date, '%Y-%m-%d'):
-                print(f"Warning: you have just sold product << {product_name} >> with buy_date << {buy_date} >> greater than its expiry_date << {expiry_date} >>. " 
-                            f"Are  you sure about this?")
+                console = Console()
+                # console.print()
+                console.print(f"Warning: you have just sold product < {product_name} > with sell_date < {sell_date} > greater than\n its expiry_date < {expiry_date} >. " 
+                            f"Are  you sure about this?",style="bold yellow")
 
         # step: check if you are making a profit or a loss on the transaction:
-        if sell_price < float(buy_price):
-            print(f"Warning: you have just sold product << {product_name} >> with buy_date << {buy_date} >> at a loss of E << {round(float(buy_price) - sell_price,2)} >>."
-                        f"Are  you sure about this?")
+        if float(sell_price) < float(buy_price):
+            console = Console()
+            console.print()
+            console.print(f"Warning: you have just sold product < {product_name} > with sell_date < {sell_date} > and sell_id\n < {sold_product_id} > at a loss of € < {round(float(buy_price) - sell_price,2)} >. "
+                        f"Are  you sure about this?",style="bold yellow")
     return [sold_product_id, bought_product_id, sell_price, sell_date] # used to show data in console in table with module rich (see fn sell_product() in super.py)
 
 
@@ -1274,19 +1284,6 @@ def show_header(list: list):
     for information in list:
         table.add_row(str(information))
     console.print(table)
-
-
-def show_last_added_sales_transaction(list: list) -> Table: # input is list with lists.
-    rich_table = Table(show_header=True, header_style="bold magenta")
-    rich_table.add_column('sell_id', style="dim", width=12)
-    rich_table.add_column('buy_id', style="dim", width=12)
-    rich_table.add_column('sell_price €', style="dim", width=12)
-    rich_table.add_column('sell_date', style="dim", width=12)
-    for row in list:
-        rich_table.add_row(*row)
-    console = Console()
-    console.print(rich_table)
-    return rich_table
 
 
 def show_csv_file(path_to_csv_file: str) -> None:

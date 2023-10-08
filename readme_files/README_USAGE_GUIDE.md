@@ -30,6 +30,7 @@ Please read this document in Open Preview: Ctrl+Shift+V, or Right-click
   - [UC: change the management reports' data by travelling through time](#uc-change-the-management-reports-data-by-travelling-through-time)
   - [UC: show reports in custom time intervals](#uc-show-reports-in-custom-time-intervals)
   - [UC: create mock data and add individual buy and sell transaction](#uc-create-mock-data-and-add-individual-buy-and-sell-transaction)
+  - [UC: sell expired product](#uc-sell-expired-product)
   - [UC: sell product while violating business rules](#uc-sell-product-while-violating-business-rules)
   - [UC: suffer a loss](#uc-suffer-a-loss)
   - [UC: make profit](#uc-make-profit)
@@ -1388,6 +1389,26 @@ quick links:
     ```python
         py super.py show_sold_csv
     ```     
+## UC: sell expired product 
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Use cases](#use-cases)
+<br/><br/>
+- step 1: create mock data:
+```python
+    py superpy create_mock_data
+```
+- step 2: select expired product:
+```python
+    py superpy show_expired_products
+```
+- step 3: sell an expired product: (adapt arguments to generated mock data):
+```
+    py super.py sell onions 4.33 -s 2012-06-23
+```
+- The result in the console will look like this: 
+
+<img src="./images_in_readme_files/sell_expired_product.JPG" alt="Image Name" width="420" height="600">
 
 
 ## UC: sell product while violating business rules 
