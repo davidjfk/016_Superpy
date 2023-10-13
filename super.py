@@ -14,36 +14,39 @@ sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
 from utils.utils import * # import ALL functions from utils.py (all of them are used in super.py )
 SUPERPY_PRODUCT_PRICES = '' # prevent UnboundLocalError
 PRODUCT_LIST_TO_CREATE_PRODUCT_RANGE = '' # prevent UnboundLocalError
-from data_used_in_superpy.product_prices import superpy_product_prices as SUPERPY_PRODUCT_PRICES
+# from data_used_in_superpy.product_prices import superpy_product_prices as SUPERPY_PRODUCT_PRICES
 from data_used_in_superpy.product_list_to_create_product_range import product_list_to_create_product_range as PRODUCT_LIST_TO_CREATE_PRODUCT_RANGE
 from data_used_in_superpy import helptekst_subparsers 
 
 def main():
     # CONFIGURATION:
     '''
-    For definitions: see README_USAGE_GUIDE.md --> ch definitions.
-    For explanation of argparse commands and arguments --> see README_USAGE_GUIDE.md --> ch argparse commands and arguments.
-    For ucs with these commands and arguments --> see README_USAGE_GUIDE.md --> ch use cases (ucs)
+    For definitions: see README_USER_MANUAL.md --> ch definitions.
+    For explanation of argparse commands and arguments --> see README_USER_MANUAL.md --> ch argparse commands and arguments.
+    For ucs with these commands and arguments --> see README_USER_MANUAL.md --> ch use cases (ucs)
 
     Scope: only subparser create_mock_data uses the following configurable variables as default values for its optional arguments. 
     Change them at your liking.
     '''
-    PRODUCT_RANGE = 3 
-    DELETE_EVERY_NTH_ROW_IN_SOLDCSV = 2
+    
+    DELETE_EVERY_NTH_ROW_IN_SOLDCSV = 2    
+    HIGHEST_PRICE_IN_RANGE = 9.99 # euro
+    LOWEST_PRICE_IN_RANGE = 0.09 # euro
+    MARKUP = 3 # factor
+    NR_OF_PRODUCTS = 3 
+    NR_OF_PRICES = 20
     SHELF_LIFE = 10 # days
     TURNOVER_TIME = 3 # days
-    MARKUP = 3 # factor
     UPPER_BOUNDARY_NR_OF_MONTHS = 0
     UPPER_BOUNDARY_NR_OF_WEEKS = 4
     UPPER_BOUNDARY_NR_OF_DAYS = 0
     '''
-    SYSTEM_DATE sets / assigns the default values of following 3 variables in the argparse subparser 'create_mock_data':
-        lower_boundary_year_of_time_interval_in_which_to_create_random_testdata 
-        lower_boundary_month_of_time_interval_in_which_to_create_random_testdata 
-        lower_boundary_week_of_time_interval_in_which_to_create_random_testdata 
-
-        So update their default values by updating SYSTEM_DATE:
-        e.g.: py super.py set_system_date 2030-10-11  
+    The following 3 variables get their default value from SYSTEM_DATE:
+        lower_boundary_year 
+        lower_boundary_month 
+        lower_boundary_day 
+    So update their default values by updating SYSTEM_DATE:
+    e.g.: py super.py set_system_date 2030-10-11  
     '''
 
     # CONSTANTS: (do not change these)
@@ -112,7 +115,7 @@ def main():
                 f" e.g. 2024-06-28 instead of 24-06-28." \
                 f" Or use instead of YYYY-MM-DD, one of the following temporal deictics: today, tomorrow, " \
                 f" overmorrow, yesterday, next_monday (...) next_sunday. See help file or"
-                f" the README_USAGE_GUIDE.md.for more info.")
+                f" the README_USER_MANUAL.md.for more info.")
 
     parser = argparse.ArgumentParser(prog='super.py',description="Welcome to inventory management tool Superpy.", epilog="The line between disorder and order lies in logistics.", formatter_class=argparse.RawTextHelpFormatter)
     subparsers = parser.add_subparsers(dest="command", help='Commands: \n buy\n create_mock_data\n delete\n sell\n set_date\n show_bought_csv\n show_cost\n show_expired_products\n show_inventory\n show_profit\n show_revenue\n show_sales_volume\n show_sold_csv\n travel_time\n\n')
@@ -124,20 +127,23 @@ def main():
     subparser_buy_product.add_argument("-expiry_date", "-e", default="does not expire", type=str, action=ValidDate, help=helptekst_subparsers.valid_date_format) 
 
     subparser_create_mock_data = subparsers.add_parser("create_mock_data", help=helptekst_subparsers.create_mock_data, description= helptekst_subparsers.description_tekst_general)
-    subparser_create_mock_data.add_argument("-product_range", "-pr", default=PRODUCT_RANGE, type=int, help="Product_range == the amount of different products in Superpy: choose between 1 and 50. ") 
+    subparser_create_mock_data.add_argument("-nr_of_products", "-nopro", default=NR_OF_PRODUCTS, type=int, help="Nr of products == the amount of different products in Superpy. ") 
+    subparser_create_mock_data.add_argument("-nr_of_prices", "-nopri", default=NR_OF_PRICES, type=int, help="Nr of prices == the amount of different prices in Superpy. ") 
+    subparser_create_mock_data.add_argument("-lowest_price_in_interval", "-lp", default=LOWEST_PRICE_IN_RANGE, type=float, help="Lowest price in range to calculate mock data with, e.g. E 0.09. ") 
+    subparser_create_mock_data.add_argument("-highest_price_in_interval", "-hp", default=HIGHEST_PRICE_IN_RANGE, type=float, help="Highest price in range to calculate mock data with, e.g. E 9.99.") 
     subparser_create_mock_data.add_argument("-delete_every_nth_row", "-denr", default=DELETE_EVERY_NTH_ROW_IN_SOLDCSV, type=int, help="Delete every nth row in sold.csv, so there are less rows in sold.csv than in bought.csv, so bought products expire while time travelling. ") 
     subparser_create_mock_data.add_argument("-shelf_life", "-sl", default=SHELF_LIFE, type=int, help="Number of days between buying a product and its expiry_date. E.g. 10 means 10 days ") 
     subparser_create_mock_data.add_argument("-turnover_time", "-tt", default=TURNOVER_TIME, type=int, help="Number of days between buying and selling a product. E.g. 3 means 3 days ")
-    subparser_create_mock_data.add_argument("-markup", "-mu", default=MARKUP, type=float, help="factor between buy_price and sell_price. E.g. 3 means 3 times the buy_price. ")
+    subparser_create_mock_data.add_argument("-markup", "-mu", default=MARKUP, type=float, help="Factor between buy_price and sell_price. E.g. 3 means 3 times the buy_price. ")
     default_year = int(SYSTEM_DATE[:4])
     default_month = int(SYSTEM_DATE[5:7])
     default_day = int(SYSTEM_DATE[8:])
-    subparser_create_mock_data.add_argument("-lower_boundary_year","-lby", default=default_year, type=int, help="lower boundary year of time_interval in which to create mock data: e.g. 2023 is the year.")
-    subparser_create_mock_data.add_argument("-lower_boundary_month","-lbm", default=default_month, type=int, help="lower boundary_month of time interval in which to create mock data: e.g. 10 means October.")
-    subparser_create_mock_data.add_argument("-lower_boundary_day","-lbd", default=default_day, type=int, help="lower boundary day of time interval in which to create mock data: e.g. 11 means 11th of the month.")
-    subparser_create_mock_data.add_argument("-upper_boundary_month","-ubm", default=UPPER_BOUNDARY_NR_OF_MONTHS, type=int, help="upper_boundary_nr_of_months_to_add_to_calculate: e.g. 4 means 4 months.")
-    subparser_create_mock_data.add_argument("-upper_boundary_week","-ubw", default=UPPER_BOUNDARY_NR_OF_WEEKS, type=int, help="upper_boundary_nr_of_weeks_to_add_to_calculate: e.g. 2 means 2 weeks.")
-    subparser_create_mock_data.add_argument("-upper_boundary_day", "-ubd", default=UPPER_BOUNDARY_NR_OF_DAYS, type=int, help="upper_boundary_nr_of_days_to_add_to_calculate: e.g. 5 means 5 days.")
+    subparser_create_mock_data.add_argument("-lower_boundary_year","-lby", default=default_year, type=int, help="With e.g. -lby of 2024, lower boundary year of time interval is 2024.")
+    subparser_create_mock_data.add_argument("-lower_boundary_month","-lbm", default=default_month, type=int, help="With e.g. -lbm of 10, lower boundary month of time interval is October.")
+    subparser_create_mock_data.add_argument("-lower_boundary_day","-lbd", default=default_day, type=int, help="With e.g. -lbd of 15, lower boundary day of time interval is the 15th day of the month.")
+    subparser_create_mock_data.add_argument("-upper_boundary_month","-ubm", default=UPPER_BOUNDARY_NR_OF_MONTHS, type=int, help="With e.g. -ubm of 3, time interval is 3 months, i.e. lower boundary plus 3 months.")
+    subparser_create_mock_data.add_argument("-upper_boundary_week","-ubw", default=UPPER_BOUNDARY_NR_OF_WEEKS, type=int, help="With e.g. -ubw of 8, time interval is 8 weeks, i.e. lower boundary plus 8 weeks.")
+    subparser_create_mock_data.add_argument("-upper_boundary_day", "-ubd", default=UPPER_BOUNDARY_NR_OF_DAYS, type=int, help="With e.g. -ubd of 7, time interval is 7 days, i.e. lower boundary plus 7 days.")
 
     subparsers.add_parser("delete", help=helptekst_subparsers.delete, description=helptekst_subparsers.description_tekst_general )
 
@@ -199,16 +205,20 @@ def main():
         system_date_year = int(args.lower_boundary_year)
         system_date_month = int(args.lower_boundary_month)
         system_date_day = int(args.lower_boundary_day)
-        SYSTEM_DATE = date(system_date_year, system_date_month, system_date_day).strftime("%Y-%m-%d")
+        new_system_date = date(system_date_year, system_date_month, system_date_day).strftime("%Y-%m-%d")
+        set_system_date_to(new_system_date, PATH_TO_FILE_WITH_SYSTEM_DATE)
         system_date_in_the_middle_of_time_interval = calculate_middle_of_time_interval(
-            SYSTEM_DATE, 
+            new_system_date, # at this point SYSTEM_DATE has not yet been updated to new_system_date.
             args.upper_boundary_month, 
             args.upper_boundary_week, 
             args.upper_boundary_day)
         path_to_file_system_datetxt = get_path_to_file('data_used_in_superpy', 'system_date.txt')
         set_system_date_to(system_date_in_the_middle_of_time_interval, path_to_file_system_datetxt)
         create_data_for_csv_files_bought_and_sold(
-            args.product_range,
+            args.nr_of_products,
+            args.nr_of_prices,
+            args.lowest_price_in_interval,
+            args.highest_price_in_interval,
             args.delete_every_nth_row,
             args.shelf_life,
             args.turnover_time,
@@ -219,17 +229,17 @@ def main():
             args.upper_boundary_month,
             args.upper_boundary_week,
             args.upper_boundary_day,
-            SUPERPY_PRODUCT_PRICES,
             PRODUCT_LIST_TO_CREATE_PRODUCT_RANGE,
+            generate_random_prices,
             PATH_TO_FILE_BOUGHT_CSV,
             PATH_TO_FILE_SOLD_CSV,
             add_days_to_date,
             create_buy_id_for_each_row_in_mock_data,
-            generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
+            generate_random_buy_date
         )
         highest_buy_id_in_boughtcsv = get_highest_buy_id_from_boughtcsv(PATH_TO_FILE_BOUGHT_CSV)
         path_to_file_with_name_buy_id_counter = get_path_to_file("data_used_in_superpy", "buy_id_counter.txt")
-        buy_id = set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt(highest_buy_id_in_boughtcsv, path_to_file_with_name_buy_id_counter)
+        buy_id = set_buy_id_counter_txt(highest_buy_id_in_boughtcsv, path_to_file_with_name_buy_id_counter)
         system_date_of_superpy = get_system_date( PATH_TO_FILE_WITH_SYSTEM_DATE) 
         show_superpy_system_info(args.command, system_date_of_superpy, get_weekday_from_date)
         show_header(HEADER_1OF2_BOUGHT_CSV)
@@ -239,14 +249,14 @@ def main():
     if args.command == "delete":
         create_data_for_csv_files_bought_and_sold(
             0, # this value 0 deletes all records. Values for other parameters are not relevant for this goal.
-            2,9,3,3,2023,10,1,2,0,0,
-            SUPERPY_PRODUCT_PRICES,
+            3,1.11,1.52,2,9,3,3,2023,10,1,2,0,0,
             PRODUCT_LIST_TO_CREATE_PRODUCT_RANGE,
+            generate_random_prices,
             PATH_TO_FILE_BOUGHT_CSV,
             PATH_TO_FILE_SOLD_CSV,
             add_days_to_date,
             create_buy_id_for_each_row_in_mock_data,
-            generate_random_buy_date_for_buy_transaction_in_future_in_time_interval
+            generate_random_buy_date
         )
         show_superpy_system_info("Delete all transactions from bought.csv and sold.csv", SYSTEM_DATE, get_weekday_from_date) 
         show_header(HEADER_1OF2_BOUGHT_CSV)  
@@ -255,8 +265,7 @@ def main():
         show_csv_file(PATH_TO_FILE_SOLD_CSV)
         path_to_file_with_name_buy_id_counter = get_path_to_file("data_used_in_superpy", "buy_id_counter.txt")
         highest_buy_id_in_boughtcsv = "b_0" # pitfall: do not reset to b_01. This will be done at other point in the code.
-        buy_id = set_buy_id_in_file_id_to_use_in_fn_to_buy_product_txt(highest_buy_id_in_boughtcsv, path_to_file_with_name_buy_id_counter)
-        print(f"new_system_date: {buy_id}")
+        buy_id = set_buy_id_counter_txt(highest_buy_id_in_boughtcsv, path_to_file_with_name_buy_id_counter)
     if args.command == "reset_system_date":     
         system_date_on_device_outside_of_Superpy = set_system_date_to(datetime.today().strftime('%Y-%m-%d'), PATH_TO_FILE_WITH_SYSTEM_DATE)
         show_superpy_system_info("Reset_system_time of Superpy to system time of host machine", system_date_on_device_outside_of_Superpy, get_weekday_from_date)  
@@ -289,32 +298,32 @@ def main():
         show_header(HEADER_2of2_SOLD_CSV)  
         show_csv_file(PATH_TO_FILE_BOUGHT_CSV)
     if args.command == "show_cost":      
-        cost = calculate_amount_in_interval(args.start_date, args.end_date, 'buy_date', 'buy_price', PATH_TO_FILE_BOUGHT_CSV) 
+        cost = calculate_amount(args.start_date, args.end_date, 'buy_date', 'buy_price', PATH_TO_FILE_BOUGHT_CSV) 
         show_cost_info = [["Cost: €", cost],["Cost: start date:  ", args.start_date],[ "Cost: end date (inclusive):", args.end_date]]
         show_superpy_logistic_info('Cost calculation', show_cost_info)  
         show_superpy_system_info(args.command, SYSTEM_DATE, get_weekday_from_date)
     if args.command == "show_expired_products":
         expired_products = calculate_expired_products(args.date, PATH_TO_FILE_SOLD_CSV, PATH_TO_FILE_BOUGHT_CSV)
         if not expired_products == "date_entered_in_fn_in_wrong_format":
-            expired_products_info = [["Expired products on SYSTEM_DATE:", args.date]]
+            expired_products_info = [["Expired products on date:", args.date]]
             show_superpy_logistic_info('Expired products', expired_products_info) 
             show_selected_buy_transactions(expired_products)
             show_superpy_system_info(args.command, SYSTEM_DATE, get_weekday_from_date)
     if args.command == "show_inventory":
         inventory = calculate_inventory(args.date, PATH_TO_FILE_SOLD_CSV, PATH_TO_FILE_BOUGHT_CSV)
-        inventory_info = [["Inventory on SYSTEM_DATE:", args.date]]
+        inventory_info = [["Inventory on date:", args.date]]
         show_superpy_logistic_info('Inventory', inventory_info)
         show_selected_buy_transactions(inventory)
         show_superpy_system_info(args.command, SYSTEM_DATE, get_weekday_from_date) 
     if args.command == "show_profit":
         path_to_csv_sold_file = get_path_to_file('data_used_in_superpy', "sold.csv")
         path_to_csv_bought_file = get_path_to_file('data_used_in_superpy', "bought.csv")
-        profit = calculate_profit(args.start_date, args.end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_amount_in_interval, calculate_amount_in_interval)
+        profit = calculate_profit(args.start_date, args.end_date, path_to_csv_sold_file, path_to_csv_bought_file, calculate_amount, calculate_amount)
         profit_info = [["Profit: €", profit],["Profit: start date:  ", args.start_date],[ "Profit: end date (inclusive):", args.end_date]]
         show_superpy_logistic_info('Profit calculation', profit_info)         
         show_superpy_system_info(args.command, SYSTEM_DATE, get_weekday_from_date) 
     if args.command == "show_revenue":
-        revenue = calculate_amount_in_interval(args.start_date, args.end_date, "sell_date", "sell_price", PATH_TO_FILE_SOLD_CSV)     
+        revenue = calculate_amount(args.start_date, args.end_date, "sell_date", "sell_price", PATH_TO_FILE_SOLD_CSV)     
         revenue_info = [["Revenue: €", revenue],["Revenue: start date:  ", args.start_date],[ "Revenue: end date (inclusive):", args.end_date]]
         show_superpy_logistic_info('Revenue calculation', revenue_info)   
         show_superpy_system_info(args.command, SYSTEM_DATE, get_weekday_from_date)

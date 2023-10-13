@@ -2,7 +2,7 @@ import filecmp, os, sys
 sys.path.append('c:\\dev\\pytWinc\\superpy')
 sys.path.append('c:\\dev\\pytWinc\\superpy\\utils_superpy')
 from utils.utils import calculate_profit
-from utils.utils import calculate_amount_in_interval
+from utils.utils import calculate_amount
 # from utils.utils import calculate_cost_in_time_range_between_start_date_and_end_date_inclusive
 from utils.utils import get_path_to_directory_of_file
 
@@ -27,8 +27,8 @@ def test_01_calculate_profit_happy_flow():
         end_date, 
         path_to_input_file_revenue_test_01,
         path_to_input_file_cost_test_01,
-        calculate_amount_in_interval,
-        calculate_amount_in_interval
+        calculate_amount,
+        calculate_amount
         )
     assert actual_result == expected_test_result
 
@@ -43,8 +43,8 @@ def test_02_calculate_profit_happy_flow():
         end_date, 
         path_to_input_file_revenue_test_02,
         path_to_input_file_cost_test_02,
-        calculate_amount_in_interval,
-        calculate_amount_in_interval
+        calculate_amount,
+        calculate_amount
         )
     assert actual_result == expected_test_result
 
