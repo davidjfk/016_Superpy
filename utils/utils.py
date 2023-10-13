@@ -746,27 +746,19 @@ def sell_product_by_product_name(product_name, sell_price,  sell_date, calculate
     expired_products_list = list(set(expired_products_list))
     sold_product_id = '' 
     bought_product_id = '' 
+
     if buy_transaction_record_in_inventory == 'product_not_found':
         console = Console()
         console.print(f"Product < {product_name} > is not in the inventory on sell_date: {sell_date}.",style="bold red")
         console.print(f"Inventory on {sell_date}: {inventory_product_list}.",style="bold green")
         console.print() 
-    else:
-        console = Console()
-        console.print(f"Product < {product_name} > is in the inventory on sell_date: {sell_date}.",style="bold green")
-        console.print(f"Inventory on {sell_date}: {inventory_product_list}.",style="bold green")  
-        console.print()                                                                                 
 
-    if buy_transaction_record_in_expired_products == 'product_not_found':
+    if buy_transaction_record_in_inventory == 'product_not_found' and buy_transaction_record_in_expired_products == 'product_not_found':
         console = Console()
         console.print(f"Product < {product_name} > is not in the list with expired products on sell_date: {sell_date}.",style="bold red")
         console.print(f"Expired products on {sell_date}: {expired_products_list}.",style="bold green")  
         console.print() 
-    else:
-        console = Console()
-        console.print(f"Product < {product_name} > is in the list with expired products on sell_date: {sell_date}.",style="bold green")
-        console.print(f"Expired products on {sell_date}: {expired_products_list}.",style="bold green") 
-        console.print() 
+
     if buy_transaction_record_in_inventory == 'product_not_found' and buy_transaction_record_in_expired_products == 'product_not_found':
         products_in_bought_csv = []
         try: # check if product is in the product range altogether: 
@@ -806,16 +798,28 @@ def sell_product_by_product_name(product_name, sell_price,  sell_date, calculate
 
         if buy_transaction_record_in_inventory == 'product_not_found' or buy_transaction_record_in_expired_products == 'product_not_found':
             return 'product_is_not_sold' 
-        
-    else: # product is in inventory or list with expired_products on that date (happy flow for Superpy-user and customer, because product can be sold) 
+
+    if not buy_transaction_record_in_inventory == 'product_not_found' or not buy_transaction_record_in_expired_products == 'product_not_found':   
+        # happy flow for customer: product is in inventory or list with expired_products on that date, so it can be sold.    
         if buy_transaction_record_in_inventory != 'product_not_found':
             bought_product_id = buy_transaction_record_in_inventory[0]
             buy_price = buy_transaction_record_in_inventory[2]
-            expiry_date = buy_transaction_record_in_inventory[4]     
-        elif buy_transaction_record_in_expired_products != 'product_not_found':
+            expiry_date = buy_transaction_record_in_inventory[4]  
+
+            console = Console()
+            console.print(f"Product < {product_name} > is in the inventory on sell_date: {sell_date}.",style="bold green")
+            console.print(f"Inventory on {sell_date}: {inventory_product_list}.",style="bold green")  
+            console.print() 
+
+        elif buy_transaction_record_in_inventory == 'product_not_found' and buy_transaction_record_in_expired_products != 'product_not_found':
             bought_product_id = buy_transaction_record_in_expired_products[0]
             buy_price = buy_transaction_record_in_expired_products[2]
             expiry_date = buy_transaction_record_in_expired_products[4]
+
+            console = Console()
+            console.print(f"Product < {product_name} > is in the list with expired products on sell_date: {sell_date}.",style="bold green")
+            console.print(f"Expired products on {sell_date}: {expired_products_list}.",style="bold green")  
+            console.print() 
         else:
             console = Console()
             console.print('Error: Cannot find transaction_record that can be sold inside fn sell_product_by_product_name() in utils.py.', style="bold red")
@@ -894,7 +898,11 @@ def show_csv_file(path_to_csv_file: str) -> None:
             csv_reader = csv.reader(file)
             header = next(csv_reader)  
             for column in header:
-                table.add_column(column)
+                
+                if column == 'product':
+                    table.add_column(column, style="dim", width=50)
+                else: 
+                    table.add_column(column)
             for row in reversed(list(csv_reader)):
                 table.add_row(*row)
     except FileNotFoundError:
@@ -930,7 +938,7 @@ def show_superpy_system_info(current_action_in_superpy, system_date, get_weekday
 def show_selected_buy_transactions(list: list) -> Table: # input is list with lists.
     rich_table = Table(show_header=True, header_style="bold magenta")
     rich_table.add_column('buy_id', style="dim", width=12)
-    rich_table.add_column('product', style="dim", width=24)
+    rich_table.add_column('product', style="dim", width=50)
     rich_table.add_column('buy_price €', style="dim", width=12)
     rich_table.add_column('buy_date', style="dim", width=12)
     rich_table.add_column('expiry_date', style="dim", width=12)

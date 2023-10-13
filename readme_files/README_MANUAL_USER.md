@@ -6,13 +6,24 @@ in the vsCode Explorer and then select the first option 'Open Preview'.
 - [Intro](#intro)
 - [Argparse commands and arguments](#argparse-commands-and-arguments)
   - [Buy Product](#buy-product)
+    - [uc 1: buy date and expiry date in format YYYY-MM-DD](#uc-1-buy-date-and-expiry-date-in-format-yyyy-mm-dd)
+    - [uc 2: buy a multi-word product (e.g. full fat milk)](#uc-2-buy-a-multi-word-product-eg-full-fat-milk)
+    - [uc 3: buy product using words (e.g. tomorrow, next\_wednesday) as start and end date](#uc-3-buy-product-using-words-eg-tomorrow-next_wednesday-as-start-and-end-date)
+    - [uc 4: buy product that does not expire](#uc-4-buy-product-that-does-not-expire)
   - [Create mock data](#create-mock-data)
     - [practical](#practical)
     - [theory](#theory)
     - [setting the arguments](#setting-the-arguments)
   - [Delete](#delete)
   - [Reset system date](#reset-system-date)
-  - [Sell product](#sell-product)
+  - [Sell Product](#sell-product)
+    - [uc 1: sell a product by its name.](#uc-1-sell-a-product-by-its-name)
+    - [uc 2: sell a product with a long name with its buy id.](#uc-2-sell-a-product-with-a-long-name-with-its-buy-id)
+    - [uc 3: sell an expired product by its product name.](#uc-3-sell-an-expired-product-by-its-product-name)
+    - [uc 4: sell a product at a loss (by its product name)](#uc-4-sell-a-product-at-a-loss-by-its-product-name)
+    - [uc 5: sell a product that is not in Superpy product range altogether](#uc-5-sell-a-product-that-is-not-in-superpy-product-range-altogether)
+    - [uc 6: sell a product that is not in inventory nor list with expired products, but does exist in product range](#uc-6-sell-a-product-that-is-not-in-inventory-nor-list-with-expired-products-but-does-exist-in-product-range)
+    - [uc 7: sell a product that has already been sold](#uc-7-sell-a-product-that-has-already-been-sold)
   - [Set system date](#set-system-date)
   - [Show bought.csv](#show-boughtcsv)
   - [Show cost](#show-cost)
@@ -25,19 +36,10 @@ in the vsCode Explorer and then select the first option 'Open Preview'.
   - [Time travel](#time-travel)
 - [ADDITIONAL USE CASES](#additional-use-cases)
   - [intro](#intro-1)
-  - [UC: get familiar with the data](#uc-get-familiar-with-the-data)
-  - [UC: buy and sell a few products](#uc-buy-and-sell-a-few-products)
-  - [UC: enter system date (e.g. 2031-04-21, tomorrow, etc.)](#uc-enter-system-date-eg-2031-04-21-tomorrow-etc)
-  - [UC: calculate cost, revenue and profit + time travel](#uc-calculate-cost-revenue-and-profit--time-travel)
-  - [UC: show all management reports](#uc-show-all-management-reports)
+  - [UC: show\_system\_date](#uc-show_system_date)
   - [UC: change the management reports' data by travelling through time](#uc-change-the-management-reports-data-by-travelling-through-time)
-  - [UC: show reports in custom time intervals](#uc-show-reports-in-custom-time-intervals)
-  - [UC: create mock data and add individual buy and sell transaction](#uc-create-mock-data-and-add-individual-buy-and-sell-transaction)
-  - [UC: sell expired product](#uc-sell-expired-product)
-  - [UC: sell product while violating business rules](#uc-sell-product-while-violating-business-rules)
   - [UC: suffer a considerable loss](#uc-suffer-a-considerable-loss)
   - [UC: make huge profit](#uc-make-huge-profit)
-  - [UC: Change default values of argparse command 'create\_mock\_data'](#uc-change-default-values-of-argparse-command-create_mock_data)
 - [DEFINITIONS](#definitions)
   - [argument in argparse](#argument-in-argparse)
   - [command in argparse](#command-in-argparse)
@@ -179,56 +181,134 @@ quick links:
 <br/><br/>
 
 Goal: buy product and add to file bought.csv 
-1. e.g.: buy and expiry date in numbers:
+
+
+### uc 1: buy date and expiry date in format YYYY-MM-DD
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Argparse commands and arguments](#argparse-commands-and-arguments)
+<br/><br/>
+   
+   - step 1: create mock data: 
 
     ```py
-        py super.py buy apple 1.75 -b 2023-09-15 -e 2023-09-27 
+        py super.py create_mock_data -lby 2028 -lbm 2 -lbd 1 -lp 5.23 -hp 18.30  -nopro 3 -nopri 3 -ubd 0 -ubm 3 -ubw 0
     ```
--   product: apple  
--   buy price: &euro; 1.75
--   buy_date: 2023-09-15 
--   expiry_date: 2023-09-27   
+    - SYSTEM_DATE becomes '2028-03-17' (on a Friday), because it is automatically set to the middle of this interval.  
+    <br/>
+    <br/>
+
+   - step 2: buy tacos:
+    ```py
+        py super.py buy tacos 2.22 -b 2028-02-22 -e 2028-03-23 
+    ```
+- legenda: 
+    - product: tacos  
+    - buy price: &euro; 2.22
+    - buy_date: 2028-02-22
+    - expiry_date: 2028-03-23  
 
 - console output e.g.:
 - <img src="./images_in_readme_files/buy_example_01.JPG" alt="Image Name" width="400" height="400">
 
 <br/>
-
-2. e.g.: multi-word product:
-    ```py
-        py super.py buy full_fat_milk 1.25 -e 2023-09-28 
-    ``` 
--   product: bottled_water --> if 2 or more words, then underscore between the words is mandatory.  
--   buy price: &euro; 1.25
--   buy_date: system_date as default
--   expiry_date: 2023-10-28  
 <br/>
 
-3. e.g.: use words as buy and expiry date.
-    ```py
-        py super.py buy bulgur 2.25 -b yesterday -e next_tuesday
-    ``` 
--   product: apple  
--   buy price: &euro; 1.25
--   buy_date: yesterday == system_date minus 1 day -->if system_date is e.g. Thursday January 18, 2024,  
-    then yesterday has date January 17, 2024   
--   expiry_date: next tuesday -->if system_date is e.g. Thursday January 18, 2024,  
-    then next  tuesday has date January 18, 2024   
+### uc 2: buy a multi-word product (e.g. full fat milk)
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Argparse commands and arguments](#argparse-commands-and-arguments)
+<br/><br/>
 
-<br/>
+   - step 1: create mock data: 
 
-4. e.g.: buying on system date and product does not expire.
     ```py
-        py super.py buy laundry_detergent 3.73 
+        py super.py create_mock_data -lby 2028 -lbm 2 -lbd 1 -lp 1.23 -hp 8.30  -nopro 3 -nopri 3 -ubd 0 -ubm 3 -ubw 0
     ```
--   product: cabbage, price: &euro; 3.73, buy_date: system_date as default, expiry_date:   
+    - SYSTEM_DATE becomes '2028-03-17' (on a Friday), because it is automatically set to the middle of this interval.  
+    <br/>
+    <br/>
 
--   product: laundry_detergent --> if 2 or more words, then underscore between the words is mandatory.  
--   buy price: &euro; 3.73 
--   buy_date: system_date as default
--   expiry_date: 'does not expire' as default
+   - step 2: buy full fat milk:
+    ```py
+        py super.py buy full_fat_milk 1.25 -e 2028-04-02 
+    ```
+- legenda: 
+    - product: full_fat_milk (with underscores)  
+    - buy price: &euro; 1.25
+    - buy_date: 2028-03-17, because default is SYSTEM_DATE
+    - expiry_date: 2028-04-02  
+
+- console output e.g.:
+- <img src="./images_in_readme_files/buy_example_02.JPG" alt="Image Name" width="430" height="600">
+
+<br/>
+<br/>
+
+### uc 3: buy product using words (e.g. tomorrow, next_wednesday) as start and end date
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Argparse commands and arguments](#argparse-commands-and-arguments)
+<br/><br/>
+  
+   - step 1: preparation: 
+
+    ```py
+        py super.py delete
+        py super.py set_system_date 2028-03-17
+    ```
+- console output e.g.:
+- <img src="./images_in_readme_files/buy_example_03a.JPG" alt="Image Name" width="400" height="400">
+- <img src="./images_in_readme_files/buy_example_03b.JPG" alt="Image Name" width="320" height="160">
+    <br/>
+    <br/>
+
+   - step 2: buy bulgur:
+    ```py
+        py super.py buy bulgur 2.29 -b yesterday -e next_tuesday 
+    ```
+- legenda:
+    - product: bulgur  
+    - buy price: &euro; 2.29
+    - buy_date: 2028-03-16 equals 'SYSTEM_DATE minus 1 day' 
+    - expiry_date: 2028-03-24 equals 'SYSTEM_DATE plus 4 days'   
+
+- console output e.g.:
+- <img src="./images_in_readme_files/buy_example_03c.JPG" alt="Image Name" width="400" height="400">
+
+<br/>
+<br/>
 
 
+### uc 4: buy product that does not expire
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Argparse commands and arguments](#argparse-commands-and-arguments)
+<br/><br/>
+   
+   - step 1: create mock data: 
+
+    ```py
+        py super.py create_mock_data -lby 2028 -lbm 2 -lbd 1 -lp 1.23 -hp 8.30  -nopro 3 -nopri 3 -ubd 0 -ubm 3 -ubw 0
+    ```
+    - SYSTEM_DATE becomes '2028-03-17' (on a Friday), because it is automatically set to the middle of this interval.  
+    <br/>
+    <br/>
+
+   - step 2: buy tacos:
+    ```py
+        py super.py buy laundry_detergent 7.77
+    ```
+- legenda: 
+    - product: full_fat_milk --> if 2 or more words, then underscore between the words is mandatory.  
+    - buy price: &euro; 7.77
+    - buy_date: 2028-03-17, because default is SYSTEM_DATE
+    - expiry_date: 'does not expire' as default
+
+- console output e.g.:
+- <img src="./images_in_readme_files/buy_example_04.JPG" alt="Image Name" width="400" height="600">
+
+<br/>
 <br/>
 
 - summary:
@@ -597,63 +677,335 @@ Goal: reset SYSTEM_DATE to current date of hosting device.
     py super.py reset_system_date 
 ```
 
-
 - console output e.g.:
 - <img src="./images_in_readme_files/reset_system_date_example_01.JPG" alt="Image Name" width="600" height="200"> 
 <br /> 
 <br /> 
 
-## Sell product
+
+## Sell Product
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Argparse commands and arguments](#argparse-commands-and-arguments)
 <br/><br/>
 
-Goal: sell product and add to file sold.csv 
-Preparation:  Check the producs and their buy_ids in the inventory: e.g. 
 
-```python
-'py super.py show_inventory -d 2024-03-15' 
-```
-
-- ex1: 
-
-```
-    py super.py sell fig 3.75 -s 2023-11-15
-    py super.py sell b_492 3.75 -s 2023-11-15 
-```
-
--   product 'fig' with buy_id b_492 in bought.csv is sold, price: &euro; 3.75, sell_date: 2023-11-15  
-
-    Remark: quicker to sell with product name.
-
-- ex2: 
-```
-    py super.py sell Cold_Pressed_Extra_Virgin_Olive_Oil_with_Lemon_and_Garlic 5.15
-    py super.py sell b_16 5.15
-```
--   product Cold_Pressed_Extra_Virgin_Olive_Oil_with_Lemon_and_Garlic with buy_id b_15 in bought.csv is sold,  
-     price: &euro; 5.15, sell_date: system_date as default.  
-
-     Remark: quicker to sell with buy_id
-
-- ex3: 
-```
-    py super.py Non_GMO_Gluten_Free_Dairy_Free_Organic_Protein_Powder 2.42 
-    py super.py b_128 2.42 
-```
--   product: row with id b_128 in bought.csv is sold, price: &euro; 2.42, sell_date: system_date as default
-<br/>
-- arg1: positional argument product_name_or_buy_id: E.g. of product name: apple, quinoa, bulgur, linseed, soft cheeese, etc. E.g. of product buy_id: b_01, b_02 (...), b_103, etc.   
-- arg2: positional argument price, in euros: e.g. 1.24, 0.3, 0.35  
-- arg3: optional argument -sell_date, -s (ex: -sd 2023-09-15) with default value system_date 
-<br/>
-- arg with date value can be entered in format YYYY-MM-DD: e.g. 2029-02-03 , or as a word (exhaustive list):  
+- summary:
+  - arg1: positional argument product: e.g. apple, potato, full_fat_milk
+  - arg2: positional argument price, in &euro;: e.g. 1.24, 0.3, 0.35   
+  - arg3: optional argument -buy_date, -b,  with default value system_date 
+  - arg4: optional argument -expiry_date, -e, with default value 'does not expire' 
+<br/><br/>
+- Date values must be entered in format YYYY-MM-DD as either:
+  1. e.g. 2029-02-03, 2026-11-22, etc,  
+   or:
+  2.  as a word (exhaustive list):  
     today, tomorrow, overmorrow, yesterday, next_monday (...) next_sunday.
 <br /> 
 <br /> 
+
+
+### uc 1: sell a product by its name. 
+
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Argparse commands and arguments](#argparse-commands-and-arguments)
+<br/><br/>
+   
+   - step 1: create mock data: 
+
+    ```py
+        py super.py create_mock_data -denr 2 -lby 2028 -lbm 1 -lbd 1 -lp 0.49 -hp 3.29  -nopro 6 -nopri 3 -sl 30 -ubd 0 -ubw 4
+    ```
+    - SYSTEM_DATE becomes '2028-01-15' (on a Saturday), because it is automatically set to the middle of this interval.  
+    <br/>
+    <br/>
+    - step 2: check the inventory:
+    ```py
+        py super.py show_inventory -d 2028-01-30
+    ```
+
+   - console output e.g.:
+   - <img src="./images_in_readme_files/sell_example_01a.JPG" alt="Image Name" width="450" height="500">
+
+   - step 3: sell a product from the inventory (products different each time you run the code)
+    ```py
+        py super.py sell quinoa 2.21 -d 2028-01-30
+    ```
+- legenda: 
+    - product: quinoa  
+    - sell price: &euro; 2.21
+    - sell_date: 2028-01-30
+
+- console output e.g.:
+- <img src="./images_in_readme_files/sell_example_01b.JPG" alt="Image Name" width="600" height="600">
+
+- <img src="./images_in_readme_files/sell_example_01c.JPG" alt="Image Name" width="500" height="400">
+
+<br/>
+<br/>
+
+
+### uc 2: sell a product with a long name with its buy id. 
+
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Argparse commands and arguments](#argparse-commands-and-arguments)
+<br/><br/>
+   - reason: typing product names such as Cold_Pressed_Extra_Virgin_Olive_Oil_with_Lemon_and_Garlic or  
+        Non_GMO_Gluten_Free_Dairy_Free_Organic_Protein_Powder can be time-consuming.  
+        If product name is very long, then sell this product with its buy id (e.g. b_08)
+   - step 1: create mock data: 
+
+    ```py
+        py super.py create_mock_data -denr 2 -lby 2028 -lbm 1 -lbd 1 -lp 0.49 -hp 3.29  -nopro 6 -nopri 3 -sl 30 -ubd 0 -ubw 4
+    ```
+    - SYSTEM_DATE becomes '2028-01-15' (on a Saturday), because it is automatically set to the middle of this interval.  
+    <br/>
+    <br/>
+    - step 2: check the inventory:
+    ```py
+        py super.py show_inventory -d 2028-01-30
+    ```
+
+   - console output e.g.:
+   - <img src="./images_in_readme_files/sell_example_02a.JPG" alt="Image Name" width="450" height="500">
+
+   - step 3: sell a product from the inventory (products different each time you run the code)
+    ```py
+        py super.py sell b_14 3.45 -d 2028-01-23
+    ```
+- legenda: 
+    - product: cold-brewed_unsweetened_nitro_coffee  
+    - sell price: &euro; 3.45
+    - sell_date: 2028-01-23
+
+- console output e.g.:
+- <img src="./images_in_readme_files/sell_example_02b.JPG" alt="Image Name" width="600" height="600">
+
+- <img src="./images_in_readme_files/sell_example_02c.JPG" alt="Image Name" width="500" height="400">
+
+<br/>
+<br/>
+
+
+### uc 3: sell an expired product by its product name. 
+
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Argparse commands and arguments](#argparse-commands-and-arguments)
+<br/><br/>
+   - reason: typing product names such as Cold_Pressed_Extra_Virgin_Olive_Oil_with_Lemon_and_Garlic or  
+        Non_GMO_Gluten_Free_Dairy_Free_Organic_Protein_Powder can be time-consuming.  
+        If product name is very long, then sell this product with its buy id (e.g. b_08)
+   - step 1: create mock data: 
+
+    ```py
+        py super.py create_mock_data -denr 2 -lby 2028 -lbm 1 -lbd 1 -lp 0.49 -hp 3.29  -nopro 12 -nopri 10 -sl 30 -ubd 0 -ubm 6
+    ```
+    - SYSTEM_DATE becomes '2028-04-15' (on a Saturday), because it is automatically set to the middle of this interval.  
+    <br/>
+    <br/>
+    - step 1: check the inventory and the list  with expired products:
+    ```py
+        py super.py show_inventory 
+        py super.py show_expired_products 
+    ```
+   - date: default value is SYSTEM_DATE for both.
+   - console output e.g.:
+   - <img src="./images_in_readme_files/sell_example_03a.JPG" alt="Image Name" width="450" height="500">
+   - <img src="./images_in_readme_files/sell_example_03b.JPG" alt="Image Name" width="450" height="500">
+
+
+   - step 3: sell a product that is in the list with expired products, but not in the inventory  
+        (products different each time you run the code). So here you could  choose oats  or  
+        fair_trade_dark_chocolate_coconut_coffee. 
+    ```py
+        py super.py sell oats 3.45 
+    ```
+- legenda: 
+    - product: oats
+    - sell price: &euro; 3.45
+    - sell_date: 2028-01-23
+
+- console output e.g.:
+- <img src="./images_in_readme_files/sell_example_03c.JPG" alt="Image Name" width="600" height="400">
+
+- <img src="./images_in_readme_files/sell_example_03d.JPG" alt="Image Name" width="500" height="400">
+- (...plus rest of sold.csv and beneath it bought.csv)
+
+- Remark: If you try to sell a product with a buy id of a product that has expired, then  
+    the sale will proceed and you will see a similar warning message as well. 
+<br/>
+<br/>
+
+
+### uc 4: sell a product at a loss (by its product name)
+
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Argparse commands and arguments](#argparse-commands-and-arguments)
+<br/><br/>
+   
+   - step 1: create mock data: 
+
+    ```py
+        py super.py create_mock_data -denr 2 -lby 2028 -lbm 1 -lbd 1 -lp 0.49 -hp 3.29  -nopro 6 -nopri 3 -sl 30 -ubd 0 -ubw 4
+    ```
+    - SYSTEM_DATE becomes '2028-01-15' (on a Saturday), because it is automatically set to the middle of this interval.  
+    <br/>
+    <br/>
+    - step 2: check the inventory:
+    ```py
+        py super.py show_inventory -d 2028-01-30
+    ```
+
+   - console output e.g.:
+   - <img src="./images_in_readme_files/sell_example_04a.JPG" alt="Image Name" width="450" height="500">
+
+   - step 3: sell a product from the inventory that is in the list only once (products different each time you run the code)
+    ```py
+        py super.py sell pasta 0.53 -s 2028-01-20
+    ```
+- legenda: 
+    - product: pasta  
+    - sell price: &euro; 0.53
+    - sell_date: 2028-01-30
+
+- console output e.g.:
+- <img src="./images_in_readme_files/sell_example_04b.JPG" alt="Image Name" width="600" height="600">
+
+- <img src="./images_in_readme_files/sell_example_04c.JPG" alt="Image Name" width="600" height="600">
+
+<br/>
+<br/>
+
+
+
+### uc 5: sell a product that is not in Superpy product range altogether
+
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Argparse commands and arguments](#argparse-commands-and-arguments)
+<br/><br/>
+   
+   - step 1: create mock data: 
+
+    ```py
+        py super.py create_mock_data -denr 2 -lby 2028 -lbm 1 -lbd 1 -lp 0.49 -hp 3.29  -nopro 8 -nopri 3 -sl 30 -ubd 0 -ubw 4
+    ```
+    - SYSTEM_DATE becomes '2028-01-15' (on a Saturday), because it is automatically set to the middle of this interval.  
+    <br/>
+    <br/>
+    - step 2: check the inventory:
+    ```py
+        py super.py show_bought_csv
+    ```
+
+   - console output e.g.:
+   - <img src="./images_in_readme_files/sell_example_05a.JPG" alt="Image Name" width="500" height="800">
+
+   - step 3: sell a product from the inventory that is in the list only once (products different each time you run the code)
+    ```py
+        py super.py sell Takikomi_gohan 19.73 -s 2028-01-30
+    ```
+- legenda: 
+    - product: Takikomi_gohan --> not in product range: see (...superpy\data_used_in_superpy\product_list_to_create_product_range.py)  
+    - sell price: &euro; 19.73
+    - sell_date: 2028-01-30
+
+- console output e.g.:
+- <img src="./images_in_readme_files/sell_example_05b.JPG" alt="Image Name" width="600" height="600">
+
+- Remark: If you try to sell a product with a non-existing buy id (e.g. buy_id 1234567891011), then  
+    you will see a similar error message. 
+<br/>
+<br/>
+
+
+
+### uc 6: sell a product that is not in inventory nor list with expired products, but does exist in product range
+
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Argparse commands and arguments](#argparse-commands-and-arguments)
+<br/><br/>
+   
+   - step 1: create mock data: 
+
+    ```py
+        py super.py create_mock_data -denr 2 -lby 2028 -lbm 1 -lbd 1 -lp 0.49 -hp 3.29  -nopro 8 -nopri 3 -sl 30 -ubd 0 -ubm 8
+    ```
+    - SYSTEM_DATE becomes '2028-05-16' (on a Saturday), because it is automatically set to the middle of this interval.  
+    <br/>
+    <br/>
+    - step 2: look  for a product that is in bought.csv, but not in the inventory nor in list with expired products:
+    ```py
+        py super.py show_bought_csv
+        py super.py show_inventory
+        py super.py show_expired_products
+    ```
+
+   - console output e.g.:
+   - <img src="./images_in_readme_files/sell_example_06a.JPG" alt="Image Name" width="500" height="800">
+   - <img src="./images_in_readme_files/sell_example_06b.JPG" alt="Image Name" width="500" height="600">
+   - <img src="./images_in_readme_files/sell_example_06c.JPG" alt="Image Name" width="500" height="600">
+
+   - step 3: In this data e.g. cookies, bulgur or sugar is such a product (products different each time you run the code)
+    ```py
+        py super.py sell bulgur 5.34 
+    ```
+- legenda: 
+    - product: cheese 
+    - sell price: &euro; 7.34
+    - sell_date: 2028-05-16, because default value is SYSTEM_DATE
+
+- console output e.g.:
+- <img src="./images_in_readme_files/sell_example_06d.JPG" alt="Image Name" width="600" height="600">
+
+
+<br/>
+<br/>
+<!-- next:  -->
+
+### uc 7: sell a product that has already been sold
+
+quick links: 
+-  [Table of contents](#table-of-contents)
+-  [Argparse commands and arguments](#argparse-commands-and-arguments)
+<br/><br/>
+   
+   - step 1: create mock data: 
+
+    ```py
+        py super.py create_mock_data -denr 2 -lby 2028 -lbm 1 -lbd 1 -lp 0.49 -hp 3.29  -nopro 3 -nopri 3 -sl 30 -ubd 0 -ubm 3
+    ```
+    - SYSTEM_DATE becomes '2028-05-16' (on a Saturday), because it is automatically set to the middle of this interval.  
+    <br/>
+    <br/>
+    
+   - console output e.g.:
+   - <img src="./images_in_readme_files/sell_example_07a.JPG" alt="Image Name" width="500" height="800">
+
+
+   - step 2: select a product that as already been sold. In this data all buy ids with uneven numbers  
+        have already been sold. (products different each time you run the code)
+   - step 3: Try to sell an already sold product again:
+    ```py
+        py super.py sell b_03 11.34
+    ```
+- legenda: 
+    - product: cheese 
+    - sell price: &euro; 11.34
+    - sell_date: 2028-05-16, because default value is SYSTEM_DATE
+
+- console output e.g.:
+- <img src="./images_in_readme_files/sell_example_07b.JPG" alt="Image Name" width="600" height="400">
+
+<br/> 
 <br /> 
- 
+<br /> 
+
 ## Set system date
 quick links: 
 -  [Table of contents](#table-of-contents)
@@ -674,17 +1026,48 @@ Goal: set_system_date_to a specific date in the file system_date.txt
 - <img src="./images_in_readme_files/set_system_date_example_01.JPG" alt="Image Name" width="600" height="200"> 
 <br /> 
 <br /> 
+- variations:
+<br/><br/>
+  - option 1: save the date!...or well...set the system_date.  
+      There are various ways to set and change
+      the system_date: 
+
+  ```python
+      py super.py set_system_date 2026-09-27
+      py super.py set_system_date 2022-10-15
+      py super.py set_system_date yesterday
+      py super.py set_system_date tomorrow
+      py super.py set_system_date next_thursday
+  ```
+  - option 2: Back to the future! Let's bend time and space  
+      and travel to our desired system_date.
+
+  ```python
+      py super.py set_system_date 2527-07-14
+      py super.py show_system_date
+      py super.py time_travel -7
+      py super.py show_system_date
+      py super.py time_travel 18
+      py super.py show_system_date
+  ``` 
 
 
+  - option 3: Back to reality. Reset the system_date to  
+      the system_date of your host machine:
+  ```python
+      py super.py set_system_date 2327-07-04
+      py super.py show_system_date
+      py super.py reset_system_date
+      py super.py show_system_date
+  ``` 
 
-1. e.g.: 
 
-```py
-    py super.py set_system_date tomorrow 
-```
+  - trick question: what is the problem here?
+  ```python
+      py super.py set_system_date today
+  ```
 
-- system_date: tomorrow.  Tomorrow == system_date plus 1 day -->if system_date is e.g. Thursday January 18, 2024,  
-    then tomorrow has date January 19, 2024   
+
 </br>
 </br>
 - Date values must be entered in format YYYY-MM-DD as either:
@@ -718,11 +1101,12 @@ Goal: show all data from bought.csv in the console:
 
 - console output e.g.:
 - <img src="./images_in_readme_files/show_bought_csv_example_01.JPG" alt="Image Name" width="600" height="800"> 
-<br /> 
-<br /> 
- 
+<br/> 
+<br/> 
+<br/>
 
 ## Show cost
+
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Argparse commands and arguments](#argparse-commands-and-arguments)
@@ -853,7 +1237,7 @@ Goal: calculate expired products on a day in format 'YYYY-MM-DD' (e.g. 2023-09-1
     ```py
         py super.py show_expired_products -d overmorrow
     ```
-   -   expiry_date: next_tuesday  --> default is start of the financial that contains the SYSTEM_DATE.   
+   -   expiry_date: date: 2028-02-19  --> SYSTEM_DATE is 2028-02-17, so overmorrow equals 'SYSTEM_DATE plus 2 days'.   
    -   <img src="./images_in_readme_files/show_expired_products_example_03.JPG" alt="Image Name" width="600" height="660"> 
 <br /> 
 <br/> 
@@ -870,7 +1254,7 @@ Goal: calculate inventory on a day in format 'YYYY-MM-DD' (e.g. 2023-09-18)
 - Preparation for all use cases below: create mock data: 
 
     ```py
-        py super.py create_mock_data -lby 2028 -lbm 2 -lbd 1 -lp 5.23 -hp 18.30  -nopro 6 -nopri 8 -ubd 0 -ubm 3 -ubw 0
+        py super.py create_mock_data -lby 2028 -lbm 2 -lbd 1 -lp 5.23 -hp 18.30  -nopro 26 -nopri 18 -ubd 0 -ubm 3 -ubw 0
     ```
     - SYSTEM_DATE becomes '2028-03-17' (on a Friday), because it is automatically set to the middle of this interval.  
         Advantage: all reports show relevant data.
@@ -884,9 +1268,9 @@ Goal: calculate inventory on a day in format 'YYYY-MM-DD' (e.g. 2023-09-18)
         py super.py show_inventory 
     ```
 
-    - date: 2028-03-27 --> because SYSTEM_DATE is default value.  
-        reason: often you need to know the expired products on SYSTEM_DATE, in other words: the products  
-        that have expired up until today.   
+    - date: 2028-03-17 --> because SYSTEM_DATE is default value.  
+        reason: often you need to know the inventory on SYSTEM_DATE, in other words: the products  
+        that are in stock today.   
   
    - console output e.g.:
    - <img src="./images_in_readme_files/show_inventory_example_01.JPG" alt="Image Name" width="600" height="660"> 
@@ -898,7 +1282,7 @@ Goal: calculate inventory on a day in format 'YYYY-MM-DD' (e.g. 2023-09-18)
     ```py
         py super.py show_inventory -d 2028-04-10 
     ```
-   -   expiry_date: 2028-04-10 
+   -   date: 2028-04-10 
    -   Console output:  e.g.:
    -   <img src="./images_in_readme_files/show_inventory_example_02.JPG" alt="Image Name" width="600" height="660"> 
 <br /> 
@@ -908,164 +1292,269 @@ Goal: calculate inventory on a day in format 'YYYY-MM-DD' (e.g. 2023-09-18)
     ```py
         py super.py show_inventory -d overmorrow
     ```
-   -   expiry_date: next_tuesday  --> default is start of the financial that contains the SYSTEM_DATE.   
+   -   date: 2028-02-19  --> SYSTEM_DATE is 2028-02-17, so overmorrow equals 'SYSTEM_DATE plus 2 days'.   
    -   <img src="./images_in_readme_files/show_inventory_example_03.JPG" alt="Image Name" width="600" height="660"> 
 <br /> 
 <br/> 
 <br /> 
 
+
 ## Show profit
+
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Argparse commands and arguments](#argparse-commands-and-arguments)
 <br/><br/>
+
 Goal: show profit in time range between start_date and end_date inclusive
 
-- ex1: 
 
-```
-    py super.py show_profit -sd 2023-09-01 -ed 2023-10-10
-```
--   start_date: 2023-09-01, 
--   end_date: 2023-10-10
--   result in terminal:  
-    'Profit from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'   
+- Preparation for all use cases below: create mock data: 
 
-- ex2: 
-```
-    py super.py show_profit -ed 2023-10-05
-```
--   start_date: start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01
--   end_date: 2023-10-05
--   result in terminal:  
-    'profit from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'
+    ```py
+        py super.py create_mock_data -lby 2028 -lbm 2 -lbd 1 -lp 5.23 -hp 18.30  -nopro 40 -nopri 25 -ubd 0 -ubm 3 -ubw 0
+    ```
+    - SYSTEM_DATE becomes '2028-03-17' (on a Friday), because it is automatically set to the middle of this interval.  
+        Advantage: all reports show relevant data.
+    <br/>
+    <br/>
 
+1. uc: show profit with default values:
 
-- ex3: 
-```
-    py super.py show_profit -sd 2023-07-01
-```
--   start_date: 2023-07-01
--   end_date: end_date is by default system_date (here, e.g. 2023-09-17) 
--   result in terminal:  
-    'Profit from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9'  
+    ```py
+        py super.py show_profit
+    ```
+    - start_date: 2028-01-01 --> default value for lower boundary is the start of the  
+        financial year. Financial year is January 1st of the year that contains SYSTEM_DATE.  
+        reason: often you need to know the profit of the current financial year starting at January 1st.
 
-
-- arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01  
-    default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01.  
-    reason: often you want to know the cost of the current financial year until today inclusive.  
-
-- arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15  
-    default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.
+    - end_date: 2028-03-17 --> equal to SYSTEM_DATE, because SYSTEM_DATE is default value.  
+        reason: often you need to know the profit until the SYSTEM_DATE inclusive.  
+  
+   - console output e.g.:
+   - <img src="./images_in_readme_files/show_profit_example_01.JPG" alt="Image Name" width="420" height="300"> 
+   <br /> 
+   <br /> 
 
 
+2. uc: show profit in custom interval: 
+    ```py
+        py super.py show_profit -sd 2028-02-15 -ed 2028-03-15 
+    ```
+   -   start_date: 2028-02-15, 
+   -   end_date: 2028-03-15
+   -   Console output:  e.g.:
+   -   <img src="./images_in_readme_files/show_profit_example_02.JPG" alt="Image Name" width="420" height="300"> 
+<br /> 
+<br/>
+
+3. uc: show profit from  start of financial year up until next Tuesday: 
+    ```py
+        py super.py show_profit -ed next_tuesday
+    ```
+   -   start_date: 2028-01-01  --> default is start of the financial that contains the SYSTEM_DATE.   
+   -   end_date: 2028-03-21 (Tuesday)
+   -   <img src="./images_in_readme_files/show_profit_example_03.JPG" alt="Image Name" width="420" height="300"> 
+<br /> 
+<br/> 
+
+
+4. uc: show profit from custom date until  system_date: 
+    ```py
+        py super.py show_sales_volume -sd 2028-03-01
+    ```
+   -   start_date: 2023-07-01 
+   -   end_date: system_date as default value has value 2028-02-17 
+   -   Console output:  e.g.:
+   -   <img src="./images_in_readme_files/show_sales_volume_example_04.JPG" alt="Image Name" width="420" height="300"> 
+<br /> 
+<br/>
+
+5. uc: show profit with custom interval in words:
+    ```py
+        py super.py show_profit -sd yesterday -ed next_friday
+    ```
+
+   -   start_date: 2028-03-16 equals 'SYSTEM_DATE minus 1 day' 
+   -   end_date:  2028-03-24 equals 'SYSTEM_DATE plus 4 days' 
+   -   Console output:  e.g.:
+   -   <img src="./images_in_readme_files/show_profit_example_05.JPG" alt="Image Name" width="420" height="300"> 
 <br /> 
 <br /> 
-- -----------------------------------------------------------------------------------------------
 <br /> 
-<br /> 
+
 
 ## Show revenue
+
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Argparse commands and arguments](#argparse-commands-and-arguments)
 <br/><br/>
+
 Goal: show revenue in time range between start_date and end_date inclusive
 
-- ex1: 
 
-```
-    py super.py show_revenue -sd 2023-09-01 -ed 2023-10-10
-```
--   start_date: 2023-09-01, 
--   end_date: 2023-10-10
--   result in terminal:  
-    'Cost from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'   
+- Preparation for all use cases below: create mock data: 
 
-- ex2: 
-```
-    py super.py show_revenue -ed 2023-10-05
-```
--   start_date: start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01
--   end_date: 2023-10-05
--   result in terminal:  
-    'Revenue from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'
+    ```py
+        py super.py create_mock_data -lby 2028 -lbm 2 -lbd 1 -lp 5.23 -hp 18.30  -nopro 40 -nopri 25 -ubd 0 -ubm 3 -ubw 0
+    ```
+    - SYSTEM_DATE becomes '2028-03-17' (on a Friday), because it is automatically set to the middle of this interval.  
+        Advantage: all reports show relevant data.
+    <br/>
+    <br/>
 
+1. uc: show revenue with default values:
 
-- ex3: 
-```
-    py super.py show_revenue -sd 2023-07-01
-```
--   start_date: 2023-07-01
--   end_date: end_date is by default system_date (here, e.g. 2023-09-17) 
--   result in terminal:  
-    'Cost from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9'  
+    ```py
+        py super.py show_revenue
+    ```
+    - start_date: 2028-01-01 --> default value for lower boundary is the start of the  
+        financial year. Financial year is January 1st of the year that contains SYSTEM_DATE.  
+        reason: often you need to know the revenue of the current financial year starting at January 1st.
 
-
-- arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01  
-    default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01.  
-    reason: often you want to know the cost of the current financial year until today inclusive.  
-
-- arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15  
-    default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.
+    - end_date: 2028-03-17 --> equal to SYSTEM_DATE, because SYSTEM_DATE is default value.  
+        reason: often you need to know the revenue until the SYSTEM_DATE inclusive.  
+  
+   - console output e.g.:
+   - <img src="./images_in_readme_files/show_revenue_example_01.JPG" alt="Image Name" width="420" height="300"> 
+   <br /> 
+   <br /> 
 
 
+2. uc: show revenue in custom interval: 
+    ```py
+        py super.py show_revenue -sd 2028-02-15 -ed 2028-03-15 
+    ```
+   -   start_date: 2028-02-15, 
+   -   end_date: 2028-03-15
+   -   Console output:  e.g.:
+   -   <img src="./images_in_readme_files/show_revenue_example_02.JPG" alt="Image Name" width="420" height="300"> 
+<br /> 
+<br/>
+
+3. uc: show revenue from  start of financial year up until next Tuesday: 
+    ```py
+        py super.py show_revenue -ed next_tuesday
+    ```
+   -   start_date: 2028-01-01  --> default is start of the financial that contains the SYSTEM_DATE.   
+   -   end_date: 2028-03-21 (Tuesday)
+   -   <img src="./images_in_readme_files/show_revenue_example_03.JPG" alt="Image Name" width="420" height="300"> 
+<br /> 
+<br/> 
+
+
+4. uc: show revenue from custom date until  system_date: 
+    ```py
+        py super.py show_revenue -sd 2028-03-01
+    ```
+   -   start_date: 2023-07-01 
+   -   end_date: system_date as default value has value 2028-02-17 
+   -   Console output:  e.g.:
+   -   <img src="./images_in_readme_files/show_revenue_example_04.JPG" alt="Image Name" width="420" height="300"> 
+<br /> 
+<br/>
+
+5. uc: show revenue with custom interval in words:
+    ```py
+        py super.py show_revenue -sd yesterday -ed next_friday
+    ```
+
+   -   start_date: 2028-03-16 equals 'SYSTEM_DATE minus 1 day' 
+   -   end_date:  2028-03-24 equals 'SYSTEM_DATE plus 4 days' 
+   -   Console output:  e.g.:
+   -   <img src="./images_in_readme_files/show_revenue_example_05.JPG" alt="Image Name" width="420" height="300"> 
 <br /> 
 <br /> 
-- -----------------------------------------------------------------------------------------------
 <br /> 
-<br /> 
+
+
 
 ## Show sales volume
+
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Argparse commands and arguments](#argparse-commands-and-arguments)
 <br/><br/>
-Goal: show sales_volume in time range between start_date and end_date inclusive
 
-- ex1: 
-
-```
-    py super.py show_sales_volume -sd 2023-09-01 -ed 2023-10-10
-```
--   start_date: 2023-09-01, 
--   end_date: 2023-10-10
--   result in terminal:  
-    'Profit from start_date: 2023-09-01 to end_date: 2023-10-10 inclusive: Euro 27.9'   
-
-- ex2: 
-```
-    py super.py show_sales_volume -ed 2023-10-05
-```
--   start_date: start of financial  year of system_date. e.g. if system_date 23-06-08, then: 23-01-01
--   end_date: 2023-10-05
--   result in terminal:  
-    'Sales volume from start_date: 2023-01-01 to end_date: 2023-10-05 inclusive: Euro 18.6'
+Goal: show sales volume in time range between start_date and end_date inclusive
 
 
-- ex3: 
-```
-    py super.py show_sales_volume -sd 2023-07-01
-```
--   start_date: 2023-07-01
--   end_date: end_date is by default system_date (here, e.g. 2023-09-17) 
--   result in terminal:  
-    'Profit from start_date: 2023-07-01 to end_date: 2023-09-17 inclusive: Euro 9.9'  
+- Preparation for all use cases below: create mock data: 
+
+    ```py
+        py super.py create_mock_data -lby 2028 -lbm 2 -lbd 1 -lp 5.23 -hp 18.30  -nopro 40 -nopri 25 -ubd 0 -ubm 3 -ubw 0
+    ```
+    - SYSTEM_DATE becomes '2028-03-17' (on a Friday), because it is automatically set to the middle of this interval.  
+        Advantage: all reports show relevant data.
+    <br/>
+    <br/>
+
+1. uc: show sales volume with default values:
+
+    ```py
+        py super.py show_sales_volume
+    ```
+    - start_date: 2028-01-01 --> default value for lower boundary is the start of the  
+        financial year. Financial year is January 1st of the year that contains SYSTEM_DATE.  
+        reason: often you need to know the sales volume of the current financial year starting at January 1st.
+
+    - end_date: 2028-03-17 --> equal to SYSTEM_DATE, because SYSTEM_DATE is default value.  
+        reason: often you need to know the sales volume until the SYSTEM_DATE inclusive.  
+  
+   - console output e.g.:
+   - <img src="./images_in_readme_files/show_sales_volume_example_01.JPG" alt="Image Name" width="420" height="300"> 
+   <br /> 
+   <br /> 
 
 
-- arg1: optional argument start_date in format 'YYYY-MM-DD'. ex: -sd 2023-09-01, or: -start_date 2023-09-01  
-    default value is january 1st of year from system_date: e.g. if system_date is 23-06-28, then default value is 23-01-01.  
-    reason: often you want to know the cost of the current financial year until today inclusive.  
+2. uc: show sales volume in custom interval: 
+    ```py
+        py super.py show_sales_volume -sd 2028-02-15 -ed 2028-03-15 
+    ```
+   -   start_date: 2028-02-15, 
+   -   end_date: 2028-03-15
+   -   Console output:  e.g.:
+   -   <img src="./images_in_readme_files/show_sales_volume_example_02.JPG" alt="Image Name" width="420" height="300"> 
+<br /> 
+<br/>
 
-- arg2: optional argument end_date in format 'YYYY-MM-DD'. ex: -ed 2023-10-15, or: -end_date 2023-10-15  
-    default value is system_date, because often you want to know the cost of the current financial year until today  inclusive.
+3. uc: show sales volume from  start of financial year up until next Tuesday: 
+    ```py
+        py super.py show_sales_volume -ed next_tuesday
+    ```
+   -   start_date: 2028-01-01  --> default is start of the financial that contains the SYSTEM_DATE.   
+   -   end_date: 2028-03-21 (Tuesday)
+   -   <img src="./images_in_readme_files/show_sales_volume_example_03.JPG" alt="Image Name" width="420" height="300"> 
+<br /> 
+<br/> 
 
 
+4. uc: show sales volume from custom date until  system_date: 
+    ```py
+        py super.py show_sales_volume -sd 2028-03-01
+    ```
+   -   start_date: 2023-07-01 
+   -   end_date: system_date as default value has value 2028-02-17 
+   -   Console output:  e.g.:
+   -   <img src="./images_in_readme_files/show_sales_volume_example_04.JPG" alt="Image Name" width="420" height="300"> 
+<br /> 
+<br/>
+
+5. uc: show sales volume with custom interval in words:
+    ```py
+        py super.py show_sales_volume -sd yesterday -ed next_friday
+    ```
+
+   -   start_date: 2028-03-16 equals 'SYSTEM_DATE minus 1 day' 
+   -   end_date:  2028-03-24 equals 'SYSTEM_DATE plus 4 days' 
+   -   Console output:  e.g.:
+   -   <img src="./images_in_readme_files/show_sales_volume_example_05.JPG" alt="Image Name" width="420" height="300"> 
 <br /> 
 <br /> 
-- -----------------------------------------------------------------------------------------------
 <br /> 
-<br /> 
+
+
 
 ## Show sold.csv
 
@@ -1251,7 +1740,7 @@ quick links:
 
 
 
-## UC: get familiar with the data
+## UC: show_system_date
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Use cases](#use-cases)
@@ -1289,228 +1778,10 @@ quick links:
     Superpy system_date is now equal to that of the host machine,  
     on which you are running Superpy. 
 
-## UC: buy and sell a few products
-quick links: 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
-    - step 1: let's  start with a clean slate: so let's  
-        delete all data (if any) in bought.csv and sold.csv:
-    ```python
-        py super.py delete
-    ```       
-    - step 2: observe that bought.csv and sold.csv do not  
-            contain any transaction records:
-
-    ```python
-        py super.py show_bought_csv
-        py super.py show_sold_csv
-    ```  
-    - step 3: set system_date: 
-    ```python
-        py super.py set_system_date 2024-09-15
-    ```
-
-    - step 4: buy the following products: 
-    ```python
-        py super.py buy apple 0.29 -b 2024-09-17 -e 2024-10-04
-        py super.py buy banana 0.19 -b yesterday -e 2024-10-28
-        py super.py buy mandarin 0.19 -b yesterday -e next_sunday
-        py super.py buy pineapple 0.49 -b 2024-09-01 -e today
-    ```
-    - step 5: show transactions in bought.csv:
-    ```python
-        py super.py show_bought_csv
-    ```  
-    - step 6: now sell these products:
-    ```python
-        py super.py sell b_01 1.29 -s 2024-09-22 
-        py super.py sell b_02 0.59 -s tomorrow 
-        py super.py sell b_03 0.49 -s overmorrow
-        py super.py sell b_03 2.29 -s next_thursday
-    ```  
-
-    - step 7: show_sold_csv
-    ```python
-        py super.py show_sold_csv
-    ```  
-
-## UC: enter system date (e.g. 2031-04-21, tomorrow, etc.)
-quick links: 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
-    - option 1: save the date!...or well...set the system_date.  
-        There are various ways to set and change
-        the system_date: 
-
-    ```python
-        py super.py set_system_date 2026-09-27
-        py super.py set_system_date 2022-10-15
-        py super.py set_system_date yesterday
-        py super.py set_system_date tomorrow
-        py super.py set_system_date next_thursday
-    ```
-    - option 2: Back to the future! Let's bend time and space  
-        and travel to our desired system_date.
-
-    ```python
-        py super.py set_system_date 2527-07-14
-        py super.py show_system_date
-        py super.py time_travel -7
-        py super.py show_system_date
-        py super.py time_travel 18
-        py super.py show_system_date
-    ``` 
+  
 
 
-    - option 3: Back to reality. Reset the system_date to  
-        the system_date of your host machine:
-    ```python
-        py super.py set_system_date 2327-07-04
-        py super.py show_system_date
-        py super.py reset_system_date
-        py super.py show_system_date
-    ``` 
-
-
-    - trick question: what is the problem here?
-    ```python
-        py super.py set_system_date today
-    ```
-
-## UC: calculate cost, revenue and profit + time travel
-quick links: 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
-    - info: by default: if mock data is created in time interval between  
-        e.g. 2024-03-01 and 2024-07-01, then the system_date is automatically  
-        set to the middle of the interval: 2024-05-01. 
-    - step 1: reset system date:
-    ```python
-        py super.py reset_system_date
-    ``` 
-    - step 2: create_mock_data:
-    - more info: Chapter 'Argparse commands and arguments' explains exactly the following options.  
-        Alternatively, look them  up in the help file:
-    ```python
-        py super.py -h
-    ```        
-    ```python
-        py super.py create_mock_data -pr 15 -lby 2024 -lbm 3 -lbd 1 -ubm 4 -ubw 0 -ubd 0 -mu 4 -denr 2 -sl 5 -tt 3
-    ```
-    - step 2: calculate cost:
-    ```python
-        py super.py show_cost
-    ``` 
-    
-    - step 3: show_revenue
-    ```python
-        py super.py show_revenue
-    ```   
-
-    - step 4: show_profit
-    ```python
-        py super.py show_profit
-    ```    
-
-    - info: the following commands all require a time interval consisting of a start date and an end date  
-        If you do not specify them, then the following default values apply:  
-
-        * start date: January 1st of the year that contains the system_date. Ex: if system_date is 2024-05-01,  
-        then start of financial year: 2024-01-01.  
-
-        * end date: system_date (e.g. 2024-05-01)  
-
-    - step 2: show_cost:
-    ```python
-        py super.py show_cost
-    ```   
-    - step 5: show_profit:
-    ```python
-        py super.py show_profit
-    ```     
-    - step 6: show_revenue:
-    ```python
-        py super.py show_revenue
-    ```     
-    - step 7: show_sales_volume:
-    ```python
-        py super.py show_sales_volume
-    ```  
-    - step 8: the next uc is a continuation of this uc.
-
-    - step 9: now time travel to past and future and see what it does with cost, revenue and profit:
-      ```python
-        py super.py time_travel -21
-        py super.py time_travel 50
-    ```  
-
-
-## UC: show all management reports
-quick links: 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
-    - info: by default: if mock data is created in time interval between  
-        e.g. 2024-03-01 and 2024-07-01, then the system_date is automatically  
-        set to the middle of the interval: 2024-05-01. 
-    - step 1: create_mock_data:
-    - more info: Chapter 'Argparse commands and arguments' explains exactly the following options.  
-        Alternatively, look them  up in the help file:
-    ```python
-        py super.py -h
-    ```        
-    ```python
-        py super.py create_mock_data -pr 15 -lby 2024 -lbm 3 -lbd 1 -ubm 4 -ubw 0 -ubd 0 -mu 4 -denr 2 -sl 5 -tt 3
-    ```
-    - step 2: show system_date:
-    ```python
-        py super.py show_system_date
-    ``` 
-    
-    - step 3: show_expired_products
-    ```python
-        py super.py show_expired_products
-    ```   
-
-    - step 4: show_inventory
-    ```python
-        py super.py show_inventory
-    ```    
-
-
-    - info: the following commands all require a time interval consisting of a start date and an end date  
-        If you do not specify them, then the following default values apply:  
-
-        * start date: January 1st of the year that contains the system_date. Ex: if system_date is 2024-05-01,  
-        then start of financial year: 2024-01-01.  
-
-        * end date: system_date (e.g. 2024-05-01)  
-
-        Now let's create some reports with these default values. While you are at it, make a few mental notes,  
-        because in the next uc, we are going to travel through time (and space...who knows) with the just  
-        created mock data to witness the amount of cost, revenue, profit, sales volume, expired products  
-        and inventory change, as time progresses and degresses. 
-
-    - step 2: show_cost:
-    ```python
-        py super.py show_cost
-    ```   
-    - step 5: show_profit:
-    ```python
-        py super.py show_profit
-    ```     
-    - step 6: show_revenue:
-    ```python
-        py super.py show_revenue
-    ```     
-    - step 7: show_sales_volume:
-    ```python
-        py super.py show_sales_volume
-    ```  
-    - step 8: the next uc is a continuation of this uc.
+  
 
 
 ## UC: change the management reports' data by travelling through time
@@ -1552,183 +1823,12 @@ quick links:
         turnover time ('-tt') is set to 3 days.
 
 
-## UC: show reports in custom time intervals
-quick links: 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
-    - info: now it is time to create reports for custom time intervals  
-        e.g. 2 weeks, 3.5 months, etc. Let's first create a lot of mock  
-        data in calendar year 2024:
-    ```python
-        py super.py create_mock_data -pr 30 -lby 2024 -lbm 1 -lbd 1 -ubm 12 -ubw 0 -ubd 0 -mu 7 -denr 2 -sl 10 -tt 12
-    ```
-    - show_system_date:
-    ```python
-        py super.py show_system_date
-    ```    
-    - time travel to the beginning of the interval: you are   
-        in the middle of an interval of 12 months on system_date 2024-07-02.  
-        Do not change the system_date. Create the following reports:
-    
-    ```python
-        py super.py show_cost -sd 2024-02-01 -ed 2024-03-01
-        py super.py show_sales_volume -sd 2024-03-01 -ed today
-        py super.py show_revenue -sd yesterday -ed 2024-12-31
-        py super.py show_profit -sd next_wednesday -ed 2024-10-15
-
-    ```   
-
-
-
-
-## UC: create mock data and add individual buy and sell transaction
-quick links: 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
-    - step 1: create some mock data
-    ```python
-        py super.py create_mock_data -pr 3 -denr 2
-    ```  
-    - step 2: make note of the highest buy_id and sell_id:
-    ```python
-        py super.py show_bought_csv
-        py super.py show_sold_csv
-    ```    
-    - 
-    - step 3: buy a product:
-    ```python
-        py super.py pizza 4.44 -b today -e next_friday
-    ```  
-    - step 3: check if product has been added to top of the list  
-        in bought.csv:
-    ```python
-        py super.py show_bought_csv
-    ```  
-    - step 4: sell an unsold product:
-    ```python
-        py super.py sell b_02 9.99 -s tomorrow
-    ```    
-    - step 5: check if sell-transaction  has been added to sold.csv  
-        If buy_id is b_04, then transaction sell_id becomes s_02. 
-        In sold.csv transactions are sorted on sell_id, so  
-        sell-transaction s_04 can be found between sell_transactions  
-        b_03 and b_05 (assuming that b_03 and b_05 have been sold).
-    ```python
-        py super.py show_sold_csv
-    ```     
-## UC: sell expired product 
-quick links: 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
-- step 1: create mock data:
-```python
-    py superpy create_mock_data
-```
-- step 2: select expired product:
-```python
-    py superpy show_expired_products
-```
-- step 3: sell an expired product: (adapt arguments to generated mock data):
-```
-    py super.py sell onions 4.33 -s 2012-06-23
-```
-- The result in the console will look like this: 
-
-<img src="./images_in_readme_files/sell_expired_product.JPG" alt="Image Name" width="420" height="600">
-
-
-## UC: sell product while violating business rules 
-quick links: 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
-- intro: 3 business rules have been implemented in fn sell_product:  
-    - 1of3: product does  not exist, so you cannot sell  it.
-    - 2of3: product has already been sold, so you cannot sell it again.
-    - 3of3: product has expired, so you cannot sell it.  
-<br/>
-
-- Business rule 1of3: if the product is not in the bought.csv, then the product cannot be sold:
-- step 1: create a bit of mock data:    
-    ```python
-        py super.py create_mock_data -pr 2 -denr 2
-    ```  
-- step 2: have a look at the range of created  
-    transactions in bought.csv
-    ```python
-        py super.py show_sold_csv
-    ```  
-- step 3: now try to sell a product that is not in bought.csv:
-    ```python
-        py super.py sell b_12345 -s next_wednesday
-    ```  
-- expected result: message in the console: 'ValueError: Buy_id'b_12345' does not exist in bought.csv!!' 
-<br/><br/>
-
-- Business rule 2of3: if the product has already been sold, then it cannot be sold again:
-- step 1: create a bit of mock data:    
-    ```python
-        py super.py create_mock_data -pr 2 -denr 2
-    ```  
-- step 2: look for a product that does not violate the 3 rules in this section:
-    ```python
-        py super.py show_bought_csv
-        py super.py show_sold_csv
-    ```  
-- step 3: sell  a product 
-    ```python
-        py super.py sell b_02 4.34 -s today
-    ```  
-- step 4: have a look at bought.csv:
-    ```python
-        py super.py show_sold_csv
-    ```  
-
-- step 5: try to sell this exact same product again
-    ```python
-        py super.py sell b_02 4.34 -s tomorrow
-    ``` 
-- expected result: message in the console: 'ValueError: Product with buy_id 'b_02' has already been sold!!'
-
-
-- Business rule 3of3: if the product has expired, then it cannot be sold:
-- step 1: create a bit of mock data:    
-    ```python
-        py super.py create_mock_data -pr 2 -lby 2024 -lbm 1 -lbd 1 -ubm 3 -ubw 0 -ubd 0 -mu 0.5 -denr 2 -sl 5 -tt 10
-    ```  
-- step 2: look for a product that has expired, but not yet been sold:
-    ```python
-        py super.py show_expired_products
-    ```  
-- result: b_02, b_04, b_06, b_08
-- info: expiry dates have been randomly created. Take e.g. b_02, look at expiry_date in the table  
-    and add 1 day (e.g. 2024-01-21 plus 1 day == 2024-01-22)  
-
-
-- step 3: try to sell an expired product:
-    ```python
-        py super.py sell b_02 4.34 -s 2024-01-22
-    ```  
-- info: 2024-01-13 is one day after its expiry date.
-  <br/>
-  - expected result: message in the console: 'ValueError: Product has expired, so it cannot be sold!!'
-  
-- step 4: have a look at bought.csv:
-    ```python
-        py super.py show_sold_csv
-    ```  
-
-- step 5: try to sell this exact same product again
-    ```python
-        py super.py sell b_02 4.34 -s tomorrow
-    ``` 
+ 
 
 
 
 ## UC: suffer a considerable loss
+
 quick links: 
 -  [Table of contents](#table-of-contents)
 -  [Use cases](#use-cases)
@@ -1775,31 +1875,7 @@ quick links:
         py super.py show_profit
     ``` 
 
-## UC: Change default values of argparse command 'create_mock_data'
-quick links: 
--  [Table of contents](#table-of-contents)
--  [Use cases](#use-cases)
-<br/><br/>
-    - As a superpy user you want to e.g. create mock data with a product range of 5 products very often.
-    - step 1: goto super.py (...\superpy\super.py) to the beginning of main().
-    - step 2: set PRODUCT_RANGE = 5
-    - step 3: Now you can do this:
-    ```python
-        py super.py create_mock_data 
-    ```        
 
-    instead of having to do this:
-    - step 2: check the financial position:
-    ```python
-        py super.py create_mock_data -pr 5
-        or e.g.:
-    ```
-    ```python
-        py super.py create_mock_data -pr 5 -del_row 3 -sl 10 -tt 3 -mu 3 -lby 2024 -lbm 10 -lbd 15 -ubmnr 3 -ubwnr 8 -ubdnr 3
-    ```  
-
-
-<br/><br/><br/>
 
 
 

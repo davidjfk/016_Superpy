@@ -275,7 +275,7 @@ def main():
         path_to_csv_bought_input_file = os.path.join(PATH_TO_DATA_DIRECTORY_INSIDE_PROJECT_SUPERPY, 'bought.csv')
         show_superpy_system_info(args.command, SYSTEM_DATE, get_weekday_from_date)  
         if is_product_bought_with_product_name(args.product_name_or_buy_id):
-            new_transaction_record = sell_product_by_product_name(args.product_name_or_buy_id, args.price, args.sell_date, calculate_inventory, calculate_expired_products, path_to_csv_sold_input_file, path_to_csv_sold_output_file, path_to_csv_bought_input_file)
+            new_transaction_record = sell_product_by_product_name(args.product_name_or_buy_id, args.price, args.sell_date, calculate_inventory, calculate_expired_products, find_product, path_to_csv_sold_input_file, path_to_csv_sold_output_file, path_to_csv_bought_input_file)
         else:
             new_transaction_record = sell_product_by_buy_id(args.product_name_or_buy_id, args.price, args.sell_date, path_to_csv_sold_input_file, path_to_csv_sold_output_file, path_to_csv_bought_input_file)
         if new_transaction_record == 'product_is_not_sold':
@@ -294,9 +294,9 @@ def main():
     if args.command == "show_bought_csv":
         show_superpy_system_info(args.command, SYSTEM_DATE, get_weekday_from_date)
         show_header(HEADER_1OF2_BOUGHT_CSV)
-        show_csv_file(PATH_TO_FILE_SOLD_CSV)
-        show_header(HEADER_2of2_SOLD_CSV)  
         show_csv_file(PATH_TO_FILE_BOUGHT_CSV)
+        show_header(HEADER_2of2_SOLD_CSV)  
+        show_csv_file(PATH_TO_FILE_SOLD_CSV)
     if args.command == "show_cost":      
         cost = calculate_amount(args.start_date, args.end_date, 'buy_date', 'buy_price', PATH_TO_FILE_BOUGHT_CSV) 
         show_cost_info = [["Cost: €", cost],["Cost: start date:  ", args.start_date],[ "Cost: end date (inclusive):", args.end_date]]
