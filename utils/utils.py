@@ -28,6 +28,7 @@ from typing import Callable
 # get_path_to_file(directory_of_file, file_name_of_which_you_want_to_know_the_path):
 # get_system_date():
 # get_weekday_from_date():
+# increment_buy_id_counter_txt():
 # is_product_buy_id():  
 # sell_product_by_buy_id():
 # sell_product_by_product_name():
@@ -164,11 +165,10 @@ def calculate_expired_products(
                 light bulbs, etc. that do not expire)
                 '''
                 if expiry_date == 'does not expire':
-                    if date_on_which_to_calculate_expired_products > buy_date and expiry_date == 'does not expire' and sell_data.get(buy_id) is None:
-                        expired_products.append(row)
+                    continue
                 else: 
                     expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date() 
-                    if date_on_which_to_calculate_expired_products > buy_date and date_on_which_to_calculate_expired_products > expiry_date and sell_data.get(buy_id) is None:
+                    if date_on_which_to_calculate_expired_products >= buy_date and date_on_which_to_calculate_expired_products > expiry_date and sell_data.get(buy_id) is None:
                         expired_products.append(row)             
                 '''
                 there is only 1 difference between  this fn and fn calculate_expired_products: 
@@ -235,11 +235,11 @@ def calculate_inventory(
                 light bulbs, etc. that do not expire)
                 '''
                 if expiry_date == 'does not expire':
-                    if date_on_which_to_calculate_products_in_inventory > buy_date and expiry_date == 'does not expire' and sell_data.get(buy_id) is None:
+                    if date_on_which_to_calculate_products_in_inventory >= buy_date and expiry_date == 'does not expire' and sell_data.get(buy_id) is None:
                         products_in_inventory.append(row)
                 else: 
                     expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date() 
-                    if date_on_which_to_calculate_products_in_inventory > buy_date and date_on_which_to_calculate_products_in_inventory < expiry_date and sell_data.get(buy_id) is None:
+                    if date_on_which_to_calculate_products_in_inventory >= buy_date and date_on_which_to_calculate_products_in_inventory <= expiry_date and sell_data.get(buy_id) is None:
                         products_in_inventory.append(row) 
                 '''
                 there is only 1 difference between  this fn and fn calculate_expired_products: 
@@ -450,7 +450,7 @@ def create_data_for_csv_files_bought_and_sold(
     except csv.Error as e:
         print(f"Error while writing CSV file: {e}")
 
-def find_product(list_with_transactions: list, product_name: str ) -> str or list:
+def find_product(list_with_transactions: list, product_name: str ) -> str or list:  
     for buy_transaction_record in list_with_transactions:
         if buy_transaction_record[1] == product_name: 
             return buy_transaction_record

@@ -22,29 +22,29 @@ def main():
     # CONFIGURATION:
     '''
     For definitions: see README_USER_MANUAL.md --> ch definitions.
-    For explanation of argparse commands and arguments --> see README_USER_MANUAL.md --> ch argparse commands and arguments.
-    For ucs with these commands and arguments --> see README_USER_MANUAL.md --> ch use cases (ucs)
+    For explanation of argparse commands and arguments --> see README_USER_MANUAL.md --> chapter Superpy Functionality.
 
-    Scope: only subparser create_mock_data uses the following configurable variables as default values for its optional arguments. 
+    Scope: only subparser create_mock_data uses the following configurable variables as default values for its optional arguments.
+    e.g. 
+    py super.py create_mock_data -denr 2 -hp 9.99 -lp 0.09 -mu 3 -nopro 3 -nopri 20 -sl 10 -tt 3 -lby 2029 -lbm 1 -lbd 1 -ubm 0 -ubw 4 -ubd 0  
     Change them at your liking.
     '''
-    
-    DELETE_EVERY_NTH_ROW_IN_SOLDCSV = 2    
-    HIGHEST_PRICE_IN_RANGE = 9.99 # euro
-    LOWEST_PRICE_IN_RANGE = 0.09 # euro
-    MARKUP = 3 # factor
-    NR_OF_PRODUCTS = 3 
-    NR_OF_PRICES = 20
-    SHELF_LIFE = 10 # days
-    TURNOVER_TIME = 3 # days
-    UPPER_BOUNDARY_NR_OF_MONTHS = 0
-    UPPER_BOUNDARY_NR_OF_WEEKS = 4
-    UPPER_BOUNDARY_NR_OF_DAYS = 0
+    DELETE_EVERY_NTH_ROW_IN_SOLDCSV = 2     # -denr 2
+    HIGHEST_PRICE_IN_RANGE = 9.99 # euro    # -hp 9.99
+    LOWEST_PRICE_IN_RANGE = 0.09 # euro     # -lp 0.09
+    MARKUP = 3                              # -mu 3
+    NR_OF_PRODUCTS = 3                      # -nopro 3
+    NR_OF_PRICES = 20                       # -nopri 20
+    SHELF_LIFE = 10 # days                  # -sl 10
+    TURNOVER_TIME = 3 # days                # -tt 3
+    UPPER_BOUNDARY_NR_OF_MONTHS = 0         # -ubm 0
+    UPPER_BOUNDARY_NR_OF_WEEKS = 4          # -ubw 4
+    UPPER_BOUNDARY_NR_OF_DAYS = 0           # -ubd 0
     '''
     The following 3 variables get their default value from SYSTEM_DATE:
-        lower_boundary_year 
-        lower_boundary_month 
-        lower_boundary_day 
+        lower_boundary_year     # -lby 
+        lower_boundary_month    # -lbm
+        lower_boundary_day      # -lbd
     So update their default values by updating SYSTEM_DATE:
     e.g.: py super.py set_system_date 2030-10-11  
     '''
@@ -108,7 +108,9 @@ def main():
                 setattr(namespace, self.dest, NEXT_SUNDAY)
                 return                   
             try:
-                datetime.strptime(values, '%Y-%m-%d')
+                if re.match(r"\d{4}_\d{2}_\d{2}", values):
+                    values = values.replace("_", "-")
+                datetime.strptime(values, '%Y-%m-%d') 
                 setattr(namespace, self.dest, values)
             except ValueError:
                 parser.error(f"Wrong: format of  date should be YYYY-MM-DD, " \
